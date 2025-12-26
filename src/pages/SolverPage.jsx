@@ -1,10 +1,18 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import InputSection from '../components/InputSection';
 import ResultSection from '../components/ResultSection';
 import { useSolver } from '../hooks/useSolver';
+import { logEvent } from "firebase/analytics";
+import { analytics } from "../utils/firebase";
+import { useLocation } from 'react-router-dom';
 
 const SolverPage = () => {
     const { input, setInput, handleSolve, result, error, isLoading, apiKey, setApiKey } = useSolver();
+    const location = useLocation();
+
+    useEffect(() => {
+        logEvent(analytics, 'page_view', {page_path: location.pathname, page_title: 'Solver' });
+    }, [location]);
 
     return (
         <>

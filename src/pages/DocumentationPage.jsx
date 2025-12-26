@@ -1,6 +1,14 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { logEvent } from "firebase/analytics";
+import { analytics } from "../utils/firebase";
+import { useLocation } from 'react-router-dom';
 
 const DocumentationPage = () => {
+    const location = useLocation();
+    useEffect(() => {
+        logEvent(analytics, 'page_view', { page_path: location.pathname, page_title: 'Documentation' });
+    }, [location]);
+
     return (
         <div className="w-full max-w-4xl mx-auto">
             <h2 className="text-3xl font-bold text-slate-900 mb-8 border-b border-slate-200 pb-4 flex items-center gap-3">
