@@ -57,46 +57,136 @@
   },
   "documentation": {
     "title": "Dokumentasi & Panduan",
+    "introduction": {
+      "title": "Selamat Datang di Pembelajaran Pola",
+      "content": "Alat ini membantu Anda menemukan pola tersembunyi dalam deret angka. Lebih dari sekadar memecahkan—pelajari cara berpikir tentang pola, memahami hubungan matematis, dan memprediksi yang akan datang."
+    },
     "how_to_use": {
       "title": "Cara Menggunakan",
-      "content": "Masukkan deret angka dipisahkan koma atau spasi (cth: <1>2, 4, 6, 8</1>). Pemecah akan otomatis mendeteksi pola dan memprediksi angka berikutnya."
+      "intro": "Masukkan deret angka dipisahkan koma atau spasi. Pemecah akan menganalisis pola dan memprediksi angka berikutnya.",
+      "valid_examples": {
+        "title": "Contoh Input Valid",
+        "integers": "Bilangan bulat: <1>2, 4, 6, 8</1>",
+        "negatives": "Bilangan negatif: <1>5, 3, 1, -1, -3</1>",
+        "decimals": "Desimal: <1>1.5, 3.0, 4.5, 6.0</1>",
+        "mixed": "Tanda campuran: <1>-10, -5, 0, 5, 10</1>"
+      },
+      "invalid_examples": {
+        "title": "Input Tidak Valid & Pesan Error",
+        "too_few": "Terlalu sedikit angka: <1>3, 5</1> → \"Butuh minimal 3 angka\"",
+        "non_numeric": "Teks di deret: <1>2, empat, 6</1> → \"Format angka tidak valid\"",
+        "empty": "Input kosong → \"Silakan masukkan deret\"",
+        "special_chars": "Karakter khusus: <1>2, @, 4</1> → \"Format angka tidak valid\""
+      },
+      "guidelines": {
+        "title": "Panduan Input",
+        "tip1": "Gunakan minimal 3 angka untuk deteksi pola yang akurat",
+        "tip2": "Pisahkan angka dengan koma atau spasi",
+        "tip3": "Lebih banyak angka = akurasi lebih baik (disarankan: 4-6 angka)",
+        "tip4": "Bilangan bulat dan desimal didukung"
+      }
+    },
+    "recognition_guide": {
+      "title": "Cara Mengenali Pola",
+      "intro": "Sebelum alat memecahkannya, coba identifikasi polanya sendiri! Berikut strategi sederhana:",
+      "step1": {
+        "title": "Langkah 1: Periksa Selisihnya",
+        "desc": "Kurangi setiap angka dari angka berikutnya. Jika selisihnya konstan, itu <1>Aritmatika</1>.",
+        "example": "Deret: 3, 7, 11, 15",
+        "calculation": "7-3=4, 11-7=4, 15-11=4 → Selisih konstan +4"
+      },
+      "step2": {
+        "title": "Langkah 2: Periksa Rasionya",
+        "desc": "Bagi setiap angka dengan angka sebelumnya. Jika rasionya konstan, itu <1>Geometri</1>.",
+        "example": "Deret: 2, 6, 18, 54",
+        "calculation": "6÷2=3, 18÷6=3, 54÷18=3 → Rasio konstan ×3"
+      },
+      "step3": {
+        "title": "Langkah 3: Periksa Pola Selang-seling atau Kompleks",
+        "desc": "Jika keduanya tidak berhasil, cari deret selang-seling atau pola khusus seperti Fibonacci.",
+        "example": "Deret: 1, 10, 2, 20, 3",
+        "calculation": "Posisi ganjil: 1, 2, 3 (+1) | Posisi genap: 10, 20 (+10) → Selang-seling!"
+      }
     },
     "api_key": {
       "title": "Pola Kompleks & Kunci API",
-      "required_title": "Kunci API Gemini Diperlukan untuk Pemecahan Lanjut",
-      "required_desc": "Pola dasar (Aritmatika, Geometri) bekerja luring, namun <1>Pola Kompleks, Selang-seling, atau Abstrak</1> membutuhkan AI Gemini Google.",
+      "intro": "Sebagian besar pola bekerja luring, tapi beberapa memerlukan AI Gemini Google untuk penalaran lanjutan.",
+      "basic_features": {
+        "title": "Tersedia Tanpa Kunci API (Luring)",
+        "patterns": "Aritmatika, Geometri, Beda Bertingkat, Pangkat Sempurna, Fibonacci",
+        "example1": "Aritmatika: <1>5, 10, 15, 20</1> → Bekerja luring",
+        "example2": "Geometri: <1>2, 8, 32, 128</1> → Bekerja luring",
+        "example3": "Dua Tingkat: <1>1, 2, 4, 7, 11</1> → Bekerja luring",
+        "example4": "Kuadrat: <1>1, 4, 9, 16, 25</1> → Bekerja luring"
+      },
+      "advanced_features": {
+        "title": "Memerlukan Kunci API Gemini",
+        "patterns": "Deret selang-seling, Pola bergantian kompleks, Teka-teki logika abstrak",
+        "example1": "Selang-seling: <1>1, 10, 2, 20, 3, 30</1> → Butuh kunci API",
+        "example2": "Operasi bergantian: <1>1, 2, 4, 5, 10, 11</1> → Butuh kunci API",
+        "example3": "Logika kompleks: <1>1, 1, 2, 3, 5, 8</1> (jika tidak terdeteksi sebagai Fibonacci) → Butuh kunci API",
+        "example4": "Pola abstrak: <1>2, 3, 5, 7, 11</1> (bilangan prima) → Butuh kunci API"
+      },
       "get_key": "Dapatkan Kunci API Gemini",
       "note": "Setelah mendapatkan kunci, verifikasi tautan proyek dan akun tagihan Anda jika perlu."
     },
     "supported_patterns": {
-      "title": "Pola yang Didukung",
+      "title": "Jenis Pola yang Didukung",
       "arithmetic": {
         "name": "Barisan Aritmatika",
-        "desc": "Tambah/kurang nilai konstan"
+        "desc": "Setiap angka bertambah atau berkurang dengan nilai konstan",
+        "thought_process": "Cari: Apakah selisih antara angka berurutan selalu sama?",
+        "example_sequence": "Contoh: 3, 7, 11, 15",
+        "step_by_step": "Selisih: 7-3=4, 11-7=4, 15-11=4 → Selisih konstan = +4",
+        "next_prediction": "Angka berikutnya: 15 + 4 = 19"
       },
       "geometric": {
         "name": "Barisan Geometri",
-        "desc": "Kali/bagi dengan konstan"
+        "desc": "Setiap angka dikalikan atau dibagi dengan rasio konstan",
+        "thought_process": "Cari: Apakah Anda mengalikan atau membagi dengan angka yang sama setiap kali?",
+        "example_sequence": "Contoh: 3, 6, 12, 24",
+        "step_by_step": "Rasio: 6÷3=2, 12÷6=2, 24÷12=2 → Rasio konstan = ×2",
+        "next_prediction": "Angka berikutnya: 24 × 2 = 48"
       },
       "fibonacci": {
         "name": "Deret Fibonacci",
-        "desc": "Jumlah dua angka sebelumnya"
+        "desc": "Setiap angka adalah jumlah dari dua angka sebelumnya",
+        "thought_process": "Cari: Apakah menjumlahkan dua angka terakhir menghasilkan angka berikutnya?",
+        "example_sequence": "Contoh: 1, 1, 2, 3, 5, 8",
+        "step_by_step": "Periksa: 1+1=2 ✓, 1+2=3 ✓, 2+3=5 ✓, 3+5=8 ✓",
+        "next_prediction": "Angka berikutnya: 5 + 8 = 13"
       },
       "triangular": {
         "name": "Bilangan Segitiga",
-        "desc": "Menambah bilangan bulat menaik"
+        "desc": "Selisih antara angka bertambah 1 setiap kali",
+        "thought_process": "Cari: Apakah selisih membentuk deret seperti 1, 2, 3, 4...?",
+        "example_sequence": "Contoh: 1, 3, 6, 10, 15",
+        "step_by_step": "Selisih: 3-1=2, 6-3=3, 10-6=4, 15-10=5 → Bertambah 1",
+        "next_prediction": "Selisih berikutnya: 6, jadi 15 + 6 = 21"
       },
       "interleaved": {
         "name": "Deret Selang-seling",
-        "desc": "Dua pola bergantian"
+        "desc": "Dua pola terpisah bergantian posisi demi posisi",
+        "thought_process": "Cari: Apakah posisi ganjil dan genap mengikuti aturan berbeda?",
+        "example_sequence": "Contoh: 1, 10, 2, 20, 3, 30",
+        "step_by_step": "Posisi ganjil (1, 3, 5): 1, 2, 3 (+1) | Posisi genap (2, 4, 6): 10, 20, 30 (+10)",
+        "next_prediction": "Berikutnya (posisi ke-7): 4 | Berikutnya (posisi ke-8): 40"
       },
       "perfect_powers": {
         "name": "Pangkat Sempurna",
-        "desc": "Pangkat bilangan bulat"
+        "desc": "Angka adalah pangkat sempurna dari bilangan bulat (n², n³, dll.)",
+        "thought_process": "Cari: Apakah ini angka yang didapat dari mengkuadratkan atau mengkubikkan bilangan bulat?",
+        "example_sequence": "Contoh: 1, 4, 9, 16, 25",
+        "step_by_step": "Periksa: 1²=1, 2²=4, 3²=9, 4²=16, 5²=25 → Kuadrat sempurna!",
+        "next_prediction": "Angka berikutnya: 6² = 36"
       },
       "two_level": {
         "name": "Beda Bertingkat",
-        "desc": "Perubahan konstan pada selisih"
+        "desc": "Selisih tidak konstan, tapi perubahan selisihnya konstan",
+        "thought_process": "Cari: Jika selisih bervariasi, periksa apakah selisih dari selisih itu konstan.",
+        "example_sequence": "Contoh: 1, 2, 4, 7, 11",
+        "step_by_step": "Selisih tingkat 1: 1, 2, 3, 4 (tidak konstan) | Selisih tingkat 2: 1, 1, 1 (konstan!)",
+        "next_prediction": "Selisih tingkat 1 berikutnya: 5, jadi 11 + 5 = 16"
       }
     }
   },
