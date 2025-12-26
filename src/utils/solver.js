@@ -3,15 +3,15 @@
  * Detects patterns in number sequences.
  */
 
-export const solveSequence = (input) => {
+const solveSequence = (input) => {
   // Parse input: allow commas, spaces, etc.
   const nums = input
     .split(/[\s,]+/)
     .map(Number)
-    .filter((n) => !isNaN(n));
+    .filter((n) => !Number.isNaN(n));
 
   if (nums.length < 3) {
-    return { error: "Please enter at least 3 numbers." };
+    return { error: 'Please enter at least 3 numbers.' };
   }
 
   // Visual data structure: { nodes: [{val, label}], links: [{label, type}] }
@@ -43,10 +43,10 @@ export const solveSequence = (input) => {
   result = detectPower(nums);
   if (result) return result;
 
-  return { error: "Pattern not found." };
+  return { error: 'Pattern not found.' };
 };
 
-const detectInterleaved = (nums) => {
+function detectInterleaved(nums) {
   // Requires at least 4 numbers to reliably detect 2 patterns (2 for each)
   if (nums.length < 4) return null;
 
@@ -100,12 +100,12 @@ const detectInterleaved = (nums) => {
     // Add prediction nodes
     nodes.push({
       value: predictions[0],
-      label: isLastEven ? "Next (Odd)" : "Next (Even)",
+      label: isLastEven ? 'Next (Odd)' : 'Next (Even)',
       isPrediction: true,
     });
     nodes.push({
       value: predictions[1],
-      label: isLastEven ? "Next (Even)" : "Next (Odd)",
+      label: isLastEven ? 'Next (Even)' : 'Next (Odd)',
       isPrediction: true,
     });
 
@@ -138,9 +138,7 @@ const detectInterleaved = (nums) => {
       // Local solver doesn't easily expose the raw diff/ratio in consistent way except in 'rule' text or last link.
       // Let's grab the label from the last link of sub-result if exists
       const lastLink =
-        resEven.visualization.connections[
-          resEven.visualization.connections.length - 1
-        ];
+        resEven.visualization.connections[resEven.visualization.connections.length - 1];
       if (lastLink) {
         connections.push({
           fromIndex: lastEvenGlobalIndex,
@@ -166,9 +164,7 @@ const detectInterleaved = (nums) => {
       const targetOddPredIndex = isLastEven ? nums.length : nums.length + 1;
 
       const lastLink =
-        resOdd.visualization.connections[
-          resOdd.visualization.connections.length - 1
-        ];
+        resOdd.visualization.connections[resOdd.visualization.connections.length - 1];
       if (lastLink) {
         connections.push({
           fromIndex: lastOddGlobalIndex,
@@ -180,7 +176,7 @@ const detectInterleaved = (nums) => {
     }
 
     return {
-      type: "Interleaved Sequence",
+      type: 'Interleaved Sequence',
       rule: `Interleaved: [${resEven.type}] and [${resOdd.type}]`,
       next,
       predictions,
@@ -190,13 +186,11 @@ const detectInterleaved = (nums) => {
   }
 
   return null;
-};
+}
 
-const detectArithmetic = (nums) => {
+function detectArithmetic(nums) {
   const diff = nums[1] - nums[0];
-  const isArithmetic = nums.every(
-    (n, i) => i === 0 || n - nums[i - 1] === diff
-  );
+  const isArithmetic = nums.every((n, i) => i === 0 || n - nums[i - 1] === diff);
 
   if (isArithmetic) {
     const next = nums[nums.length - 1] + diff;
@@ -204,35 +198,33 @@ const detectArithmetic = (nums) => {
 
     // Visualization
     const nodes = nums.map((n, i) => ({ value: n, label: `i=${i}` }));
-    nodes.push({ value: next, label: "Next", isPrediction: true });
+    nodes.push({ value: next, label: 'Next', isPrediction: true });
 
     const connections = [];
-    for (let i = 0; i < nums.length; i++) {
+    for (let i = 0; i < nums.length; i += 1) {
       connections.push({
         fromIndex: i,
         toIndex: i + 1,
         label: diff >= 0 ? `+${diff}` : `${diff}`,
-        type: diff >= 0 ? "add" : "sub",
+        type: diff >= 0 ? 'add' : 'sub',
       });
     }
 
     return {
-      type: "Arithmetic Progression",
+      type: 'Arithmetic Progression',
       rule,
       next,
       visualization: { nodes, connections },
     };
   }
   return null;
-};
+}
 
-const detectGeometric = (nums) => {
+function detectGeometric(nums) {
   if (nums.includes(0)) return null; // Avoid division by zero issues for simple geo
   const ratio = nums[1] / nums[0];
   // Check if all follow ratio (allow small float error? No, assume integer sequences for now or precise floats)
-  const isGeometric = nums.every(
-    (n, i) => i === 0 || Math.abs(n / nums[i - 1] - ratio) < 0.0001
-  );
+  const isGeometric = nums.every((n, i) => i === 0 || Math.abs(n / nums[i - 1] - ratio) < 0.0001);
 
   if (isGeometric) {
     const next = nums[nums.length - 1] * ratio;
@@ -242,31 +234,31 @@ const detectGeometric = (nums) => {
     const nodes = nums.map((n, i) => ({ value: n, label: `i=${i}` }));
     nodes.push({
       value: parseFloat(next.toFixed(2)),
-      label: "Next",
+      label: 'Next',
       isPrediction: true,
     });
 
     const connections = [];
-    for (let i = 0; i < nums.length; i++) {
+    for (let i = 0; i < nums.length; i += 1) {
       connections.push({
         fromIndex: i,
         toIndex: i + 1,
         label: `x${parseFloat(ratio.toFixed(2))}`,
-        type: "mul",
+        type: 'mul',
       });
     }
 
     return {
-      type: "Geometric Progression",
+      type: 'Geometric Progression',
       rule,
       next: parseFloat(next.toFixed(2)),
       visualization: { nodes, connections },
     };
   }
   return null;
-};
+}
 
-const detectFibonacci = (nums) => {
+function detectFibonacci(nums) {
   // Standard fib: next = sum of prev two
   // Check if n[i] = n[i-1] + n[i-2] for i >= 2
   const isFib = nums.every((n, i) => i < 2 || n === nums[i - 1] + nums[i - 2]);
@@ -275,25 +267,25 @@ const detectFibonacci = (nums) => {
     const next = nums[nums.length - 1] + nums[nums.length - 2];
     const nodes = [
       ...nums.map((n, i) => ({ value: n, label: `i=${i}` })),
-      { value: next, label: "Next", isPrediction: true },
+      { value: next, label: 'Next', isPrediction: true },
     ];
 
     // Fib has connections from i-2 and i-1 to i. But for simple linear visualization we might just showing +?
     // Actually fib is tricky to visualize linearly. Let's do simple i to i+1 flow with 'sum' label for now, or maybe arcs?
     // Let's stick to simple flow for now as local solver is basic.
     const connections = [];
-    for (let i = 0; i < nums.length; i++) {
+    for (let i = 0; i < nums.length; i += 1) {
       connections.push({
         fromIndex: i,
         toIndex: i + 1,
-        label: "sum",
-        type: "add",
+        label: 'sum',
+        type: 'add',
       });
     }
 
     return {
-      type: "Fibonacci Sequence",
-      rule: "Sum of previous two numbers",
+      type: 'Fibonacci Sequence',
+      rule: 'Sum of previous two numbers',
       next,
       visualization: {
         nodes,
@@ -302,13 +294,13 @@ const detectFibonacci = (nums) => {
     };
   }
   return null;
-};
+}
 
-const detectTwoLevel = (nums) => {
+function detectTwoLevel(nums) {
   // Differences of differences are constant
   // 1, 2, 4, 7, 11 (diffs: 1, 2, 3, 4 -> diffs2: 1, 1, 1)
   const diffs = [];
-  for (let i = 1; i < nums.length; i++) diffs.push(nums[i] - nums[i - 1]);
+  for (let i = 1; i < nums.length; i += 1) diffs.push(nums[i] - nums[i - 1]);
 
   // Check if diffs are arithmetic
   const subResult = detectArithmetic(diffs);
@@ -318,23 +310,23 @@ const detectTwoLevel = (nums) => {
 
     const nodes = [
       ...nums.map((n, i) => ({ value: n, label: `i=${i}` })),
-      { value: next, label: "Next", isPrediction: true },
+      { value: next, label: 'Next', isPrediction: true },
     ];
     const connections = diffs.map((d, i) => ({
       fromIndex: i,
       toIndex: i + 1,
       label: d >= 0 ? `+${d}` : `${d}`,
-      type: "add",
+      type: 'add',
     }));
     connections.push({
       fromIndex: nums.length - 1,
       toIndex: nums.length,
       label: `+${nextDiff}`,
-      type: "add",
+      type: 'add',
     });
 
     return {
-      type: "2-Level Arithmetic",
+      type: '2-Level Arithmetic',
       rule: `Differences increase by constant`,
       next,
       visualization: {
@@ -344,9 +336,9 @@ const detectTwoLevel = (nums) => {
     };
   }
   return null;
-};
+}
 
-const detectPower = (nums) => {
+function detectPower(nums) {
   // Check if n = i^2 or i^3 (assuming 1-based or 0-based index?)
   // Or just check if sqrt is int?
   // 1, 4, 9, 16
@@ -359,23 +351,23 @@ const detectPower = (nums) => {
       const next = nextRoot * nextRoot;
 
       const connections = [];
-      for (let i = 0; i < nums.length; i++) {
+      for (let i = 0; i < nums.length; i += 1) {
         connections.push({
           fromIndex: i,
           toIndex: i + 1,
-          label: "^2",
-          type: "pow",
+          label: '^2',
+          type: 'pow',
         });
       }
 
       return {
-        type: "Perfect Squares",
-        rule: "Squares of integers",
+        type: 'Perfect Squares',
+        rule: 'Squares of integers',
         next,
         visualization: {
           nodes: [
             ...nums.map((n, i) => ({ value: n, label: `i=${i}` })),
-            { value: next, label: "Next", isPrediction: true },
+            { value: next, label: 'Next', isPrediction: true },
           ],
           connections,
         },
@@ -383,4 +375,6 @@ const detectPower = (nums) => {
     }
   }
   return null;
-};
+}
+
+export default solveSequence;

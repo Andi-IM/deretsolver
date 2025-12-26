@@ -1,10 +1,10 @@
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
-import { playwright } from "@vitest/browser-playwright";
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import { playwright } from '@vitest/browser-playwright';
 
 export default defineConfig({
   plugins: [react()],
-  envPrefix: ["VITE_", "GOOGLE_AI_APIKEY"],
+  envPrefix: ['VITE_', 'GOOGLE_AI_APIKEY'],
   test: {
     globals: true,
     // Browser mode often requires no 'setupFiles' if they rely on Node/JSDOM
@@ -12,9 +12,9 @@ export default defineConfig({
     browser: {
       enabled: true,
       provider: playwright(),
-      instances: [{ browser: "chromium" }],
+      instances: [{ browser: 'chromium' }],
     },
-    // eslint-disable-next-line no-undef
-    reporters: process.env.GITHUB_ACTIONS ? ["dot", "github-actions"] : ["dot"],
+
+    reporters: process.env.GITHUB_ACTIONS ? ['dot', 'github-actions'] : ['dot'],
   },
 });

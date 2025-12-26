@@ -1,6 +1,6 @@
-import { GoogleGenAI } from "@google/genai";
-import { z } from "zod";
-import { zodToJsonSchema } from "zod-to-json-schema";
+import { GoogleGenAI } from '@google/genai';
+import { z } from 'zod';
+import { zodToJsonSchema } from 'zod-to-json-schema';
 
 /**
  * Solves a number sequence using the Gemini API.
@@ -8,64 +8,58 @@ import { zodToJsonSchema } from "zod-to-json-schema";
  * @param {string} apiKey - The user's Gemini API Key.
  * @returns {Promise<Object>} - The sequence analysis result or an error object.
  */
-export const solveWithGemini = async (input, apiKey) => {
+const solveWithGemini = async (input, apiKey) => {
   if (!apiKey) {
     return {
       error:
-        "Complex patterns require a Gemini API Key. Please enter it in the Input section settings.",
+        'Complex patterns require a Gemini API Key. Please enter it in the Input section settings.',
     };
   }
 
   try {
-    const client = new GoogleGenAI({ apiKey: apiKey });
+    const client = new GoogleGenAI({ apiKey });
 
     // Poin 1: Schema yang Disederhanakan
     const errorSchema = z.object({
       error: z
         .string()
-        .describe(
-          "Error message when pattern identification fails or input is invalid"
-        ),
+        .describe('Error message when pattern identification fails or input is invalid'),
     });
 
     const digitPatternSchema = z.object({
       type: z
         .string()
         .describe(
-          "Pattern type: 'Arithmetic', 'Geometric', 'Fibonacci', 'Interleaved Arithmetic', etc."
+          "Pattern type: 'Arithmetic', 'Geometric', 'Fibonacci', 'Interleaved Arithmetic', etc.",
         ),
 
       rule: z
         .string()
-        .describe(
-          "Clear explanation of the pattern logic with mathematical operations"
-        ),
+        .describe('Clear explanation of the pattern logic with mathematical operations'),
 
-      next: z.number().describe("Next predicted number in sequence"),
+      next: z.number().describe('Next predicted number in sequence'),
 
       // Simplified visualization - flatten structure
       sequenceValues: z
         .array(z.number())
-        .describe("All sequence values including the prediction at the end"),
+        .describe('All sequence values including the prediction at the end'),
 
       sequenceLabels: z
         .array(z.string())
-        .describe(
-          "Labels for each value in order, e.g., 'n1', 'n2', 'n3', 'predicted'"
-        ),
+        .describe("Labels for each value in order, e.g., 'n1', 'n2', 'n3', 'predicted'"),
 
       connections: z.preprocess(
         (val) => {
           // Handle array of stringified JSON objects
           if (Array.isArray(val)) {
             return val.map((item) => {
-              if (typeof item === "string") {
+              if (typeof item === 'string') {
                 try {
                   // Parse the stringified JSON and remove backslashes
-                  const cleaned = item.replace(/\\/g, "");
+                  const cleaned = item.replace(/\\/g, '');
                   return JSON.parse(cleaned);
                 } catch (e) {
-                  console.error("Failed to parse connection item:", item, e);
+                  console.error('Failed to parse connection item:', item, e);
                   return item; // Return as-is if parsing fails
                 }
               }
@@ -77,40 +71,30 @@ export const solveWithGemini = async (input, apiKey) => {
         z
           .array(
             z.object({
-              fromIndex: z
-                .number()
-                .describe("Index of the source value in sequenceValues"),
-              toIndex: z
-                .number()
-                .describe("Index of the target value in sequenceValues"),
+              fromIndex: z.number().describe('Index of the source value in sequenceValues'),
+              toIndex: z.number().describe('Index of the target value in sequenceValues'),
               label: z.string().describe("Operation label, e.g., '+3', 'x2'"),
-              type: z
-                .enum(["add", "sub", "mul", "pow", "other"])
-                .describe("Type of operation"),
-            })
+              type: z.enum(['add', 'sub', 'mul', 'pow', 'other']).describe('Type of operation'),
+            }),
           )
-          .describe(
-            "List of connections between values to visualize the pattern logic."
-          )
+          .describe('List of connections between values to visualize the pattern logic.'),
       ),
 
       isInterleaved: z
         .boolean()
-        .describe(
-          "True if the sequence is composed of multiple interleaved sequences"
-        ),
+        .describe('True if the sequence is composed of multiple interleaved sequences'),
 
       predictions: z
         .array(z.number())
         .describe(
-          "If interleaved, provide the next value for EACH sub-sequence. If single pattern, this array contains just the single 'next' value."
+          "If interleaved, provide the next value for EACH sub-sequence. If single pattern, this array contains just the single 'next' value.",
         ),
     });
 
     const providedSchema = z.union([digitPatternSchema, errorSchema]);
 
     // Poin 3: Gunakan Model Lebih Stabil
-    const model = "gemini-2.5-flash";
+    const model = 'gemini-2.5-flash';
 
     // Poin 2: Prompt dengan Instruksi Lebih Spesifik
     const prompt = `
@@ -174,21 +158,21 @@ Provide accurate and consistent data for all fields.
     `.trim();
 
     const response = await client.models.generateContent({
-      model: model,
+      model,
       contents: prompt,
       config: {
-        responseMimeType: "application/json",
+        responseMimeType: 'application/json',
         responseSchema: zodToJsonSchema(providedSchema),
       },
     });
 
-    console.log("Raw response:", response.text);
-    console.log("Parsed JSON: ", JSON.parse(response.text));
+    console.log('Raw response:', response.text);
+    console.log('Parsed JSON: ', JSON.parse(response.text));
     const parsedJson = providedSchema.parse(JSON.parse(response.text));
 
     return parsedJson;
   } catch (err) {
-    console.error("Gemini API Error:", err);
+    console.error('Gemini API Error:', err);
     return {
       error: `Failed to connect to Gemini API: ${
         err.message || err
@@ -196,3 +180,5 @@ Provide accurate and consistent data for all fields.
     };
   }
 };
+
+export default solveWithGemini;

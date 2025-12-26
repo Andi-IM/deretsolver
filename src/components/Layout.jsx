@@ -1,14 +1,11 @@
-import { Link, useLocation } from "react-router-dom";
-import LanguageSwitcher from "./LanguageSwitcher";
+import { Link, useLocation } from 'react-router-dom';
+import LanguageSwitcher from './LanguageSwitcher';
 
-const Layout = ({ children }) => {
+function Layout({ children }) {
   const location = useLocation();
 
-  const isActive = (path) => {
-    return location.pathname === path
-      ? "text-blue-600"
-      : "hover:text-slate-900 transition-colors";
-  };
+  const isActive = (path) =>
+    location.pathname === path ? 'text-blue-600' : 'hover:text-slate-900 transition-colors';
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 font-sans text-slate-800 antialiased">
@@ -43,24 +40,22 @@ const Layout = ({ children }) => {
                 />
               </svg>
             </div>
-            <h1 className="text-lg font-bold tracking-tight text-slate-900">
-              Deret Solver
-            </h1>
+            <h1 className="text-lg font-bold tracking-tight text-slate-900">Deret Solver</h1>
           </Link>
 
           <div className="flex items-center gap-4 sm:gap-8">
             <nav className="hidden sm:flex items-center gap-8 text-sm font-medium text-slate-500">
-              <Link className={isActive("/")} to="/">
+              <Link className={isActive('/')} to="/">
                 Solver
               </Link>
-              <Link className={isActive("/docs")} to="/docs">
+              <Link className={isActive('/docs')} to="/docs">
                 Documentation
               </Link>
             </nav>
 
             <div className="flex items-center gap-2">
               <LanguageSwitcher />
-              <button className="sm:hidden p-2 text-slate-500">
+              <button type="button" className="sm:hidden p-2 text-slate-500">
                 <span className="material-symbols-outlined">menu</span>
               </button>
             </div>
@@ -74,13 +69,11 @@ const Layout = ({ children }) => {
 
       <footer className="mt-auto py-8 border-t border-slate-200 bg-white">
         <div className="max-w-5xl mx-auto px-4 text-center">
-          <p className="text-sm text-slate-400">
-            © 2023 Deret Solver. Mathematics made visual.
-          </p>
+          <p className="text-sm text-slate-400">© 2023 Deret Solver. Mathematics made visual.</p>
         </div>
       </footer>
     </div>
   );
-};
+}
 
 export default Layout;

@@ -1,13 +1,11 @@
-import { useState } from "react";
-import { solveSequence } from "../utils/solver";
-import { solveWithGemini } from "../utils/geminiSolver";
+import { useState } from 'react';
+import solveSequence from '../utils/solver';
+import solveWithGemini from '../utils/geminiSolver';
 
 export const useSolver = () => {
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState('');
   const [apiKey, setApiKey] = useState(
-    import.meta.env.GOOGLE_AI_APIKEY ||
-      import.meta.env.VITE_GEMINI_API_KEY ||
-      ""
+    import.meta.env.GOOGLE_AI_APIKEY || import.meta.env.VITE_GEMINI_API_KEY || '',
   );
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
@@ -30,25 +28,23 @@ export const useSolver = () => {
     if (input.trim().length > 0) {
       setIsLoading(true);
       const geminiRes = await solveWithGemini(input, apiKey);
-      const transformToNestedFormat = (result) => {
-        if (result.error) return result;
+      const transformToNestedFormat = (solverResult) => {
+        if (solverResult.error) return solverResult;
 
-        const predictionCount = result.predictions
-          ? result.predictions.length
-          : 1;
-        const nodes = result.sequenceValues.map((value, i) => ({
+        const predictionCount = solverResult.predictions ? solverResult.predictions.length : 1;
+        const nodes = solverResult.sequenceValues.map((value, i) => ({
           value,
-          label: result.sequenceLabels[i],
-          isPrediction: i >= result.sequenceValues.length - predictionCount,
+          label: solverResult.sequenceLabels[i],
+          isPrediction: i >= solverResult.sequenceValues.length - predictionCount,
         }));
 
         return {
-          type: result.type,
-          rule: result.rule,
-          next: result.next,
-          predictions: result.predictions,
-          isInterleaved: result.isInterleaved,
-          visualization: { nodes, connections: result.connections },
+          type: solverResult.type,
+          rule: solverResult.rule,
+          next: solverResult.next,
+          predictions: solverResult.predictions,
+          isInterleaved: solverResult.isInterleaved,
+          visualization: { nodes, connections: solverResult.connections },
         };
       };
 
@@ -77,3 +73,5 @@ export const useSolver = () => {
     setError,
   };
 };
+
+export default useSolver;
