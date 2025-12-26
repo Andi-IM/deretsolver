@@ -192,7 +192,7 @@ const detectInterleaved = (nums) => {
   return null;
 };
 
-const detectPower = (nums) => {
+const detectArithmetic = (nums) => {
   const diff = nums[1] - nums[0];
   const isArithmetic = nums.every(
     (n, i) => i === 0 || n - nums[i - 1] === diff

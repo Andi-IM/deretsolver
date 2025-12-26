@@ -1,7 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 import { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
-import { recursiveUnescape } from "./strings";
 
 /**
  * Solves a number sequence using the Gemini API.
@@ -54,9 +53,21 @@ export const solveWithGemini = async (input, apiKey) => {
 
       connections: z.preprocess(
         (val) => {
-          if (typeof val == "string") {
-            // trim whitespace and remove backslash symbols
-            return val.replace(/\\/g, "");
+          // Handle array of stringified JSON objects
+          if (Array.isArray(val)) {
+            return val.map((item) => {
+              if (typeof item === "string") {
+                try {
+                  // Parse the stringified JSON and remove backslashes
+                  const cleaned = item.replace(/\\/g, "");
+                  return JSON.parse(cleaned);
+                } catch (e) {
+                  console.error("Failed to parse connection item:", item, e);
+                  return item; // Return as-is if parsing fails
+                }
+              }
+              return item; // Already an object
+            });
           }
           return val;
         },
