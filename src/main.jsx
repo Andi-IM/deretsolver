@@ -9,7 +9,10 @@ import App from './App';
 import './i18n';
 
 createRoot(document.getElementById('root')).render(
-  <GoogleReCaptchaProvider reCaptchaKey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}>
+  <GoogleReCaptchaProvider
+    reCaptchaKey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
+    scriptProps={{ async: true }}
+  >
     <HelmetProvider>
       <StrictMode>
         <BrowserRouter>

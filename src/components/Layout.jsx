@@ -77,6 +77,27 @@ function Layout({ children }) {
             </Link>
           </div>
           <p className="text-sm text-slate-600">© 2023 Deret Solver. Mathematics made visual.</p>
+          <p className="text-xs text-slate-500">
+            This site is protected by reCAPTCHA and the Google{' '}
+            <a
+              href="https://policies.google.com/privacy"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:underline"
+            >
+              Privacy Policy
+            </a>{' '}
+            and{' '}
+            <a
+              href="https://policies.google.com/terms"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:underline"
+            >
+              Terms of Service
+            </a>{' '}
+            apply.
+          </p>
         </div>
       </footer>
     </div>

@@ -4,6 +4,8 @@
   font-family: 'Material Symbols Outlined';
   font-weight: normal;
   font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   font-size: 24px; /* Preferred icon size */
   display: inline-block;
   line-height: 1;
@@ -37,4 +39,10 @@
       transform: translateY(0);
     }
   }
+}
+
+/* Hide reCAPTCHA badge to prevent it from blocking content */
+/* Disclosure text is included in the footer as required */
+.grecaptcha-badge {
+  visibility: hidden;
 }
