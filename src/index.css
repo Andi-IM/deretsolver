@@ -1,0 +1,20 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #2094f3;
+  --color-success: #10b981;
+  --color-error: #ef4444;
+  --font-sans: Inter, sans-serif;
+}
+
+/* Custom animations if needed outside of standard tailwind */
+@layer utilities {
+  .animate-trans-y-in {
+    animation: trans-y-in 0.3s ease-out forwards;
+  }
+  
+  @keyframes trans-y-in {
+    0% { opacity: 0; transform: translateY(-10px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+}
