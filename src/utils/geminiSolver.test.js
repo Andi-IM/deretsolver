@@ -48,18 +48,13 @@ describe('solveWithGemini', () => {
 
     // Setup the mock chain: new GoogleGenAI() -> client.models.generateContent()
     const mockGenerateContent = vi.fn().mockResolvedValue(mockResponse);
-    // eslint-disable-next-line no-unused-vars
     const mockClient = {
       models: {
         generateContent: mockGenerateContent,
       },
     };
 
-    // Mock implementation must be a function that can be called with 'new'
-    // eslint-disable-next-line no-shadow
-    GoogleGenAI.mockImplementation(function mockClient() {
-      return mockClient;
-    });
+    GoogleGenAI.mockImplementation(() => mockClient);
 
     const result = await solveWithGemini(mockInput, mockApiKey);
 
@@ -73,16 +68,12 @@ describe('solveWithGemini', () => {
   it('handles API error gracefully', async () => {
     // Setup mock to reject
     const mockGenerateContent = vi.fn().mockRejectedValue(new Error('Network Error'));
-    // eslint-disable-next-line no-unused-vars
     const mockClient = {
       models: {
         generateContent: mockGenerateContent,
       },
     };
-    // eslint-disable-next-line no-shadow
-    GoogleGenAI.mockImplementation(function mockClient() {
-      return mockClient;
-    });
+    GoogleGenAI.mockImplementation(() => mockClient);
 
     const result = await solveWithGemini(mockInput, mockApiKey);
 
