@@ -1,9 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { GoogleGenAI } from '@google/genai';
 import solveWithGemini from './geminiSolver';
 
 // Mock the GoogleGenAI library
-vi.mock('@google/genai');
+const { MockGoogleGenAI } = vi.hoisted(() => ({
+  MockGoogleGenAI: vi.fn(class {}),
+}));
+
+vi.mock('@google/genai', () => ({
+  GoogleGenAI: MockGoogleGenAI,
+}));
 
 // Mock the logger to avoid Firebase initialization during tests
 vi.mock('./logger', () => ({
@@ -47,14 +52,16 @@ describe('solveWithGemini', () => {
     };
 
     // Setup the mock chain: new GoogleGenAI() -> client.models.generateContent()
-    const mockGenerateContent = vi.fn().mockResolvedValue(mockResponse);
-    const mockClient = {
-      models: {
-        generateContent: mockGenerateContent,
-      },
-    };
+    const mockGenerateContent = vi.fn(async () => mockResponse);
 
-    GoogleGenAI.mockImplementation(() => mockClient);
+    // eslint-disable-next-line prefer-arrow-callback
+    MockGoogleGenAI.mockImplementation(function mockConstructor() {
+      return {
+        models: {
+          generateContent: mockGenerateContent,
+        },
+      };
+    });
 
     const result = await solveWithGemini(mockInput, mockApiKey);
 
@@ -62,23 +69,28 @@ describe('solveWithGemini', () => {
     expect(result.type).toBe('Geometric Sequence');
     expect(result.next).toBe(32);
     expect(mockGenerateContent).toHaveBeenCalledTimes(1);
-    expect(GoogleGenAI).toHaveBeenCalledWith({ apiKey: mockApiKey });
+    expect(MockGoogleGenAI).toHaveBeenCalledWith({ apiKey: mockApiKey });
   });
 
   it('handles API error gracefully', async () => {
     // Setup mock to reject
-    const mockGenerateContent = vi.fn().mockRejectedValue(new Error('Network Error'));
-    const mockClient = {
-      models: {
-        generateContent: mockGenerateContent,
-      },
-    };
-    GoogleGenAI.mockImplementation(() => mockClient);
+    const mockGenerateContent = vi.fn(async () => {
+      throw new Error('Network Error');
+    });
+
+    // eslint-disable-next-line prefer-arrow-callback
+    MockGoogleGenAI.mockImplementation(function mockConstructor() {
+      return {
+        models: {
+          generateContent: mockGenerateContent,
+        },
+      };
+    });
 
     const result = await solveWithGemini(mockInput, mockApiKey);
 
     expect(result).toHaveProperty('error');
-    expect(result.error).toContain('Failed to connect');
+    expect(result.error).toContain('Failed to connect to Gemini API');
     expect(result.error).toContain('Network Error');
   });
 });
