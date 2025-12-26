@@ -1,6 +1,7 @@
 import { GoogleGenAI } from "@google/genai";
 import { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
+import { recursiveUnescape } from "./strings";
 
 /**
  * Solves a number sequence using the Gemini API.
@@ -51,17 +52,33 @@ export const solveWithGemini = async (input, apiKey) => {
           "Labels for each value in order, e.g., 'n1', 'n2', 'n3', 'predicted'"
         ),
 
-      operations: z
-        .array(z.string())
-        .describe(
-          "Operations between consecutive values, e.g., '+3', '×2', '^2'. Array length = sequenceValues.length - 1"
-        ),
-
-      operationTypes: z
-        .array(z.enum(["add", "sub", "mul", "pow", "other"]))
-        .describe(
-          "Type of each operation: add=addition, sub=subtraction, mul=multiplication, pow=power, other=complex. Same order as operations array"
-        ),
+      connections: z.preprocess(
+        (val) => {
+          if (typeof val == "string") {
+            // trim whitespace and remove backslash symbols
+            return val.replace(/\\/g, "");
+          }
+          return val;
+        },
+        z
+          .array(
+            z.object({
+              fromIndex: z
+                .number()
+                .describe("Index of the source value in sequenceValues"),
+              toIndex: z
+                .number()
+                .describe("Index of the target value in sequenceValues"),
+              label: z.string().describe("Operation label, e.g., '+3', 'x2'"),
+              type: z
+                .enum(["add", "sub", "mul", "pow", "other"])
+                .describe("Type of operation"),
+            })
+          )
+          .describe(
+            "List of connections between values to visualize the pattern logic."
+          )
+      ),
 
       isInterleaved: z
         .boolean()
@@ -79,7 +96,7 @@ export const solveWithGemini = async (input, apiKey) => {
     const providedSchema = z.union([digitPatternSchema, errorSchema]);
 
     // Poin 3: Gunakan Model Lebih Stabil
-    const model = "gemini-3-flash-preview"; // atau "gemini-2.5-flash" jika sudah tersedia
+    const model = "gemini-2.5-pro"; // atau "gemini-2.5-flash" jika sudah tersedia
 
     // Poin 2: Prompt dengan Instruksi Lebih Spesifik
     const prompt = `
@@ -93,29 +110,51 @@ Your tasks:
 5. Generate visualization data:
    - sequenceValues: List ALL numbers as an array (original sequence + ALL predicted values).
    - sequenceLabels: Create a label for each value (e.g., "n1", "n2", ..., "pred1", "pred2").
-   - operations: List the operation between each consecutive pair.
-   - operationTypes: Classify each operation (e.g.,"add", "sub", "mul", "pow", "other").
+   - connections: Create a list of connections to visualize the pattern.
+     - For standard sequences, connect n[i] to n[i+1].
+     - For interleaved or complex sequences, connect ONLY related terms (e.g., n[i] to n[i+2]).
    - isInterleaved: true/false
    - predictions: Array of predicted values.
+
+Example for standard "2, 4, 6":
+{
+  "type": "Arithmetic Sequence",
+  "rule": "Each number increases by 2",
+  "next": 8,
+  "sequenceValues": [2, 4, 6, 8],
+  "sequenceLabels": ["n1", "n2", "n3", "predicted"],
+  "connections": [
+    {"fromIndex": 0, "toIndex": 1, "label": "+2", "type": "add"},
+    {"fromIndex": 1, "toIndex": 2, "label": "+2", "type": "add"},
+    {"fromIndex": 2, "toIndex": 3, "label": "+2", "type": "add"}
+  ],
+  "isInterleaved": false,
+  "predictions": [8]
+}
 
 Example for interleaved "1, 10, 2, 20, 3":
 {
   "type": "Interleaved Sequence",
   "rule": "Sequence 1 increases by 1 (1, 2, 3...). Sequence 2 increases by 10 (10, 20...)",
   "next": 30, // Global next
-  "sequenceValues": [1, 10, 2, 20, 3, 30, 4], // 30 is next for seq2, 4 is next for seq1 (assuming alternating)
+  "sequenceValues": [1, 10, 2, 20, 3, 30, 4], // 30 is next for seq2, 4 is next for seq1
   "sequenceLabels": ["n1", "n2", "n3", "n4", "n5", "pred (Seq2)", "pred (Seq1)"],
-  "operations": [], 
-  "operationTypes": [],
+  "connections": [
+    {"fromIndex": 0, "toIndex": 2, "label": "+1", "type": "add"}, // 1 -> 2
+    {"fromIndex": 2, "toIndex": 4, "label": "+1", "type": "add"}, // 2 -> 3
+    {"fromIndex": 4, "toIndex": 6, "label": "+1", "type": "add"}, // 3 -> 4 (pred)
+    {"fromIndex": 1, "toIndex": 3, "label": "+10", "type": "add"}, // 10 -> 20
+    {"fromIndex": 3, "toIndex": 5, "label": "+10", "type": "add"}  // 20 -> 30 (pred)
+  ],
   "isInterleaved": true,
   "predictions": [30, 4] 
 }
 
 Important: 
-- The operations array length must equal sequenceValues.length - 1
-- For interleaved patterns, explain both sub-patterns in the rule
-- Populating 'predictions' is CRITICAL for interleaved sequences. It must contain the next value for EACH sub-pattern.
-- Ensure 'sequenceValues' contains the original sequence FOLLOWED BY the values in 'predictions' in the correct global order.
+- Identify the correct relationships. DO NOT connect unrelated numbers in interleaved sequences.
+- 'connections' replaces the old 'operations' list. Be precise with indices.
+- Ensure 'sequenceValues' contains the original sequence FOLLOWED BY the values in 'predictions'.
+- Populating 'predictions' is CRITICAL for interleaved sequences.
 
 Provide accurate and consistent data for all fields.
     `.trim();
@@ -130,6 +169,7 @@ Provide accurate and consistent data for all fields.
     });
 
     console.log("Raw response:", response.text);
+    console.log("Parsed JSON: ", JSON.parse(response.text));
     const parsedJson = providedSchema.parse(JSON.parse(response.text));
 
     return parsedJson;

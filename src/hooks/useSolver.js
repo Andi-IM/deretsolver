@@ -42,18 +42,13 @@ export const useSolver = () => {
           isPrediction: i >= result.sequenceValues.length - predictionCount,
         }));
 
-        const links = result.operations.map((label, i) => ({
-          label,
-          type: result.operationTypes[i],
-        }));
-
         return {
           type: result.type,
           rule: result.rule,
           next: result.next,
           predictions: result.predictions,
           isInterleaved: result.isInterleaved,
-          visualization: { nodes, links },
+          visualization: { nodes, connections: result.connections },
         };
       };
 

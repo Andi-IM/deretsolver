@@ -98,47 +98,124 @@ const ResultSection = ({ result }) => {
 
 const VisualizerContent = ({ visualization }) => {
     if (!visualization) return null;
-    const { nodes, links } = visualization;
+    const { nodes, connections = [] } = visualization;
+    
+    // Layout Constants
+    const NODE_SIZE = 56; // w-14 (56px)
+    const GAP = 64;       // Space between nodes
+    const ITEM_WIDTH = NODE_SIZE + GAP;
+    
+    // Calculate total dimensions
+    const totalWidth = Math.max(
+        (nodes.length * ITEM_WIDTH) - GAP + (NODE_SIZE/2), 
+        (nodes.length * ITEM_WIDTH) + 20 
+    );
+    
+    const CONTAINER_HEIGHT = 200;
+    const MIDDLE_Y = CONTAINER_HEIGHT / 2;
 
     return (
-        <div className="flex items-center">
-            {nodes.map((node, i) => (
-                <div key={i} className="flex items-center">
-                    {/* Node */}
-                    <div className="relative z-10 flex-shrink-0">
-                         <div className={`w-14 h-14 rounded-full border-2 flex items-center justify-center text-lg font-bold font-mono shadow-sm bg-white transition-all duration-300
-                            ${node.isPrediction 
-                                ? 'border-emerald-400 text-emerald-600 ring-4 ring-emerald-50 scale-110' 
-                                : 'border-slate-300 text-slate-700'
-                            }`}
-                        >
-                            {node.value}
-                        </div>
-                         <div className={`absolute -bottom-6 w-full text-center text-[10px] font-mono font-medium
-                            ${node.isPrediction ? 'text-emerald-600' : 'text-slate-400'}`}>
-                            {node.label || (node.isPrediction ? 'NEXT' : `i=${i}`)}
-                         </div>
-                    </div>
+        <div className="relative" style={{ width: totalWidth, height: CONTAINER_HEIGHT }}>
+            {/* SVG Layer for Connections */}
+            <svg 
+                className="absolute inset-0 pointer-events-none overflow-visible" 
+                width="100%" 
+                height="100%"
+            >
+                <defs>
+                    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8" />
+                    </marker>
+                </defs>
 
-                    {/* Link */}
-                    {i < nodes.length - 1 && (
-                        <div className="relative flex items-center justify-center w-16 sm:w-20 md:w-24 flex-shrink-0 -mx-1">
-                            {/* Line */}
-                            <div className={`absolute w-full h-[2px] ${node.isPrediction ? 'bg-emerald-200 dashed' : 'bg-slate-300'}`}></div>
-                            
-                            {/* Label capsule */}
-                            {links[i] && (
-                                <div className={`relative z-10 px-2.5 py-1 text-[10px] font-bold text-white rounded-full shadow-sm transform -translate-y-[1px]
-                                    ${links[i].type === 'add' ? 'bg-blue-500' : ''}
-                                    ${links[i].type === 'sub' ? 'bg-red-500' : ''}
-                                    ${links[i].type === 'mul' ? 'bg-orange-500' : ''}
-                                    ${links[i].type === 'pow' ? 'bg-purple-500' : ''}
-                                `}>
-                                    {links[i].label}
-                                </div>
-                            )}
-                        </div>
-                    )}
+                 {connections.map((conn, i) => {
+                     // Coordinates
+                     const x1 = (conn.fromIndex * ITEM_WIDTH) + (NODE_SIZE / 2);
+                     const x2 = (conn.toIndex * ITEM_WIDTH) + (NODE_SIZE / 2);
+                     
+                     // Distance check
+                     const dist = Math.abs(conn.toIndex - conn.fromIndex);
+                     const isLinear = dist === 1;
+                     
+                     // Arc height logic
+                     const arcHeight = isLinear ? 0 : (Math.min(dist * 25, 80)); 
+                     
+                     let pathD = '';
+                     let labelX = 0;
+                     let labelY = 0;
+
+                     if (isLinear) {
+                         // Straight line between nodes (center-right to center-left)
+                         const startX = x1 + (NODE_SIZE / 2) + 4;
+                         const endX = x2 - (NODE_SIZE / 2) - 4;
+                         pathD = `M ${startX} ${MIDDLE_Y} L ${endX} ${MIDDLE_Y}`;
+                         
+                         labelX = (startX + endX) / 2;
+                         labelY = MIDDLE_Y - 12; 
+                     } else {
+                         // Arc over nodes
+                         const startY = MIDDLE_Y - (NODE_SIZE / 2); 
+                         const endY = MIDDLE_Y - (NODE_SIZE / 2);
+                         const midX = (x1 + x2) / 2;
+                         const controlY = startY - arcHeight * 1.5; 
+                         
+                         pathD = `M ${x1} ${startY} Q ${midX} ${controlY} ${x2} ${endY}`;
+                         
+                         labelX = midX;
+                         labelY = startY - arcHeight * 0.75 - 10;
+                     }
+
+                     const colorClass = conn.type === 'add' ? '#3b82f6' : 
+                                      conn.type === 'sub' ? '#ef4444' : 
+                                      conn.type === 'mul' ? '#f97316' : 
+                                      conn.type === 'pow' ? '#a855f7' : '#94a3b8';
+
+                     return (
+                         <g key={i}>
+                             <path 
+                                d={pathD} 
+                                fill="none" 
+                                stroke={colorClass} 
+                                strokeWidth="2" 
+                                strokeDasharray={conn.label === '...' ? '4 4' : '0'}
+                                className="transition-all duration-500"
+                             />
+                             
+                             {/* Label */}
+                             <foreignObject x={labelX - 25} y={labelY - 10} width="50" height="24">
+                                 <div className="flex items-center justify-center w-full h-full">
+                                     <span 
+                                        className="text-[10px] font-bold bg-white px-1.5 py-0.5 rounded-full shadow-sm border border-slate-100 whitespace-nowrap" 
+                                        style={{ color: colorClass }}
+                                     >
+                                         {conn.label}
+                                     </span>
+                                 </div>
+                             </foreignObject>
+                         </g>
+                     )
+                 })}
+            </svg>
+
+            {/* Nodes Layer */}
+            {nodes.map((node, i) => (
+                <div 
+                    key={i} 
+                    className="absolute transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center z-10"
+                    style={{ left: (i * ITEM_WIDTH) + (NODE_SIZE / 2), top: MIDDLE_Y }}
+                >
+                     <div className={`w-14 h-14 rounded-full border-2 flex items-center justify-center text-lg font-bold font-mono shadow-sm bg-white transition-all duration-300
+                        ${node.isPrediction 
+                            ? 'border-emerald-400 text-emerald-600 ring-4 ring-emerald-50 scale-110' 
+                            : 'border-slate-300 text-slate-700'
+                        }`}
+                    >
+                        {node.value}
+                    </div>
+                     <div className={`absolute -bottom-8 w-max text-center text-[10px] font-mono font-medium
+                        ${node.isPrediction ? 'text-emerald-600' : 'text-slate-400'}`}>
+                        {node.label || (node.isPrediction ? 'NEXT' : `i=${i}`)}
+                     </div>
                 </div>
             ))}
         </div>
