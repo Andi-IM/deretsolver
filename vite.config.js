@@ -11,4 +11,27 @@ export default defineConfig({
     setupFiles: './src/test/setup.js',
     exclude: ['**/node_modules/**', '**/dist/**', '**/*.browser.test.*'],
   },
+  build: {
+    target: 'es2017',
+    sourcemap: false,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          react: [
+            'react',
+            'react-dom',
+            'react-router-dom',
+            'react-google-recaptcha-v3',
+            'react-helmet-async',
+            'react-i18next',
+            'react-router-dom',
+            'react-router-dom',
+          ],
+          zod: ['zod', 'zod-to-json-schema'],
+          material: ['material-symbols', 'lucide-react'],
+          firebase: ['firebase', '@google/genai'],
+        },
+      },
+    },
+  },
 });
