@@ -110,7 +110,7 @@ export const solveWithGemini = async (input, apiKey) => {
     const providedSchema = z.union([digitPatternSchema, errorSchema]);
 
     // Poin 3: Gunakan Model Lebih Stabil
-    const model = "gemini-2.5-pro"; // atau "gemini-2.5-flash" jika sudah tersedia
+    const model = "gemini-2.5-flash";
 
     // Poin 2: Prompt dengan Instruksi Lebih Spesifik
     const prompt = `
