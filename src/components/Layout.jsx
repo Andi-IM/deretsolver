@@ -76,7 +76,9 @@ function Layout({ children }) {
               {t('page.privacy')}
             </Link>
           </div>
-          <p className="text-sm text-slate-600">© {new Date().getFullYear()} Deret Solver. Mathematics made visual.</p>
+          <p className="text-sm text-slate-600">
+            © {new Date().getFullYear()} Deret Solver. Mathematics made visual.
+          </p>
           <p className="text-xs text-slate-500">
             This site is protected by reCAPTCHA and the Google{' '}
             <a
