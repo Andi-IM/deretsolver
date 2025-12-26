@@ -44,7 +44,7 @@ function Layout({ children }) {
           </Link>
 
           <div className="flex items-center gap-4 sm:gap-8">
-            <nav className="hidden sm:flex items-center gap-8 text-sm font-medium text-slate-500">
+            <nav className="hidden sm:flex items-center gap-8 text-sm font-medium text-slate-700">
               <Link className={isActive('/')} to="/">
                 Solver
               </Link>
@@ -55,7 +55,7 @@ function Layout({ children }) {
 
             <div className="flex items-center gap-2">
               <LanguageSwitcher />
-              <button type="button" className="sm:hidden p-2 text-slate-500">
+              <button type="button" className="sm:hidden p-2 text-slate-700">
                 <span className="material-symbols-outlined">menu</span>
               </button>
             </div>
@@ -69,7 +69,7 @@ function Layout({ children }) {
 
       <footer className="mt-auto py-8 border-t border-slate-200 bg-white">
         <div className="max-w-5xl mx-auto px-4 text-center">
-          <p className="text-sm text-slate-400">© 2023 Deret Solver. Mathematics made visual.</p>
+          <p className="text-sm text-slate-600">© 2023 Deret Solver. Mathematics made visual.</p>
         </div>
       </footer>
     </div>

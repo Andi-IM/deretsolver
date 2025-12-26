@@ -23,7 +23,7 @@ function InputSection({ input, setInput, onSolve, error, isLoading, apiKey, setA
               <p className="text-sm text-red-700">{error}</p>
             </div>
           </div>
-          <button type="button" className="text-red-400 hover:text-red-500">
+          <button type="button" className="text-red-600 hover:text-red-700">
             <span className="material-symbols-outlined text-[20px]">close</span>
           </button>
         </div>
@@ -32,7 +32,7 @@ function InputSection({ input, setInput, onSolve, error, isLoading, apiKey, setA
       <div className="relative z-10 space-y-4">
         <label
           htmlFor="input-sequence"
-          className="block text-xs font-bold text-slate-500 uppercase tracking-widest ml-1"
+          className="block text-xs font-bold text-slate-700 uppercase tracking-widest ml-1"
         >
           {t('input.label')}
         </label>
@@ -46,7 +46,7 @@ function InputSection({ input, setInput, onSolve, error, isLoading, apiKey, setA
                   ? 'border-red-300 focus:border-red-400 focus:ring-4 focus:ring-red-50'
                   : 'border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-50'
               } 
-              transition-all duration-200 resize-y outline-none placeholder:text-slate-300`}
+              transition-all duration-200 resize-y outline-none placeholder:text-slate-400`}
             placeholder={t('input.placeholder')}
             value={input}
             onChange={(e) => setInput(e.target.value)}
@@ -55,17 +55,17 @@ function InputSection({ input, setInput, onSolve, error, isLoading, apiKey, setA
         </div>
 
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center px-1 gap-3 sm:gap-0">
-          <span className="text-xs text-slate-400 font-medium">{t('input.helper')}</span>
+          <span className="text-xs text-slate-600 font-medium">{t('input.helper')}</span>
           <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-4">
             <button
               type="button"
               onClick={() => setShowKeyInput(!showKeyInput)}
-              className="text-xs text-slate-400 hover:text-blue-500 flex items-center gap-1 transition-colors"
+              className="text-xs text-slate-600 hover:text-blue-500 flex items-center gap-1 transition-colors"
             >
               <Key className="w-3 h-3" />
               {apiKey ? t('input.api_key_set') : t('input.add_api_key')}
             </button>
-            <span className="text-xs text-slate-400 font-mono tracking-tight shrink-0">
+            <span className="text-xs text-slate-600 font-mono tracking-tight shrink-0">
               {t('input.items_count', {
                 count: input.split(',').filter((x) => x.trim()).length,
               })}

@@ -87,7 +87,7 @@ function DocumentationPage() {
                     {t('documentation.api_key.get_key')}
                   </a>
                 </div>
-                <p className="text-xs text-amber-700/70 mt-2">{t('documentation.api_key.note')}</p>
+                <p className="text-xs text-amber-800 mt-2">{t('documentation.api_key.note')}</p>
               </div>
             </div>
           </div>
@@ -112,10 +112,10 @@ function DocumentationPage() {
                   <div className="font-bold text-slate-700 mb-1">
                     {t(`documentation.supported_patterns.${pattern.key}.name`)}
                   </div>
-                  <div className="text-slate-500 text-xs mb-2">
+                  <div className="text-slate-700 text-xs mb-2">
                     {t(`documentation.supported_patterns.${pattern.key}.desc`)}
                   </div>
-                  <code className="font-mono text-[10px] bg-slate-50 px-2 py-1 rounded border border-slate-200 text-slate-600 block w-fit">
+                  <code className="font-mono text-[10px] bg-slate-50 px-2 py-1 rounded border border-slate-200 text-slate-800 block w-fit">
                     {pattern.example}
                   </code>
                 </div>

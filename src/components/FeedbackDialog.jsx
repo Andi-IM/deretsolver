@@ -72,12 +72,12 @@ function FeedbackDialog({ result, input }) {
               <span className="material-symbols-outlined text-2xl">thumb_up</span>
             </div>
             <h3 className="text-lg font-bold text-slate-800 mb-1">{t('feedback.thank_you')}</h3>
-            <p className="text-slate-500">{t('feedback.thank_you_message')}</p>
+            <p className="text-slate-700">{t('feedback.thank_you_message')}</p>
           </div>
         ) : (
           <>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest">
+              <h3 className="text-sm font-bold text-slate-600 uppercase tracking-widest">
                 {t('feedback.title')}
               </h3>
             </div>
@@ -130,7 +130,7 @@ function FeedbackDialog({ result, input }) {
                 <div className="mb-6">
                   <label
                     htmlFor="feedback-comment"
-                    className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2"
+                    className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2"
                   >
                     {t('feedback.details_label')}
                   </label>
@@ -147,7 +147,7 @@ function FeedbackDialog({ result, input }) {
                   <button
                     type="button"
                     onClick={() => setStatus('idle')}
-                    className="px-5 py-2.5 text-slate-500 font-bold hover:bg-slate-50 rounded-xl transition-colors text-sm"
+                    className="px-5 py-2.5 text-slate-700 font-bold hover:bg-slate-50 rounded-xl transition-colors text-sm"
                   >
                     {t('feedback.cancel')}
                   </button>
@@ -170,7 +170,7 @@ function FeedbackDialog({ result, input }) {
             {status === 'submitting' && (
               <div className="py-8 flex flex-col items-center justify-center">
                 <div className="w-8 h-8 border-4 border-slate-200 border-t-emerald-500 rounded-full animate-spin mb-3" />
-                <p className="text-slate-400 text-sm font-medium">{t('feedback.sending')}</p>
+                <p className="text-slate-600 text-sm font-medium">{t('feedback.sending')}</p>
               </div>
             )}
           </>

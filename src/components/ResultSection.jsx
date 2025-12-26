@@ -9,7 +9,7 @@ function ResultSection({ result }) {
       {/* LEFT COLUMN: Result Analysis */}
       <div className="lg:w-[350px] flex-shrink-0 flex flex-col">
         <div className="bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 p-6 flex flex-col h-full">
-          <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-6">
+          <h3 className="text-[11px] font-bold text-slate-600 uppercase tracking-widest mb-6">
             {t('result.analysis_title')}
           </h3>
 
@@ -32,13 +32,13 @@ function ResultSection({ result }) {
 
           <div className="space-y-6 flex-grow">
             <div>
-              <h4 className="text-xs font-bold text-slate-400 mb-1 uppercase tracking-wider">
+              <h4 className="text-xs font-bold text-slate-600 mb-1 uppercase tracking-wider">
                 {t('result.pattern_type')}
               </h4>
               <p className="text-lg font-bold text-slate-900 leading-tight">{result.type}</p>
             </div>
             <div>
-              <h4 className="text-xs font-bold text-slate-400 mb-1 uppercase tracking-wider">
+              <h4 className="text-xs font-bold text-slate-600 mb-1 uppercase tracking-wider">
                 {t('result.rule')}
               </h4>
               <p className="text-base text-slate-600 leading-relaxed">{result.rule}</p>
@@ -46,7 +46,7 @@ function ResultSection({ result }) {
           </div>
 
           <div className="pt-8 mt-4 border-t border-slate-50">
-            <p className="text-center text-xs font-medium text-slate-400 mb-3 uppercase tracking-wide">
+            <p className="text-center text-xs font-medium text-slate-600 mb-3 uppercase tracking-wide">
               {result.predictions && result.predictions.length > 1
                 ? t('result.predicted_next_plural')
                 : t('result.predicted_next')}
@@ -83,12 +83,12 @@ function ResultSection({ result }) {
       <div className="flex-grow flex flex-col min-w-0">
         <div className="bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 p-6 h-full flex flex-col">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-            <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">
+            <h3 className="text-[11px] font-bold text-slate-600 uppercase tracking-widest whitespace-nowrap">
               {t('result.visualization_title')}
             </h3>
 
             {/* Legend */}
-            <div className="flex flex-wrap items-center gap-3 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+            <div className="flex flex-wrap items-center gap-3 text-[10px] font-bold uppercase tracking-wider text-slate-700">
               <div className="flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-blue-500" /> {t('result.legend.add')}
               </div>
@@ -169,7 +169,7 @@ function VisualizerContent({ visualization }) {
           </marker>
         </defs>
 
-        {connections.map((conn, ) => {
+        {connections.map((conn) => {
           // Coordinates
           const x1 = conn.fromIndex * ITEM_WIDTH + NODE_SIZE / 2;
           const x2 = conn.toIndex * ITEM_WIDTH + NODE_SIZE / 2;
@@ -260,7 +260,7 @@ function VisualizerContent({ visualization }) {
           </div>
           <div
             className={`absolute -bottom-8 w-max text-center text-[10px] font-mono font-medium
-                        ${node.isPrediction ? 'text-emerald-600' : 'text-slate-400'}`}
+                        ${node.isPrediction ? 'text-emerald-600' : 'text-slate-600'}`}
           >
             {node.label || (node.isPrediction ? 'NEXT' : `i=${i}`)}
           </div>
