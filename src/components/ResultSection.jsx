@@ -67,9 +67,9 @@ const ResultSection = ({ result }) => {
                       style={{ backgroundImage: 'radial-gradient(#94a3b8 1px, transparent 1px)', backgroundSize: '20px 20px' }}>
                  </div>
                  
-                 <div className="absolute inset-0 flex items-center justify-center p-4">
+                 <div className="absolute inset-0 p-4">
                      {/* Horizontal Scroll Container */}
-                     <div className="w-full overflow-x-auto pb-4 pt-10 flex px-4">
+                     <div className="w-full h-full overflow-x-auto flex items-center px-4">
                          <div className="flex items-center mx-auto min-w-max">
                             <VisualizerContent visualization={result.visualization} />
                          </div>
