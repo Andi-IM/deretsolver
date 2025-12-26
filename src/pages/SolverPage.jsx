@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import InputSection from "../components/InputSection";
 import ResultSection from "../components/ResultSection";
 import FeedbackDialog from "../components/FeedbackDialog";
-import LanguageSwitcher from "../components/LanguageSwitcher";
 import { useSolver } from "../hooks/useSolver";
 import { logEvent } from "firebase/analytics";
 import { analytics } from "../utils/firebase";
@@ -40,10 +39,6 @@ const SolverPage = () => {
         <meta name="description" content={t("app.description")} />
         <html lang={i18n.language} />
       </Helmet>
-
-      <div className="absolute top-4 right-4 z-50">
-        <LanguageSwitcher />
-      </div>
 
       <div className="text-center max-w-3xl mx-auto space-y-4 mb-8 pt-8">
         <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-900">

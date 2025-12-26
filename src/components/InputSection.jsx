@@ -62,11 +62,11 @@ const InputSection = ({
           ></textarea>
         </div>
 
-        <div className="flex justify-between items-center px-1">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center px-1 gap-3 sm:gap-0">
           <span className="text-xs text-slate-400 font-medium">
             {t("input.helper")}
           </span>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-4">
             <button
               onClick={() => setShowKeyInput(!showKeyInput)}
               className="text-xs text-slate-400 hover:text-blue-500 flex items-center gap-1 transition-colors"
@@ -74,7 +74,7 @@ const InputSection = ({
               <Key className="w-3 h-3" />
               {apiKey ? t("input.api_key_set") : t("input.add_api_key")}
             </button>
-            <span className="text-xs text-slate-400 font-mono tracking-tight">
+            <span className="text-xs text-slate-400 font-mono tracking-tight shrink-0">
               {t("input.items_count", {
                 count: input.split(",").filter((x) => x.trim()).length,
               })}
