@@ -25,7 +25,11 @@ jobs:
       - name: Autobuild
         uses: github/codeql-action/autobuild@v4
       - name: Perform Lint Check and Test
-        run: npm ci --legacy-peer-deps && npm run lint && npm run test
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      - run: npm ci --legacy-peer-deps && npm run lint && npm run test
       - name: Perform CodeQL analysis
         uses: github/codeql-action/analyze@v4
         with:
