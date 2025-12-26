@@ -22,13 +22,13 @@ vi.mock('react-i18next', () => ({
       changeLanguage: () => new Promise(() => {}),
     },
   }),
-  Trans: ({ i18nKey }) => 
+  Trans: ({ i18nKey }) => (
     // Simple mock for Trans that just returns the key or some content
     // and renders children/components if needed.
     // For this test we just want to see if it renders without crashing
     // and maybe check if the key is passed.
-     <span data-testid="trans-component">{i18nKey}</span>
-  ,
+    <span data-testid="trans-component">{i18nKey}</span>
+  ),
 }));
 
 // Mock firebase
