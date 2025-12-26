@@ -5,7 +5,18 @@ This template provides a minimal setup to get React working in Vite with HMR and
 Currently, two official plugins are available:
 
 - [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+
+## Features
+
+- **Dual Solver System**:
+  - **Local Solver**: Instantly solves Arithmetic, Geometric, Fibonacci, Two-Level Difference, Power, and **Interleaved Sequences** offline.
+  - **Gemini AI Solver**: Handles complex, abstract, and logic-based sequences using Google's Gemini API.
+- **Advanced Visualization**:
+  - Dynamic **SVG-based visualization** with arcs for interleaved sequences and straight lines for standard sequences.
+  - Interactive nodes and connections representing the pattern logic.
+- **Documentation & Guide**: Built-in guide for usage and supported patterns.
+- **Responsive Design**: Mobile-friendly layout using Tailwind CSS.
 
 ## React Compiler
 

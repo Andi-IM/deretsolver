@@ -1,11 +1,19 @@
 
+import { Link, useLocation } from 'react-router-dom';
+
 const Layout = ({ children }) => {
+  const location = useLocation();
+
+  const isActive = (path) => {
+    return location.pathname === path ? 'text-blue-600' : 'hover:text-slate-900 transition-colors';
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 font-sans text-slate-800 antialiased">
       {/* Top Navigation */}
       <header className="sticky top-0 z-40 w-full bg-white border-b border-slate-100">
         <div className="max-w-7xl mx-auto px-4 md:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
+          <Link to="/" className="flex items-center gap-3">
             {/* Logo */}
             <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center text-white shadow-sm">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
@@ -15,11 +23,10 @@ const Layout = ({ children }) => {
                 </svg>
             </div>
             <h1 className="text-lg font-bold tracking-tight text-slate-900">Deret Solver</h1>
-          </div>
+          </Link>
           <nav className="hidden sm:flex items-center gap-8 text-sm font-medium text-slate-500">
-            <a className="text-blue-600" href="#">Solver</a>
-            <a className="hover:text-slate-900 transition-colors" href="#">Examples</a>
-            <a className="hover:text-slate-900 transition-colors" href="#">Documentation</a>
+            <Link className={isActive('/')} to="/">Solver</Link>
+            <Link className={isActive('/docs')} to="/docs">Documentation</Link>
           </nav>
           <button className="sm:hidden p-2 text-slate-500">
             <span className="material-symbols-outlined">menu</span>

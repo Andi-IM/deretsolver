@@ -10,7 +10,10 @@ import { zodToJsonSchema } from "zod-to-json-schema";
  */
 export const solveWithGemini = async (input, apiKey) => {
   if (!apiKey) {
-    return { error: "Gemini API Key is required for advanced patterns." };
+    return {
+      error:
+        "Complex patterns require a Gemini API Key. Please enter it in the Input section settings.",
+    };
   }
 
   try {
