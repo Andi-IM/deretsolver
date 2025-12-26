@@ -4,7 +4,8 @@
     "description": "Enter a sequence to find the hidden pattern and predict the next number instantly."
   },
   "page": {
-    "solver": "Solver"
+    "solver": "Solver",
+    "privacy": "Privacy Policy"
   },
   "result": {
     "analysis_title": "Result Analysis",
@@ -69,13 +70,110 @@
     },
     "supported_patterns": {
       "title": "Supported Patterns",
-      "arithmetic": { "name": "Arithmetic Progression", "desc": "Adds/subtracts a constant value" },
-      "geometric": { "name": "Geometric Progression", "desc": "Multiplies/divides by a constant" },
-      "fibonacci": { "name": "Fibonacci Sequence", "desc": "Sum of previous two numbers" },
-      "triangular": { "name": "Triangular Numbers", "desc": "Adds increasing integers" },
-      "interleaved": { "name": "Interleaved Sequences", "desc": "Two patterns alternating" },
-      "perfect_powers": { "name": "Perfect Squares/Cubes", "desc": "Powers of integers" },
-      "two_level": { "name": "Two-Level Difference", "desc": "Constant change in differences" }
+      "arithmetic": {
+        "name": "Arithmetic Progression",
+        "desc": "Adds/subtracts a constant value"
+      },
+      "geometric": {
+        "name": "Geometric Progression",
+        "desc": "Multiplies/divides by a constant"
+      },
+      "fibonacci": {
+        "name": "Fibonacci Sequence",
+        "desc": "Sum of previous two numbers"
+      },
+      "triangular": {
+        "name": "Triangular Numbers",
+        "desc": "Adds increasing integers"
+      },
+      "interleaved": {
+        "name": "Interleaved Sequences",
+        "desc": "Two patterns alternating"
+      },
+      "perfect_powers": {
+        "name": "Perfect Squares/Cubes",
+        "desc": "Powers of integers"
+      },
+      "two_level": {
+        "name": "Two-Level Difference",
+        "desc": "Constant change in differences"
+      }
+    }
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "last_updated": "Last Updated: December 26, 2025",
+    "introduction": {
+      "title": "Introduction",
+      "content": "Welcome to Deret Solver. We respect your privacy and are committed to protecting your personal data. This privacy policy will inform you about how we handle your information when you use our service."
+    },
+    "information_collection": {
+      "title": "Information We Collect",
+      "intro": "When you use Deret Solver, we may collect the following information:",
+      "usage_data": {
+        "title": "Usage Data:",
+        "content": "We collect information about how you interact with our service, including the sequences you solve and features you use."
+      },
+      "analytics_data": {
+        "title": "Analytics Data:",
+        "content": "We use Google Analytics to understand how users interact with our website, which helps us improve the service."
+      },
+      "technical_data": {
+        "title": "Technical Data:",
+        "content": "We may collect information about your browser type, device, and IP address for security and performance purposes."
+      }
+    },
+    "information_usage": {
+      "title": "How We Use Your Information",
+      "intro": "We use the collected information for the following purposes:",
+      "provide_service": "To provide and maintain our service",
+      "improve_experience": "To improve and optimize user experience",
+      "analyze_usage": "To analyze usage patterns and trends",
+      "detect_issues": "To detect and prevent technical issues or abuse"
+    },
+    "data_security": {
+      "title": "Data Storage and Security",
+      "content": "We implement appropriate security measures to protect your information. However, no method of transmission over the internet is 100% secure, and we cannot guarantee absolute security."
+    },
+    "third_party": {
+      "title": "Third-Party Services",
+      "intro": "We use third-party services that may collect information used to identify you:",
+      "google_analytics": {
+        "title": "Google Analytics:",
+        "content": "For analyzing website usage and traffic patterns"
+      },
+      "recaptcha": {
+        "title": "Google reCAPTCHA:",
+        "content": "For protecting against spam and abuse"
+      },
+      "firebase": {
+        "title": "Firebase:",
+        "content": "For hosting and analytics services"
+      }
+    },
+    "cookies": {
+      "title": "Cookies",
+      "content": "We use cookies and similar tracking technologies to track activity on our service and store certain information. Cookies are files with a small amount of data which may include an anonymous unique identifier."
+    },
+    "user_rights": {
+      "title": "Your Rights",
+      "intro": "You have the right to:",
+      "access": "Access the personal information we hold about you",
+      "correction": "Request correction of inaccurate data",
+      "deletion": "Request deletion of your data",
+      "opt_out": "Opt-out of analytics tracking"
+    },
+    "children": {
+      "title": "Children's Privacy",
+      "content": "Our service is available to users of all ages. We do not knowingly collect personally identifiable information from children. If you are a parent or guardian and you are aware that your child has provided us with personal data, please contact us."
+    },
+    "policy_changes": {
+      "title": "Changes to This Privacy Policy",
+      "content": "We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the \"Last Updated\" date."
+    },
+    "contact": {
+      "title": "Contact Us",
+      "content": "If you have any questions about this Privacy Policy, please contact us through the feedback form available on our website."
     }
   }
 }

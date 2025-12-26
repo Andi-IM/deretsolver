@@ -1,8 +1,10 @@
 import { Link, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from './LanguageSwitcher';
 
 function Layout({ children }) {
   const location = useLocation();
+  const { t } = useTranslation();
 
   const isActive = (path) =>
     location.pathname === path ? 'text-blue-600' : 'hover:text-slate-900 transition-colors';
@@ -68,7 +70,12 @@ function Layout({ children }) {
       </main>
 
       <footer className="mt-auto py-8 border-t border-slate-200 bg-white">
-        <div className="max-w-5xl mx-auto px-4 text-center">
+        <div className="max-w-5xl mx-auto px-4 text-center space-y-2">
+          <div className="flex items-center justify-center gap-4 text-sm">
+            <Link to="/privacy" className="text-slate-600 hover:text-blue-600 transition-colors">
+              {t('page.privacy')}
+            </Link>
+          </div>
           <p className="text-sm text-slate-600">© 2023 Deret Solver. Mathematics made visual.</p>
         </div>
       </footer>

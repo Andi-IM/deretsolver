@@ -4,7 +4,8 @@
     "description": "Masukkan deret untuk menemukan pola tersembunyi dan memprediksi angka berikutnya secara instan."
   },
   "page": {
-    "solver": "Pemecah"
+    "solver": "Pemecah",
+    "privacy": "Kebijakan Privasi"
   },
   "result": {
     "analysis_title": "Analisis Hasil",
@@ -69,13 +70,110 @@
     },
     "supported_patterns": {
       "title": "Pola yang Didukung",
-      "arithmetic": { "name": "Barisan Aritmatika", "desc": "Tambah/kurang nilai konstan" },
-      "geometric": { "name": "Barisan Geometri", "desc": "Kali/bagi dengan konstan" },
-      "fibonacci": { "name": "Deret Fibonacci", "desc": "Jumlah dua angka sebelumnya" },
-      "triangular": { "name": "Bilangan Segitiga", "desc": "Menambah bilangan bulat menaik" },
-      "interleaved": { "name": "Deret Selang-seling", "desc": "Dua pola bergantian" },
-      "perfect_powers": { "name": "Pangkat Sempurna", "desc": "Pangkat bilangan bulat" },
-      "two_level": { "name": "Beda Bertingkat", "desc": "Perubahan konstan pada selisih" }
+      "arithmetic": {
+        "name": "Barisan Aritmatika",
+        "desc": "Tambah/kurang nilai konstan"
+      },
+      "geometric": {
+        "name": "Barisan Geometri",
+        "desc": "Kali/bagi dengan konstan"
+      },
+      "fibonacci": {
+        "name": "Deret Fibonacci",
+        "desc": "Jumlah dua angka sebelumnya"
+      },
+      "triangular": {
+        "name": "Bilangan Segitiga",
+        "desc": "Menambah bilangan bulat menaik"
+      },
+      "interleaved": {
+        "name": "Deret Selang-seling",
+        "desc": "Dua pola bergantian"
+      },
+      "perfect_powers": {
+        "name": "Pangkat Sempurna",
+        "desc": "Pangkat bilangan bulat"
+      },
+      "two_level": {
+        "name": "Beda Bertingkat",
+        "desc": "Perubahan konstan pada selisih"
+      }
+    }
+  },
+  "privacy": {
+    "title": "Kebijakan Privasi",
+    "last_updated": "Terakhir Diperbarui: 26 Desember 2025",
+    "introduction": {
+      "title": "Pendahuluan",
+      "content": "Selamat datang di Deret Solver. Kami menghormati privasi Anda dan berkomitmen untuk melindungi data pribadi Anda. Kebijakan privasi ini akan menjelaskan bagaimana kami menangani informasi Anda saat menggunakan layanan kami."
+    },
+    "information_collection": {
+      "title": "Informasi yang Kami Kumpulkan",
+      "intro": "Saat Anda menggunakan Deret Solver, kami dapat mengumpulkan informasi berikut:",
+      "usage_data": {
+        "title": "Data Penggunaan:",
+        "content": "Kami mengumpulkan informasi tentang bagaimana Anda berinteraksi dengan layanan kami, termasuk deret yang Anda pecahkan dan fitur yang Anda gunakan."
+      },
+      "analytics_data": {
+        "title": "Data Analitik:",
+        "content": "Kami menggunakan Google Analytics untuk memahami bagaimana pengguna berinteraksi dengan situs web kami, yang membantu kami meningkatkan layanan."
+      },
+      "technical_data": {
+        "title": "Data Teknis:",
+        "content": "Kami dapat mengumpulkan informasi tentang jenis browser, perangkat, dan alamat IP Anda untuk tujuan keamanan dan kinerja."
+      }
+    },
+    "information_usage": {
+      "title": "Bagaimana Kami Menggunakan Informasi Anda",
+      "intro": "Kami menggunakan informasi yang dikumpulkan untuk tujuan berikut:",
+      "provide_service": "Untuk menyediakan dan memelihara layanan kami",
+      "improve_experience": "Untuk meningkatkan dan mengoptimalkan pengalaman pengguna",
+      "analyze_usage": "Untuk menganalisis pola dan tren penggunaan",
+      "detect_issues": "Untuk mendeteksi dan mencegah masalah teknis atau penyalahgunaan"
+    },
+    "data_security": {
+      "title": "Penyimpanan dan Keamanan Data",
+      "content": "Kami menerapkan langkah-langkah keamanan yang sesuai untuk melindungi informasi Anda. Namun, tidak ada metode transmisi melalui internet yang 100% aman, dan kami tidak dapat menjamin keamanan absolut."
+    },
+    "third_party": {
+      "title": "Layanan Pihak Ketiga",
+      "intro": "Kami menggunakan layanan pihak ketiga yang dapat mengumpulkan informasi untuk mengidentifikasi Anda:",
+      "google_analytics": {
+        "title": "Google Analytics:",
+        "content": "Untuk menganalisis penggunaan situs web dan pola lalu lintas"
+      },
+      "recaptcha": {
+        "title": "Google reCAPTCHA:",
+        "content": "Untuk melindungi dari spam dan penyalahgunaan"
+      },
+      "firebase": {
+        "title": "Firebase:",
+        "content": "Untuk hosting dan layanan analitik"
+      }
+    },
+    "cookies": {
+      "title": "Cookie",
+      "content": "Kami menggunakan cookie dan teknologi pelacakan serupa untuk melacak aktivitas di layanan kami dan menyimpan informasi tertentu. Cookie adalah file dengan sejumlah kecil data yang mungkin termasuk pengenal unik anonim."
+    },
+    "user_rights": {
+      "title": "Hak Anda",
+      "intro": "Anda memiliki hak untuk:",
+      "access": "Mengakses informasi pribadi yang kami simpan tentang Anda",
+      "correction": "Meminta koreksi data yang tidak akurat",
+      "deletion": "Meminta penghapusan data Anda",
+      "opt_out": "Menolak pelacakan analitik"
+    },
+    "children": {
+      "title": "Privasi Anak-anak",
+      "content": "Layanan kami tersedia untuk pengguna dari segala usia. Kami tidak secara sadar mengumpulkan informasi yang dapat mengidentifikasi pribadi dari anak-anak. Jika Anda adalah orang tua atau wali dan menyadari bahwa anak Anda telah memberikan data pribadi kepada kami, silakan hubungi kami."
+    },
+    "policy_changes": {
+      "title": "Perubahan pada Kebijakan Privasi Ini",
+      "content": "Kami dapat memperbarui Kebijakan Privasi kami dari waktu ke waktu. Kami akan memberi tahu Anda tentang perubahan apa pun dengan memposting Kebijakan Privasi baru di halaman ini dan memperbarui tanggal \"Terakhir Diperbarui\"."
+    },
+    "contact": {
+      "title": "Hubungi Kami",
+      "content": "Jika Anda memiliki pertanyaan tentang Kebijakan Privasi ini, silakan hubungi kami melalui formulir umpan balik yang tersedia di situs web kami."
     }
   }
 }
