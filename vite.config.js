@@ -28,7 +28,7 @@ export default defineConfig({
             'react-router-dom',
           ],
           zod: ['zod', 'zod-to-json-schema'],
-          material: ['material-symbols', 'lucide-react'],
+          material: ['@fontsource/material-symbols-outlined', 'lucide-react'],
           firebase: ['firebase', '@google/genai'],
         },
       },
