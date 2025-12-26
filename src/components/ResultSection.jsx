@@ -180,7 +180,7 @@ const VisualizerContent = ({ visualization }) => {
                                 strokeDasharray={conn.label === '...' ? '4 4' : '0'}
                                 className="transition-all duration-500"
                              />
-                             
+                              
                              {/* Label */}
                              <foreignObject x={labelX - 25} y={labelY - 10} width="50" height="24">
                                  <div className="flex items-center justify-center w-full h-full">
@@ -193,7 +193,7 @@ const VisualizerContent = ({ visualization }) => {
                                  </div>
                              </foreignObject>
                          </g>
-                     )
+                     );
                  })}
             </svg>
 
