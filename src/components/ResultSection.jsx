@@ -169,7 +169,7 @@ function VisualizerContent({ visualization }) {
           </marker>
         </defs>
 
-        {connections.map((conn, i) => {
+        {connections.map((conn, ) => {
           // Coordinates
           const x1 = conn.fromIndex * ITEM_WIDTH + NODE_SIZE / 2;
           const x2 = conn.toIndex * ITEM_WIDTH + NODE_SIZE / 2;
@@ -215,7 +215,7 @@ function VisualizerContent({ visualization }) {
           const colorClass = strokeColors[conn.type] || '#94a3b8';
 
           return (
-            <g key={`${conn.fromIndex}-${conn.toIndex}-${i}`}>
+            <g key={`conn-${conn.fromIndex}-${conn.toIndex}-${conn.type}`}>
               <path
                 d={pathD}
                 fill="none"

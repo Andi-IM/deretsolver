@@ -53,5 +53,29 @@
     "processing": "Memproses",
     "solve": "Pecahkan Pola",
     "error_title": "Notifikasi Error"
+  },
+  "documentation": {
+    "title": "Dokumentasi & Panduan",
+    "how_to_use": {
+      "title": "Cara Menggunakan",
+      "content": "Masukkan deret angka dipisahkan koma atau spasi (cth: <1>2, 4, 6, 8</1>). Pemecah akan otomatis mendeteksi pola dan memprediksi angka berikutnya."
+    },
+    "api_key": {
+      "title": "Pola Kompleks & Kunci API",
+      "required_title": "Kunci API Gemini Diperlukan untuk Pemecahan Lanjut",
+      "required_desc": "Pola dasar (Aritmatika, Geometri) bekerja luring, namun <1>Pola Kompleks, Selang-seling, atau Abstrak</1> membutuhkan AI Gemini Google.",
+      "get_key": "Dapatkan Kunci API Gemini",
+      "note": "Setelah mendapatkan kunci, verifikasi tautan proyek dan akun tagihan Anda jika perlu."
+    },
+    "supported_patterns": {
+      "title": "Pola yang Didukung",
+      "arithmetic": { "name": "Barisan Aritmatika", "desc": "Tambah/kurang nilai konstan" },
+      "geometric": { "name": "Barisan Geometri", "desc": "Kali/bagi dengan konstan" },
+      "fibonacci": { "name": "Deret Fibonacci", "desc": "Jumlah dua angka sebelumnya" },
+      "triangular": { "name": "Bilangan Segitiga", "desc": "Menambah bilangan bulat menaik" },
+      "interleaved": { "name": "Deret Selang-seling", "desc": "Dua pola bergantian" },
+      "perfect_powers": { "name": "Pangkat Sempurna", "desc": "Pangkat bilangan bulat" },
+      "two_level": { "name": "Beda Bertingkat", "desc": "Perubahan konstan pada selisih" }
+    }
   }
 }

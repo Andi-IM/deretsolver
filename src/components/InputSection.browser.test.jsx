@@ -1,12 +1,10 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { page } from 'vitest/browser';
-import { render } from 'vitest-browser-react';
+import { render } from '@vitest/browser';
 import InputSection from './InputSection';
 import '../index.css'; // Import global styles
 
 // Mock needed for useTranslation hook
-import { vi } from 'vitest';
-
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key) => key,

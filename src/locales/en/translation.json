@@ -53,5 +53,29 @@
     "processing": "Processing",
     "solve": "Solve Pattern",
     "error_title": "Error Notification"
+  },
+  "documentation": {
+    "title": "Documentation & Guide",
+    "how_to_use": {
+      "title": "How to Use",
+      "content": "Enter a sequence of numbers separated by commas or spaces (e.g., <1>2, 4, 6, 8</1>). The solver will automatically detect the pattern and predict the next number."
+    },
+    "api_key": {
+      "title": "Complex Patterns & API Key",
+      "required_title": "Gemini API Key Required for Advanced Solving",
+      "required_desc": "While basic patterns (Arithmetic, Geometric) work offline, <1>Complex, Interleaved, or Abstract patterns</1> require Google's Gemini AI.",
+      "get_key": "Get your Gemini API Key",
+      "note": "After getting the key, verify your project link and billing account if necessary."
+    },
+    "supported_patterns": {
+      "title": "Supported Patterns",
+      "arithmetic": { "name": "Arithmetic Progression", "desc": "Adds/subtracts a constant value" },
+      "geometric": { "name": "Geometric Progression", "desc": "Multiplies/divides by a constant" },
+      "fibonacci": { "name": "Fibonacci Sequence", "desc": "Sum of previous two numbers" },
+      "triangular": { "name": "Triangular Numbers", "desc": "Adds increasing integers" },
+      "interleaved": { "name": "Interleaved Sequences", "desc": "Two patterns alternating" },
+      "perfect_powers": { "name": "Perfect Squares/Cubes", "desc": "Powers of integers" },
+      "two_level": { "name": "Two-Level Difference", "desc": "Constant change in differences" }
+    }
   }
 }

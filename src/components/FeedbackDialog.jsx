@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { useTranslation } from 'react-i18next';
 import { db } from '../utils/firebase';
+import logger from '../utils/logger';
 
 function FeedbackDialog({ result, input }) {
   const [status, setStatus] = useState('idle'); // idle, helpful, not_helpful_form, submitting, submitted
@@ -23,7 +24,7 @@ function FeedbackDialog({ result, input }) {
       });
       setStatus('submitted');
     } catch (error) {
-      console.error('Error adding document: ', error);
+      logger.error('Error adding document: ', error);
       // Even if it fails, we probably just want to show the thank you message or revert
       setStatus('submitted'); // Optimistic UI
     }
@@ -49,7 +50,7 @@ function FeedbackDialog({ result, input }) {
       });
       setStatus('submitted');
     } catch (error) {
-      console.error('Error adding document: ', error);
+      logger.error('Error adding document: ', error);
       setStatus('submitted');
     }
   };

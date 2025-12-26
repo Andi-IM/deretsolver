@@ -1,6 +1,7 @@
 import { GoogleGenAI } from '@google/genai';
 import { z } from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
+import logger from './logger';
 
 /**
  * Solves a number sequence using the Gemini API.
@@ -59,7 +60,7 @@ const solveWithGemini = async (input, apiKey) => {
                   const cleaned = item.replace(/\\/g, '');
                   return JSON.parse(cleaned);
                 } catch (e) {
-                  console.error('Failed to parse connection item:', item, e);
+                  logger.error('Failed to parse connection item:', item, e);
                   return item; // Return as-is if parsing fails
                 }
               }
@@ -166,13 +167,13 @@ Provide accurate and consistent data for all fields.
       },
     });
 
-    console.log('Raw response:', response.text);
-    console.log('Parsed JSON: ', JSON.parse(response.text));
+    logger.debug('Raw response:', response.text);
+    logger.debug('Parsed JSON: ', JSON.parse(response.text));
     const parsedJson = providedSchema.parse(JSON.parse(response.text));
 
     return parsedJson;
   } catch (err) {
-    console.error('Gemini API Error:', err);
+    logger.error('Gemini API Error:', err);
     return {
       error: `Failed to connect to Gemini API: ${
         err.message || err

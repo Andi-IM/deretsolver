@@ -1,9 +1,20 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { GoogleGenAI } from '@google/genai';
-import { solveWithGemini } from './geminiSolver';
+import solveWithGemini from './geminiSolver';
 
 // Mock the GoogleGenAI library
 vi.mock('@google/genai');
+
+// Mock the logger to avoid Firebase initialization during tests
+vi.mock('./logger', () => ({
+  default: {
+    debug: vi.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+    log: vi.fn(),
+  },
+}));
 
 describe('solveWithGemini', () => {
   const mockApiKey = 'test-api-key';
@@ -37,6 +48,7 @@ describe('solveWithGemini', () => {
 
     // Setup the mock chain: new GoogleGenAI() -> client.models.generateContent()
     const mockGenerateContent = vi.fn().mockResolvedValue(mockResponse);
+    // eslint-disable-next-line no-unused-vars
     const mockClient = {
       models: {
         generateContent: mockGenerateContent,
@@ -44,7 +56,10 @@ describe('solveWithGemini', () => {
     };
 
     // Mock implementation must be a function that can be called with 'new'
-    GoogleGenAI.mockImplementation(() => mockClient);
+    // eslint-disable-next-line no-shadow
+    GoogleGenAI.mockImplementation(function mockClient() {
+      return mockClient;
+    });
 
     const result = await solveWithGemini(mockInput, mockApiKey);
 
@@ -58,12 +73,16 @@ describe('solveWithGemini', () => {
   it('handles API error gracefully', async () => {
     // Setup mock to reject
     const mockGenerateContent = vi.fn().mockRejectedValue(new Error('Network Error'));
+    // eslint-disable-next-line no-unused-vars
     const mockClient = {
       models: {
         generateContent: mockGenerateContent,
       },
     };
-    GoogleGenAI.mockImplementation(() => mockClient);
+    // eslint-disable-next-line no-shadow
+    GoogleGenAI.mockImplementation(function mockClient() {
+      return mockClient;
+    });
 
     const result = await solveWithGemini(mockInput, mockApiKey);
 
