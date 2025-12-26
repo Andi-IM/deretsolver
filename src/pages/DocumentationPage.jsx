@@ -39,7 +39,7 @@ function DocumentationPage() {
     <>
       <Helmet>
         <title>
-          {t('app.title')} | {t('page.solver')}
+          {t('documentation.title')} | {t('page.solver')}
         </title>
         <meta name="description" content={t('app.description')} />
         <html lang={i18n.language} />
