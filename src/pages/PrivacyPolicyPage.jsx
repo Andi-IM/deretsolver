@@ -12,7 +12,7 @@ function PrivacyPolicyPage() {
   return (
     <>
       <Helmet>
-        <title>{t('privacy.title')} - Deret Solver</title>
+        <title>{t('app.title')} | {t('privacy.title')}</title>
         <meta name="description" content={t('privacy.introduction.content')} />
         <html lang={i18n.language} />
       </Helmet>
