@@ -1,11 +1,15 @@
-# React + Vite
+# Deret Solver
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**Deret Solver** is an intelligent number sequence solver that combines local pattern detection with AI-powered analysis. It helps users identify, visualize, and understand various types of number sequences including arithmetic, geometric, Fibonacci, interleaved patterns, and more complex sequences.
 
-Currently, two official plugins are available:
+## Overview
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Deret Solver uses a dual-solver approach to handle both simple and complex number sequences:
+
+- **Local Solver**: Fast, offline detection of common patterns (arithmetic, geometric, Fibonacci, etc.)
+- **Gemini AI Solver**: AI-powered analysis for complex, abstract, and logic-based sequences using Google's Gemini API
+
+Built with React and Vite for optimal performance and developer experience.
 
 ## Features
 
@@ -25,3 +29,7 @@ The React Compiler is not enabled on this template because of its impact on dev 
 ## Expanding the ESLint configuration
 
 If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
