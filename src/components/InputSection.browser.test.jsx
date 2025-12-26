@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import { page } from "vitest/browser";
 import { render } from "vitest-browser-react";
 import InputSection from "./InputSection";
+import "../index.css"; // Import global styles
 
 // Mock needed for useTranslation hook
 import { vi } from "vitest";

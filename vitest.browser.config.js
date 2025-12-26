@@ -14,6 +14,7 @@ export default defineConfig({
       provider: playwright(),
       instances: [{ browser: "chromium" }],
     },
+    // eslint-disable-next-line no-undef
     reporters: process.env.GITHUB_ACTIONS ? ["dot", "github-actions"] : ["dot"],
   },
 });
