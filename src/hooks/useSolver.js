@@ -22,7 +22,7 @@ export const useSolver = () => {
     const localRes = solveSequence(input);
 
     if (localRes && !localRes.error) {
-      setResult(localRes);
+      setResult({ ...localRes, id: Date.now() });
       return;
     }
 
@@ -58,7 +58,7 @@ export const useSolver = () => {
         setError(geminiRes.error || localRes.error); // Prioritize Gemini error (e.g. Auth failure) if fallback was attempted
       } else {
         const nestedResult = transformToNestedFormat(geminiRes);
-        setResult(nestedResult);
+        setResult({ ...nestedResult, id: Date.now() });
       }
     } else {
       setError(localRes.error);

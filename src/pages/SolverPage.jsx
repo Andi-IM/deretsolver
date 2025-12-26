@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import InputSection from '../components/InputSection';
 import ResultSection from '../components/ResultSection';
+import FeedbackDialog from '../components/FeedbackDialog';
 import { useSolver } from '../hooks/useSolver';
 import { logEvent } from "firebase/analytics";
 import { analytics } from "../utils/firebase";
@@ -36,6 +37,8 @@ const SolverPage = () => {
             <ResultSection 
                 result={result} 
             />
+            
+            <FeedbackDialog key={result ? result.id : 'no-result'} result={result} input={input} />
         </>
     );
 };
