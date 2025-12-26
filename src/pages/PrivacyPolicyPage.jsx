@@ -1,18 +1,24 @@
 import { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
 
 function PrivacyPolicyPage() {
   const { t, i18n } = useTranslation();
+  const location = useLocation();
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
+  // Update document title manually to ensure it works with client-side navigation
+  useEffect(() => {
+    document.title = `${t('privacy.title')} | ${t('app.shortname')}`;
+  }, [t, location.pathname]);
+
   return (
     <>
       <Helmet>
-        <title>{t('app.title')} | {t('privacy.title')}</title>
         <meta name="description" content={t('privacy.introduction.content')} />
         <html lang={i18n.language} />
       </Helmet>

@@ -1,5 +1,6 @@
 {
   "app": {
+    "shortname": "Deret Solver",
     "title": "Number Sequence Pattern Solver",
     "description": "Enter a sequence to find the hidden pattern and predict the next number instantly."
   },

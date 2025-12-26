@@ -1,5 +1,6 @@
 {
   "app": {
+    "shortname": "Deret Solver",
     "title": "Pemecah Pola Deret Angka",
     "description": "Masukkan deret untuk menemukan pola tersembunyi dan memprediksi angka berikutnya secara instan."
   },

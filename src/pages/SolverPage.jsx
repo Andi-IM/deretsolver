@@ -30,12 +30,14 @@ function SolverPage() {
       .catch((err) => logger.error('Failed to log analytics:', err));
   }, [location.pathname]);
 
+  // Update document title manually to ensure it works with client-side navigation
+  useEffect(() => {
+    document.title = `${t('app.shortname')}`;
+  }, [t, location.pathname]);
+
   return (
     <>
       <Helmet>
-        <title>
-          {t('app.title')} | {t('page.solver')}
-        </title>
         <meta name="description" content={t('app.description')} />
         <html lang={i18n.language} />
       </Helmet>
