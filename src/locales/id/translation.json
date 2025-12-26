@@ -1,0 +1,57 @@
+{
+  "app": {
+    "title": "Pemecah Pola Deret Angka",
+    "description": "Masukkan deret untuk menemukan pola tersembunyi dan memprediksi angka berikutnya secara instan."
+  },
+  "page": {
+    "solver": "Pemecah"
+  },
+  "result": {
+    "analysis_title": "Analisis Hasil",
+    "success": "Sukses",
+    "success_message": "Pola berhasil diidentifikasi.",
+    "pattern_type": "Tipe Pola",
+    "rule": "Aturan",
+    "predicted_next": "Prediksi Angka Berikutnya",
+    "predicted_next_plural": "Prediksi Angka-angka Berikutnya",
+    "visualization_title": "Visualisasi Deret",
+    "legend": {
+      "add": "Tam",
+      "sub": "Kur",
+      "mul": "Kal",
+      "pow": "Pangk"
+    }
+  },
+  "feedback": {
+    "title": "Umpan Balik",
+    "question": "Apakah hasil ini membantu?",
+    "yes": "Ya, membantu",
+    "no": "Kurang tepat",
+    "issue_prompt": "Apa masalahnya?",
+    "reasons": {
+      "incorrect": "Hasil Salah",
+      "unclear": "Penjelasan Tidak Jelas",
+      "other": "Lainnya"
+    },
+    "details_label": "Detail Tambahan (Opsional)",
+    "details_placeholder": "Ceritakan lebih lanjut apa yang terjadi...",
+    "cancel": "Batal",
+    "submit": "Kirim Umpan Balik",
+    "sending": "Mengirim umpan balik...",
+    "thank_you": "Terima Kasih!",
+    "thank_you_message": "Umpan balik Anda membantu kami meningkatkan pemecah ini."
+  },
+  "input": {
+    "label": "Deret Angka",
+    "placeholder": "2, 4, 8, 16",
+    "helper": "Gunakan koma (cth: 2, 4, 8)",
+    "items_count": "{{count}} item",
+    "api_key_set": "Kunci API Terpasang",
+    "add_api_key": "Tambah Kunci API Gemini",
+    "api_key_placeholder": "Masukkan Kunci API Gemini (dimulai dgn AIza...)",
+    "api_key_helper": "Diperlukan untuk deteksi pola tingkat lanjut (logic kompleks).",
+    "processing": "Memproses",
+    "solve": "Pecahkan Pola",
+    "error_title": "Notifikasi Error"
+  }
+}

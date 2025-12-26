@@ -1,0 +1,57 @@
+{
+  "app": {
+    "title": "Number Sequence Pattern Solver",
+    "description": "Enter a sequence to find the hidden pattern and predict the next number instantly."
+  },
+  "page": {
+    "solver": "Solver"
+  },
+  "result": {
+    "analysis_title": "Result Analysis",
+    "success": "Success",
+    "success_message": "Pattern successfully identified.",
+    "pattern_type": "Pattern Type",
+    "rule": "Rule",
+    "predicted_next": "Predicted Next Number",
+    "predicted_next_plural": "Predicted Next Numbers",
+    "visualization_title": "Sequence Visualization",
+    "legend": {
+      "add": "Add",
+      "sub": "Sub",
+      "mul": "Mul",
+      "pow": "Pow"
+    }
+  },
+  "feedback": {
+    "title": "Feedback",
+    "question": "Was this result helpful?",
+    "yes": "Yes, helpful",
+    "no": "Not really",
+    "issue_prompt": "What was the issue?",
+    "reasons": {
+      "incorrect": "Incorrect Result",
+      "unclear": "Unclear Explanation",
+      "other": "Other"
+    },
+    "details_label": "Additional Details (Optional)",
+    "details_placeholder": "Tell us more about what happened...",
+    "cancel": "Cancel",
+    "submit": "Submit Feedback",
+    "sending": "Sending feedback...",
+    "thank_you": "Thank You!",
+    "thank_you_message": "Your feedback helps us improve the solver."
+  },
+  "input": {
+    "label": "Input Sequence",
+    "placeholder": "2, 4, 8, 16",
+    "helper": "Use commas (e.g., 2, 4, 8)",
+    "items_count": "{{count}} items",
+    "api_key_set": "API Key Set",
+    "add_api_key": "Add Gemini API Key",
+    "api_key_placeholder": "Enter Gemini API Key (starts with AIza...)",
+    "api_key_helper": "Required for advanced pattern detection (interleaved, complex logic).",
+    "processing": "Processing",
+    "solve": "Solve Pattern",
+    "error_title": "Error Notification"
+  }
+}
