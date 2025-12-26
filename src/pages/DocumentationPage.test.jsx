@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
+import { HelmetProvider } from 'react-helmet-async';
 import DocumentationPage from './DocumentationPage';
 
 // Mock react-i18next
@@ -15,11 +16,15 @@ vi.mock('react-i18next', () => ({
         'documentation.supported_patterns.title': 'Supported Patterns',
         'documentation.supported_patterns.arithmetic.name': 'Arithmetic Progression',
         'documentation.supported_patterns.arithmetic.desc': 'Adds/subtracts a constant value',
+        'app.title': 'Number Sequence Pattern Solver',
+        'app.description': 'Enter a sequence to find the hidden pattern',
+        'page.solver': 'Solver',
       };
       return translations[key] || key;
     },
     i18n: {
       changeLanguage: () => new Promise(() => {}),
+      language: 'en',
     },
   }),
   Trans: ({ i18nKey }) => (
@@ -43,9 +48,11 @@ vi.mock('firebase/analytics', () => ({
 describe('DocumentationPage', () => {
   it('renders correctly', () => {
     render(
-      <MemoryRouter>
-        <DocumentationPage />
-      </MemoryRouter>,
+      <HelmetProvider>
+        <MemoryRouter>
+          <DocumentationPage />
+        </MemoryRouter>
+      </HelmetProvider>,
     );
 
     expect(screen.getByText('Documentation & Guide')).toBeInTheDocument();
@@ -55,9 +62,11 @@ describe('DocumentationPage', () => {
 
   it('renders supported patterns', () => {
     render(
-      <MemoryRouter>
-        <DocumentationPage />
-      </MemoryRouter>,
+      <HelmetProvider>
+        <MemoryRouter>
+          <DocumentationPage />
+        </MemoryRouter>
+      </HelmetProvider>,
     );
     expect(screen.getByText('Arithmetic Progression')).toBeInTheDocument();
     expect(screen.getByText('Adds/subtracts a constant value')).toBeInTheDocument();
