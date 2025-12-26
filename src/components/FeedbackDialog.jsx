@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { useTranslation } from 'react-i18next';
-import { db } from '../utils/firebase';
 import logger from '../utils/logger';
 
 function FeedbackDialog({ result, input }) {
@@ -13,6 +11,11 @@ function FeedbackDialog({ result, input }) {
   const handleHelpful = async () => {
     setStatus('submitting');
     try {
+      // Lazy load Firebase
+      const { initializeFirebase } = await import('../utils/firebase');
+      const { db } = await initializeFirebase();
+      const { collection, addDoc, serverTimestamp } = await import('firebase/firestore');
+
       await addDoc(collection(db, 'feedback'), {
         isHelpful: true,
         question: input,
@@ -20,12 +23,10 @@ function FeedbackDialog({ result, input }) {
         resultType: result.type,
         resultRule: result.rule,
         timestamp: serverTimestamp(),
-        // We can add more context if needed
       });
       setStatus('submitted');
     } catch (error) {
       logger.error('Error adding document: ', error);
-      // Even if it fails, we probably just want to show the thank you message or revert
       setStatus('submitted'); // Optimistic UI
     }
   };
@@ -35,9 +36,14 @@ function FeedbackDialog({ result, input }) {
   };
 
   const handleSubmitNotHelpful = async () => {
-    if (!reason) return; // Require a reason
+    if (!reason) return;
     setStatus('submitting');
     try {
+      // Lazy load Firebase
+      const { initializeFirebase } = await import('../utils/firebase');
+      const { db } = await initializeFirebase();
+      const { collection, addDoc, serverTimestamp } = await import('firebase/firestore');
+
       await addDoc(collection(db, 'feedback'), {
         isHelpful: false,
         reason,

@@ -1,7 +1,5 @@
 /* eslint-disable no-console */
 /* eslint-disable class-methods-use-this */
-import { logEvent } from 'firebase/analytics';
-import { analytics } from './firebase';
 
 const LOG_LEVELS = {
   DEBUG: 0,
@@ -54,7 +52,12 @@ class Logger {
     // Only log WARN and ERROR to Firebase to save quota/noise
     if (level === 'ERROR' || level === 'WARN') {
       try {
+        // Lazy load Firebase (doesn't block critical path)
+        const { getFirebaseAnalytics } = await import('./firebase');
+        const analytics = getFirebaseAnalytics();
+
         if (analytics) {
+          const { logEvent } = await import('firebase/analytics');
           logEvent(analytics, 'app_log', {
             level,
             message: String(message),

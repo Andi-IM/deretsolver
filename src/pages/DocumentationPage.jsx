@@ -1,8 +1,7 @@
 import React, { useEffect } from 'react';
-import { logEvent } from 'firebase/analytics';
 import { useLocation } from 'react-router-dom';
 import { useTranslation, Trans } from 'react-i18next';
-import { analytics } from '../utils/firebase';
+import logger from '../utils/logger';
 
 const PATTERNS_LIST = [
   { key: 'arithmetic', example: '2, 5, 8, 11' },
@@ -18,9 +17,22 @@ function DocumentationPage() {
   const { t } = useTranslation();
   const location = useLocation();
 
+  // Analytics: Log page view (deferred to not block render)
   useEffect(() => {
-    logEvent(analytics, 'page_view', { page_path: location.pathname, page_title: 'Documentation' });
-  }, [location]);
+    import('../utils/firebase')
+      .then(({ initializeFirebase }) => initializeFirebase())
+      .then(({ analytics }) => {
+        if (analytics) {
+          import('firebase/analytics').then(({ logEvent }) => {
+            logEvent(analytics, 'page_view', {
+              page_path: location.pathname,
+              page_title: 'Documentation',
+            });
+          });
+        }
+      })
+      .catch((err) => logger.error('Failed to log analytics:', err));
+  }, [location.pathname]);
 
   return (
     <div className="w-full max-w-4xl mx-auto">
