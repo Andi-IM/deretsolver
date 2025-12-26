@@ -33,10 +33,13 @@ export const useSolver = () => {
       const transformToNestedFormat = (result) => {
         if (result.error) return result;
 
+        const predictionCount = result.predictions
+          ? result.predictions.length
+          : 1;
         const nodes = result.sequenceValues.map((value, i) => ({
           value,
           label: result.sequenceLabels[i],
-          isPrediction: i === result.sequenceValues.length - 1,
+          isPrediction: i >= result.sequenceValues.length - predictionCount,
         }));
 
         const links = result.operations.map((label, i) => ({
@@ -48,6 +51,8 @@ export const useSolver = () => {
           type: result.type,
           rule: result.rule,
           next: result.next,
+          predictions: result.predictions,
+          isInterleaved: result.isInterleaved,
           visualization: { nodes, links },
         };
       };

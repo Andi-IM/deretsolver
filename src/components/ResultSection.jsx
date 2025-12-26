@@ -37,10 +37,23 @@ const ResultSection = ({ result }) => {
             </div>
 
             <div className="pt-8 mt-4 border-t border-slate-50">
-                <p className="text-center text-xs font-medium text-slate-400 mb-3 uppercase tracking-wide">Predicted Next Number</p>
-                <div className="w-full bg-emerald-500 hover:bg-emerald-600 transition-colors cursor-default text-white rounded-xl py-3 flex items-center justify-center shadow-lg shadow-emerald-500/20 group">
-                    <span className="text-3xl font-bold font-mono tracking-tight group-hover:scale-110 transition-transform">{result.next}</span>
-                </div>
+                <p className="text-center text-xs font-medium text-slate-400 mb-3 uppercase tracking-wide">
+                    {result.predictions && result.predictions.length > 1 ? 'Predicted Next Numbers' : 'Predicted Next Number'}
+                </p>
+                {result.predictions && result.predictions.length > 1 ? (
+                    <div className="grid grid-cols-2 gap-3">
+                        {result.predictions.map((val, idx) => (
+                             <div key={idx} className="bg-emerald-500 hover:bg-emerald-600 transition-colors cursor-default text-white rounded-xl py-3 flex flex-col items-center justify-center shadow-lg shadow-emerald-500/20 group">
+                                <span className="text-[10px] uppercase font-bold opacity-70 mb-0.5">Seq {idx + 1}</span>
+                                <span className="text-2xl font-bold font-mono tracking-tight group-hover:scale-110 transition-transform">{val}</span>
+                             </div>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="w-full bg-emerald-500 hover:bg-emerald-600 transition-colors cursor-default text-white rounded-xl py-3 flex items-center justify-center shadow-lg shadow-emerald-500/20 group">
+                        <span className="text-3xl font-bold font-mono tracking-tight group-hover:scale-110 transition-transform">{result.next}</span>
+                    </div>
+                )}
             </div>
         </div>
       </div>
@@ -103,7 +116,7 @@ const VisualizerContent = ({ visualization }) => {
                         </div>
                          <div className={`absolute -bottom-6 w-full text-center text-[10px] font-mono font-medium
                             ${node.isPrediction ? 'text-emerald-600' : 'text-slate-400'}`}>
-                            {node.isPrediction ? 'NEXT' : `i=${i}`}
+                            {node.label || (node.isPrediction ? 'NEXT' : `i=${i}`)}
                          </div>
                     </div>
 
