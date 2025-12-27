@@ -163,4 +163,53 @@ describe('solveWithGemini', () => {
     expect(result.connections).toBeDefined();
     expect(result.connections.length).toBe(2);
   });
+
+  it('handles corrupted connection items gracefully', async () => {
+    // Import logger to spy on it
+    const logger = await import('./logger');
+    const loggerErrorSpy = vi.spyOn(logger.default, 'error');
+
+    const mockResultData = {
+      type: 'Arithmetic Sequence',
+      rule: 'Add 2',
+      next: 10,
+      sequenceValues: [2, 4, 6, 8, 10],
+      sequenceLabels: ['n1', 'n2', 'n3', 'n4', 'n5'],
+      connections: [
+        'invalid-json-string', // This should trigger the catch block in preprocess
+        { fromIndex: 0, toIndex: 1, label: '+2', type: 'add' },
+      ],
+      isInterleaved: false,
+      predictions: [10],
+    };
+
+    const mockResponse = {
+      text: JSON.stringify(mockResultData),
+    };
+
+    const mockGenerateContent = vi.fn(async () => mockResponse);
+
+    // eslint-disable-next-line prefer-arrow-callback
+    MockGoogleGenAI.mockImplementation(function mockConstructor() {
+      return {
+        models: {
+          generateContent: mockGenerateContent,
+        },
+      };
+    });
+
+    const result = await solveWithGemini(mockInput, mockApiKey);
+
+    // The preprocess catch block logs an error
+    expect(loggerErrorSpy).toHaveBeenCalledWith(
+      'Failed to parse connection item:',
+      'invalid-json-string',
+      expect.any(Error),
+    );
+
+    // Because the item remains a string, Zod validation fails for the entire schema
+    // and returns a generic error object
+    expect(result).toHaveProperty('error');
+    expect(result.error).toContain('Failed to connect to Gemini API');
+  });
 });

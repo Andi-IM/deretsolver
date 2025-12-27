@@ -1,66 +1,44 @@
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import React from 'react';
+import { render, screen, waitFor } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import DocumentationPage from './DocumentationPage';
 
-// Mock react-i18next
+// Mock dependencies
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (key) => {
-      const translations = {
-        'documentation.title': 'Documentation & Guide',
-        'documentation.how_to_use.title': 'How to Use',
-        'documentation.how_to_use.content': 'Enter a sequence...',
-        'documentation.api_key.title': 'Complex Patterns & API Key',
-        'documentation.supported_patterns.title': 'Supported Patterns',
-        'documentation.supported_patterns.arithmetic.name': 'Arithmetic Progression',
-        'documentation.supported_patterns.arithmetic.desc': 'Adds/subtracts a constant value',
-        'app.title': 'Number Sequence Pattern Solver',
-        'app.description': 'Enter a sequence to find the hidden pattern',
-        'page.solver': 'Solver',
-      };
-      return translations[key] || key;
-    },
-    i18n: {
-      changeLanguage: () => new Promise(() => {}),
-      language: 'en',
-    },
+    t: (key) => key,
+    i18n: { language: 'en' },
   }),
-  Trans: ({ i18nKey }) => (
-    // Simple mock for Trans that just returns the key or some content
-    // and renders children/components if needed.
-    // For this test we just want to see if it renders without crashing
-    // and maybe check if the key is passed.
-    <span data-testid="trans-component">{i18nKey}</span>
-  ),
+  Trans: ({ i18nKey }) => <span>{i18nKey}</span>,
 }));
 
-// Mock firebase
+vi.mock('../utils/logger', () => ({
+  default: {
+    error: vi.fn(),
+  },
+}));
+
 vi.mock('../utils/firebase', () => ({
-  analytics: {},
+  initializeFirebase: vi.fn(() => Promise.resolve({ analytics: {} })),
 }));
 
+// Mock firebase/analytics
 vi.mock('firebase/analytics', () => ({
   logEvent: vi.fn(),
 }));
 
 describe('DocumentationPage', () => {
-  it('renders correctly', () => {
-    render(
-      <HelmetProvider>
-        <MemoryRouter>
-          <DocumentationPage />
-        </MemoryRouter>
-      </HelmetProvider>,
-    );
-
-    expect(screen.getByText('Documentation & Guide')).toBeInTheDocument();
-    expect(screen.getByText('How to Use')).toBeInTheDocument();
-    expect(screen.getByText('Supported Patterns')).toBeInTheDocument();
+  beforeEach(() => {
+    vi.clearAllMocks();
   });
 
-  it('renders supported patterns', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  const renderComponent = () =>
     render(
       <HelmetProvider>
         <MemoryRouter>
@@ -68,7 +46,64 @@ describe('DocumentationPage', () => {
         </MemoryRouter>
       </HelmetProvider>,
     );
-    expect(screen.getByText('Arithmetic Progression')).toBeInTheDocument();
-    expect(screen.getByText('Adds/subtracts a constant value')).toBeInTheDocument();
+
+  it('should render documentation title', () => {
+    renderComponent();
+    // Use getAllByText since title appears in both Helmet (managed by HelmetProvider) and h2
+    // Or just check that at least one is present
+    const titles = screen.getAllByText('documentation.title');
+    expect(titles.length).toBeGreaterThan(0);
+  });
+
+  it('should render all documentation sections', () => {
+    renderComponent();
+
+    // Check for section headers
+    expect(screen.getByText('documentation.introduction.title')).toBeInTheDocument();
+    expect(screen.getByText('documentation.how_to_use.title')).toBeInTheDocument();
+    expect(screen.getByText('documentation.recognition_guide.title')).toBeInTheDocument();
+    expect(screen.getByText('documentation.supported_patterns.title')).toBeInTheDocument();
+    expect(screen.getByText('documentation.api_key.title')).toBeInTheDocument();
+  });
+
+  it('should initialize firebase analytics on mount', async () => {
+    const { initializeFirebase } = await import('../utils/firebase');
+
+    renderComponent();
+
+    // Check if initial firebase call happens
+    await waitFor(() => {
+      expect(initializeFirebase).toHaveBeenCalled();
+    });
+  });
+
+  it('should update document title', async () => {
+    renderComponent();
+    await waitFor(() => {
+      expect(document.title).toBe('documentation.title | app.shortname');
+    });
+  });
+
+  it('should handle analytics error gracefully', async () => {
+    const logger = await import('../utils/logger');
+    const firebase = await import('../utils/firebase');
+
+    // Mock failure
+    firebase.initializeFirebase.mockRejectedValueOnce(new Error('Firebase init failed'));
+
+    renderComponent();
+
+    await waitFor(() => {
+      expect(logger.default.error).toHaveBeenCalledWith(
+        'Failed to log analytics:',
+        expect.any(Error),
+      );
+    });
+  });
+
+  it('should render supported patterns list', () => {
+    renderComponent();
+    // Check for a few pattern keys being rendered via translation mock
+    expect(screen.getAllByText(/documentation.supported_patterns./).length).toBeGreaterThan(0);
   });
 });

@@ -253,4 +253,117 @@ describe('FeedbackDialog', () => {
 
     expect(submitButton).not.toBeDisabled();
   });
+
+  it('should handle reCAPTCHA not available during token generation', async () => {
+    const user = userEvent.setup();
+    const { addDoc } = await import('firebase/firestore');
+    const logger = await import('../utils/logger');
+
+    // Remove grecaptcha after component mounts
+    delete global.window.grecaptcha;
+
+    render(<FeedbackDialog result={mockResult} input={mockInput} />);
+
+    const yesButton = screen.getByRole('button', { name: /feedback.yes/i });
+    await user.click(yesButton);
+
+    await waitFor(() => {
+      expect(screen.getByText('feedback.thank_you')).toBeInTheDocument();
+    });
+
+    // Should still submit with null token
+    expect(addDoc).toHaveBeenCalledWith(
+      undefined,
+      expect.objectContaining({
+        recaptchaToken: null,
+      }),
+    );
+
+    expect(logger.default.warn).toHaveBeenCalledWith(
+      'reCAPTCHA not ready, skipping token generation',
+    );
+  });
+
+  it('should handle reCAPTCHA execute failure', async () => {
+    const user = userEvent.setup();
+    const logger = await import('../utils/logger');
+
+    // Mock grecaptcha.execute to fail
+    global.window.grecaptcha = {
+      ready: vi.fn((callback) => callback()),
+      execute: vi.fn(() => Promise.reject(new Error('reCAPTCHA error'))),
+    };
+
+    render(<FeedbackDialog result={mockResult} input={mockInput} />);
+
+    const yesButton = screen.getByRole('button', { name: /feedback.yes/i });
+    await user.click(yesButton);
+
+    await waitFor(() => {
+      expect(logger.default.error).toHaveBeenCalledWith(
+        'Failed to execute reCAPTCHA:',
+        expect.any(Error),
+      );
+    });
+  });
+
+  it('should show submitting state while processing feedback', async () => {
+    const user = userEvent.setup();
+    const { addDoc } = await import('firebase/firestore');
+
+    // Make addDoc slow
+    addDoc.mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          setTimeout(() => resolve({ id: 'test-id' }), 100);
+        }),
+    );
+
+    render(<FeedbackDialog result={mockResult} input={mockInput} />);
+
+    const yesButton = screen.getByRole('button', { name: /feedback.yes/i });
+    await user.click(yesButton);
+
+    // Should show submitting state
+    expect(screen.getByText('feedback.sending')).toBeInTheDocument();
+
+    // Wait for completion
+    await waitFor(() => {
+      expect(screen.getByText('feedback.thank_you')).toBeInTheDocument();
+    });
+  });
+
+  it('should handle undefined result properties gracefully', async () => {
+    const user = userEvent.setup();
+    const { addDoc } = await import('firebase/firestore');
+
+    const incompleteResult = {
+      id: 'test-3',
+    };
+
+    render(<FeedbackDialog result={incompleteResult} input={mockInput} />);
+
+    const noButton = screen.getByRole('button', { name: /feedback.no/i });
+    await user.click(noButton);
+
+    await waitFor(() => {
+      expect(screen.getByText('feedback.issue_prompt')).toBeInTheDocument();
+    });
+
+    const incorrectButton = screen.getByRole('button', { name: /feedback.reasons.incorrect/i });
+    await user.click(incorrectButton);
+
+    const submitButton = screen.getByRole('button', { name: /feedback.submit/i });
+    await user.click(submitButton);
+
+    await waitFor(() => {
+      expect(addDoc).toHaveBeenCalledWith(
+        undefined,
+        expect.objectContaining({
+          resultType: 'unknown',
+          resultRule: 'unknown',
+        }),
+      );
+    });
+  });
 });

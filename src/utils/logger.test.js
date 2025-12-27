@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import logger from './logger';
 
@@ -141,5 +142,18 @@ describe('Logger', () => {
     expect(console.info).toHaveBeenCalledTimes(1);
     expect(console.warn).toHaveBeenCalledTimes(1);
     expect(console.error).toHaveBeenCalledTimes(1);
+  });
+
+  it('should handle invalid log level gracefully', () => {
+    logger.setLevel('INVALID_LEVEL');
+    // Should not throw error and should keep existing level
+    logger.info('Test message');
+    expect(console.info).toHaveBeenCalled();
+  });
+
+  it('should use console.log as fallback for unknown level', () => {
+    // Directly call consoleTransport with unknown level
+    logger.consoleTransport('UNKNOWN', 'test message', null);
+    expect(console.log).toHaveBeenCalled();
   });
 });
