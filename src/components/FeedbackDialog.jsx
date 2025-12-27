@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import logger from '@/utils/logger';
 
 function FeedbackDialogContent({ result, input }) {

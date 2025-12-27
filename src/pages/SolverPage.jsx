@@ -1,10 +1,11 @@
-import React, { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
+import { useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
+import { useTranslation } from 'react-i18next';
+import { useLocation } from 'react-router-dom';
+
+import FeedbackDialog from '@/components/FeedbackDialog';
 import InputSection from '@/components/InputSection';
 import ResultSection from '@/components/ResultSection';
-import FeedbackDialog from '@/components/FeedbackDialog';
 import { useSolver } from '@/hooks/useSolver';
 import logger from '@/utils/logger';
 

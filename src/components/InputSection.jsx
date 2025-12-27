@@ -1,6 +1,7 @@
-import { ArrowRight, Loader2, Key } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
+import { ArrowRight, Key, Loader2 } from 'lucide-react';
 
 function InputSection({ input, setInput, onSolve, error, isLoading, apiKey, setApiKey }) {
   const [showKeyInput, setShowKeyInput] = useState(false);

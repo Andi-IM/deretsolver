@@ -1,7 +1,8 @@
-import React, { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
-import { useTranslation, Trans } from 'react-i18next';
+import { useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
+import { Trans, useTranslation } from 'react-i18next';
+import { useLocation } from 'react-router-dom';
+
 import logger from '@/utils/logger';
 
 const PATTERNS_LIST = [

@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { Link, useLocation } from 'react-router-dom';
+
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 function Layout({ children }) {

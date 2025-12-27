@@ -1,8 +1,9 @@
-import { Routes, Route } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
+
 import Layout from '@/components/Layout';
-import SolverPage from '@/pages/SolverPage';
 import DocumentationPage from '@/pages/DocumentationPage';
 import PrivacyPolicyPage from '@/pages/PrivacyPolicyPage';
+import SolverPage from '@/pages/SolverPage';
 
 function App() {
   return (

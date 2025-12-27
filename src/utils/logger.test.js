@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
 import logger from '@/utils/logger';
 
 describe('Logger', () => {

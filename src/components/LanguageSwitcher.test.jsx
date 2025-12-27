@@ -1,6 +1,8 @@
-import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
 import { useTranslation } from 'react-i18next';
+
+import { fireEvent, render, screen } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
+
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 // Mock react-i18next
