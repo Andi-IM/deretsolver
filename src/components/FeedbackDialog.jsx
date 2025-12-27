@@ -17,9 +17,11 @@ function FeedbackDialogContent({ result, input }) {
       if (window.grecaptcha) return Promise.resolve();
       return new Promise((resolve, reject) => {
         const script = document.createElement('script');
+        // Cache reCAPTCHA script for 1 hour (3600000 ms)
+        const timestamp = Math.floor(Date.now() / 3600000);
         script.src = `https://www.google.com/recaptcha/api.js?render=${
           import.meta.env.VITE_RECAPTCHA_SITE_KEY
-        }`;
+        }&t=${timestamp}`;
         script.async = true;
         script.onload = () => {
           if (window.grecaptcha?.ready) window.grecaptcha.ready(resolve);
