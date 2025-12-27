@@ -1,8 +1,10 @@
+import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from './LanguageSwitcher';
 
 function Layout({ children }) {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
   const { t } = useTranslation();
 
@@ -57,12 +59,41 @@ function Layout({ children }) {
 
             <div className="flex items-center gap-2">
               <LanguageSwitcher />
-              <button type="button" className="sm:hidden p-2 text-slate-700">
-                <span className="material-symbols-outlined">menu</span>
+              <button
+                type="button"
+                className="sm:hidden p-2 text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                aria-label="Toggle menu"
+              >
+                <span className="material-symbols-outlined">
+                  {isMobileMenuOpen ? 'close' : 'menu'}
+                </span>
               </button>
             </div>
           </div>
         </div>
+
+        {/* Mobile Menu */}
+        {isMobileMenuOpen && (
+          <div className="sm:hidden border-t border-slate-100 bg-white">
+            <nav className="flex flex-col p-4 space-y-4">
+              <Link
+                className={`${isActive('/')} block py-2 px-3 rounded-lg hover:bg-slate-50`}
+                to="/"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Solver
+              </Link>
+              <Link
+                className={`${isActive('/docs')} block py-2 px-3 rounded-lg hover:bg-slate-50`}
+                to="/docs"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Documentation
+              </Link>
+            </nav>
+          </div>
+        )}
       </header>
 
       <main className="flex-grow w-full max-w-5xl mx-auto px-4 md:px-6 py-12 space-y-12">
