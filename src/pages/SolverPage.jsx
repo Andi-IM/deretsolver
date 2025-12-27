@@ -2,11 +2,11 @@ import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Helmet } from 'react-helmet-async';
-import InputSection from '../components/InputSection';
-import ResultSection from '../components/ResultSection';
-import FeedbackDialog from '../components/FeedbackDialog';
-import { useSolver } from '../hooks/useSolver';
-import logger from '../utils/logger';
+import InputSection from '@/components/InputSection';
+import ResultSection from '@/components/ResultSection';
+import FeedbackDialog from '@/components/FeedbackDialog';
+import { useSolver } from '@/hooks/useSolver';
+import logger from '@/utils/logger';
 
 function SolverPage() {
   const { input, setInput, handleSolve, result, error, isLoading, apiKey, setApiKey } = useSolver();
@@ -15,7 +15,7 @@ function SolverPage() {
 
   // Analytics: Log page view (deferred to not block render)
   useEffect(() => {
-    import('../utils/firebase')
+    import('@/utils/firebase')
       .then(({ initializeFirebase }) => initializeFirebase())
       .then(({ analytics }) => {
         if (analytics) {

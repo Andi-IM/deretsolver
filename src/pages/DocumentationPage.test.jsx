@@ -3,7 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
-import DocumentationPage from './DocumentationPage';
+import DocumentationPage from '@/pages/DocumentationPage';
 
 // Mock dependencies
 vi.mock('react-i18next', () => ({
@@ -14,13 +14,13 @@ vi.mock('react-i18next', () => ({
   Trans: ({ i18nKey }) => <span>{i18nKey}</span>,
 }));
 
-vi.mock('../utils/logger', () => ({
+vi.mock('@/utils/logger', () => ({
   default: {
     error: vi.fn(),
   },
 }));
 
-vi.mock('../utils/firebase', () => ({
+vi.mock('@/utils/firebase', () => ({
   initializeFirebase: vi.fn(() => Promise.resolve({ analytics: {} })),
 }));
 
@@ -67,7 +67,7 @@ describe('DocumentationPage', () => {
   });
 
   it('should initialize firebase analytics on mount', async () => {
-    const { initializeFirebase } = await import('../utils/firebase');
+    const { initializeFirebase } = await import('@/utils/firebase');
 
     renderComponent();
 
@@ -85,8 +85,8 @@ describe('DocumentationPage', () => {
   });
 
   it('should handle analytics error gracefully', async () => {
-    const logger = await import('../utils/logger');
-    const firebase = await import('../utils/firebase');
+    const logger = await import('@/utils/logger');
+    const firebase = await import('@/utils/firebase');
 
     // Mock failure
     firebase.initializeFirebase.mockRejectedValueOnce(new Error('Firebase init failed'));

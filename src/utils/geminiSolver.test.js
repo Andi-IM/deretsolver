@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import solveWithGemini from './geminiSolver';
+import solveWithGemini from '@/utils/geminiSolver';
 
 // Mock the GoogleGenAI library
 const { MockGoogleGenAI } = vi.hoisted(() => ({
@@ -11,7 +11,7 @@ vi.mock('@google/genai', () => ({
 }));
 
 // Mock the logger to avoid Firebase initialization during tests
-vi.mock('./logger', () => ({
+vi.mock('@/utils/logger', () => ({
   default: {
     debug: vi.fn(),
     info: vi.fn(),
@@ -166,7 +166,7 @@ describe('solveWithGemini', () => {
 
   it('handles corrupted connection items gracefully', async () => {
     // Import logger to spy on it
-    const logger = await import('./logger');
+    const logger = await import('@/utils/logger');
     const loggerErrorSpy = vi.spyOn(logger.default, 'error');
 
     const mockResultData = {

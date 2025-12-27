@@ -1,7 +1,7 @@
 import { GoogleGenAI } from '@google/genai';
 import { z } from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
-import logger from './logger';
+import logger from '@/utils/logger';
 
 /**
  * Solves a number sequence using the Gemini API.

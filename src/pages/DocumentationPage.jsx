@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useTranslation, Trans } from 'react-i18next';
 import { Helmet } from 'react-helmet-async';
-import logger from '../utils/logger';
+import logger from '@/utils/logger';
 
 const PATTERNS_LIST = [
   { key: 'arithmetic', example: '2, 5, 8, 11' },
@@ -20,7 +20,7 @@ function DocumentationPage() {
 
   // Analytics: Log page view (deferred to not block render)
   useEffect(() => {
-    import('../utils/firebase')
+    import('@/utils/firebase')
       .then(({ initializeFirebase }) => initializeFirebase())
       .then(({ analytics }) => {
         if (analytics) {

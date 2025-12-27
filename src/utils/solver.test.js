@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import solveSequence from './solver';
+import solveSequence from '@/utils/solver';
 
 describe('solveSequence', () => {
   it('solves geometric sequence 2,4,8,16 -> 32', () => {

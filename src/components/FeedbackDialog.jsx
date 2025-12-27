@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import logger from '../utils/logger';
+import logger from '@/utils/logger';
 
 function FeedbackDialogContent({ result, input }) {
   const [status, setStatus] = useState('idle'); // idle, helpful, not_helpful_form, submitting, submitted
@@ -72,7 +72,7 @@ function FeedbackDialogContent({ result, input }) {
       const recaptchaToken = await getRecaptchaToken();
 
       // Lazy load Firebase
-      const { initializeFirebase } = await import('../utils/firebase');
+      const { initializeFirebase } = await import('@/utils/firebase');
       const { db } = await initializeFirebase();
       const { collection, addDoc, serverTimestamp } = await import('firebase/firestore');
 
@@ -104,7 +104,7 @@ function FeedbackDialogContent({ result, input }) {
       const recaptchaToken = await getRecaptchaToken();
 
       // Lazy load Firebase
-      const { initializeFirebase } = await import('../utils/firebase');
+      const { initializeFirebase } = await import('@/utils/firebase');
       const { db } = await initializeFirebase();
       const { collection, addDoc, serverTimestamp } = await import('firebase/firestore');
 

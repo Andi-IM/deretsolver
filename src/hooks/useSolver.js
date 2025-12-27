@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import solveSequence from '../utils/solver';
-import solveWithGemini from '../utils/geminiSolver';
+import solveSequence from '@/utils/solver';
+import solveWithGemini from '@/utils/geminiSolver';
 
 export const useSolver = () => {
   const [input, setInput] = useState('');

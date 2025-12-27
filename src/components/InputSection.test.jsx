@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import InputSection from './InputSection';
+import InputSection from '@/components/InputSection';
 
 // Mock react-i18next
 vi.mock('react-i18next', () => ({

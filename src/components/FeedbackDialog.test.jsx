@@ -2,10 +2,10 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import FeedbackDialog from './FeedbackDialog';
+import FeedbackDialog from '@/components/FeedbackDialog';
 
 // Mock modules
-vi.mock('../utils/logger', () => ({
+vi.mock('@/utils/logger', () => ({
   default: {
     error: vi.fn(),
     warn: vi.fn(),
@@ -19,7 +19,7 @@ vi.mock('react-i18next', () => ({
   }),
 }));
 
-vi.mock('../utils/firebase', () => ({
+vi.mock('@/utils/firebase', () => ({
   initializeFirebase: vi.fn(() =>
     Promise.resolve({
       db: {},
@@ -189,7 +189,7 @@ describe('FeedbackDialog', () => {
   it('should handle Firebase submission error gracefully', async () => {
     const user = userEvent.setup();
     const { addDoc } = await import('firebase/firestore');
-    const logger = await import('../utils/logger');
+    const logger = await import('@/utils/logger');
 
     addDoc.mockRejectedValueOnce(new Error('Firebase error'));
 
@@ -257,7 +257,7 @@ describe('FeedbackDialog', () => {
   it('should handle reCAPTCHA not available during token generation', async () => {
     const user = userEvent.setup();
     const { addDoc } = await import('firebase/firestore');
-    const logger = await import('../utils/logger');
+    const logger = await import('@/utils/logger');
 
     // Remove grecaptcha after component mounts
     delete global.window.grecaptcha;
@@ -286,7 +286,7 @@ describe('FeedbackDialog', () => {
 
   it('should handle reCAPTCHA execute failure', async () => {
     const user = userEvent.setup();
-    const logger = await import('../utils/logger');
+    const logger = await import('@/utils/logger');
 
     // Mock grecaptcha.execute to fail
     global.window.grecaptcha = {

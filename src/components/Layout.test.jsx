@@ -3,10 +3,10 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
-import Layout from './Layout';
+import Layout from '@/components/Layout';
 
 // Mock language switcher to avoid complex setup
-vi.mock('./LanguageSwitcher', () => ({
+vi.mock('@/components/LanguageSwitcher', () => ({
   default: () => <button type="button">Switch Language</button>,
 }));
 
