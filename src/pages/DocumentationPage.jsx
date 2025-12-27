@@ -37,15 +37,16 @@ function DocumentationPage() {
       .catch((err) => logger.error('Failed to log analytics:', err));
   }, [location.pathname]);
 
-  // Update document title manually to ensure it works with client-side navigation
-  useEffect(() => {
-    document.title = `${t('documentation.title')} | ${t('app.shortname')}`;
-  }, [t, location.pathname]);
-
   return (
     <>
       <Helmet>
+        <title>{`${t('documentation.title')} | ${t('app.shortname')}`}</title>
         <meta name="description" content={t('app.description')} />
+        <link rel="canonical" href="https://deretsolver.airham.my.id/docs" />
+        <meta property="og:title" content={`${t('documentation.title')} | ${t('app.shortname')}`} />
+        <meta property="og:description" content={t('app.description')} />
+        <meta property="og:url" content="https://deretsolver.airham.my.id/docs" />
+        <meta property="og:type" content="article" />
         <html lang={i18n.language} />
       </Helmet>
       <div className="w-full max-w-4xl mx-auto">
