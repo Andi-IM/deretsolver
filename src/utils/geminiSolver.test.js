@@ -93,4 +93,74 @@ describe('solveWithGemini', () => {
     expect(result.error).toContain('Failed to connect to Gemini API');
     expect(result.error).toContain('Network Error');
   });
+
+  it('handles interleaved sequence response', async () => {
+    const mockResultData = {
+      type: 'Interleaved Sequence',
+      rule: 'Two sequences: +1 and +10',
+      next: 30,
+      sequenceValues: [1, 10, 2, 20, 3, 30, 4],
+      sequenceLabels: ['n1', 'n2', 'n3', 'n4', 'n5', 'pred1', 'pred2'],
+      connections: [],
+      isInterleaved: true,
+      predictions: [30, 4],
+    };
+
+    const mockResponse = {
+      text: JSON.stringify(mockResultData),
+    };
+
+    const mockGenerateContent = vi.fn(async () => mockResponse);
+
+    // eslint-disable-next-line prefer-arrow-callback
+    MockGoogleGenAI.mockImplementation(function mockConstructor() {
+      return {
+        models: {
+          generateContent: mockGenerateContent,
+        },
+      };
+    });
+
+    const result = await solveWithGemini(mockInput, mockApiKey);
+
+    expect(result).not.toHaveProperty('error');
+    expect(result.isInterleaved).toBe(true);
+    expect(result.predictions).toEqual([30, 4]);
+  });
+
+  it('handles connections preprocessing', async () => {
+    const mockResultData = {
+      type: 'Arithmetic Sequence',
+      rule: 'Add 2',
+      next: 10,
+      sequenceValues: [2, 4, 6, 8, 10],
+      sequenceLabels: ['n1', 'n2', 'n3', 'n4', 'n5'],
+      connections: [
+        { fromIndex: 0, toIndex: 1, label: '+2', type: 'add' },
+        { fromIndex: 1, toIndex: 2, label: '+2', type: 'add' },
+      ],
+      isInterleaved: false,
+      predictions: [10],
+    };
+
+    const mockResponse = {
+      text: JSON.stringify(mockResultData),
+    };
+
+    const mockGenerateContent = vi.fn(async () => mockResponse);
+
+    // eslint-disable-next-line prefer-arrow-callback
+    MockGoogleGenAI.mockImplementation(function mockConstructor() {
+      return {
+        models: {
+          generateContent: mockGenerateContent,
+        },
+      };
+    });
+
+    const result = await solveWithGemini(mockInput, mockApiKey);
+
+    expect(result.connections).toBeDefined();
+    expect(result.connections.length).toBe(2);
+  });
 });
