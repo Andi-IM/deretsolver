@@ -1,3 +1,6 @@
+[![CodeQL](https://github.com/Andi-IM/deretsolver/actions/workflows/codeql.yml/badge.svg)](https://github.com/Andi-IM/deretsolver/actions/workflows/codeql.yml)
+[![Deploy to Firebase Hosting on merge](https://github.com/Andi-IM/deretsolver/actions/workflows/firebase-hosting-merge.yml/badge.svg)](https://github.com/Andi-IM/deretsolver/actions/workflows/firebase-hosting-merge.yml)
+
 # Deret Solver
 
 **Deret Solver** is an intelligent number sequence solver that combines local pattern detection with AI-powered analysis. It helps users identify, visualize, and understand various types of number sequences including arithmetic, geometric, Fibonacci, interleaved patterns, and more complex sequences.

@@ -24,3 +24,7 @@ coverage
 *.sln
 *.sw?
 .env
+test-results
+test_**.txt
+.nyc_output
+playwright-report

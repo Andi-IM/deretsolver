@@ -1,0 +1,27 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["react", "jsx-a11y", "import"],
+  "env": {
+    "browser": true,
+    "es2020": true
+  },
+  "globals": {
+    "React": "readonly"
+  },
+  "rules": {
+    "no-console": "warn",
+    "no-unused-vars": "error",
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn"
+  },
+  "overrides": [
+    {
+      "files": ["e2e/**/*.js", "e2e/**/*.spec.js", "**/*.test.js", "**/*.test.jsx", "**/*.spec.js"],
+      "rules": {
+        "no-unused-expressions": "off",
+        "no-console": "off"
+      }
+    }
+  ],
+  "ignorePatterns": ["dist/**", "node_modules/**", "coverage/**"]
+}

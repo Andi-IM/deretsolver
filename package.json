@@ -7,9 +7,11 @@
   "scripts": {
     "dev": "vite",
     "test": "vitest",
-    "test:browser": "vitest --config vitest.browser.config.js",
+    "test:e2e": "playwright test",
+    "test:e2e:coverage": "cross-env VITE_COVERAGE=true playwright test",
+    "coverage:e2e": "npm run test:e2e:coverage && nyc report --reporter=text --reporter=html",
     "build": "vite build",
-    "lint": "eslint .",
+    "lint": "oxlint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "preview": "vite preview"
@@ -30,8 +32,7 @@
     "zod-to-json-schema": "^3.25.0"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3.3.3",
-    "@eslint/js": "^9.39.1",
+    "@playwright/test": "^1.57.0",
     "@tailwindcss/postcss": "^4.1.18",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
@@ -40,28 +41,18 @@
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
-    "@vitest/browser": "^4.0.16",
-    "@vitest/browser-playwright": "^4.0.16",
     "@vitest/coverage-v8": "^4.0.16",
     "autoprefixer": "^10.4.23",
-    "eslint": "^9.39.1",
-    "eslint-config-airbnb": "^19.0.4",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-import-resolver-node": "^0.3.9",
-    "eslint-plugin-import": "^2.32.0",
-    "eslint-plugin-jsx-a11y": "^6.10.2",
-    "eslint-plugin-prettier": "^5.5.4",
-    "eslint-plugin-react": "^7.37.5",
-    "eslint-plugin-react-hooks": "^7.0.1",
-    "eslint-plugin-react-refresh": "^0.4.24",
-    "globals": "^16.5.0",
+    "cross-env": "^10.1.0",
     "jsdom": "^27.3.0",
+    "nyc": "^17.1.0",
+    "oxlint": "^1.35.0",
     "playwright": "^1.57.0",
     "postcss": "^8.5.6",
     "prettier": "^3.7.4",
     "tailwindcss": "^4.1.18",
     "vite": "^7.2.4",
-    "vitest": "^4.0.16",
-    "vitest-browser-react": "^2.0.2"
+    "vite-plugin-istanbul": "^7.2.1",
+    "vitest": "^4.0.16"
   }
 }

@@ -1,0 +1,48 @@
+﻿
+D:\deretsolver\e2e\documentation.spec.js
+   7:46  error  Unexpected dangling '_' in '__coverage__'                              no-underscore-dangle
+  42:5   error  Expected an assignment or function call and instead saw an expression  no-unused-expressions
+  49:5   error  Expected an assignment or function call and instead saw an expression  no-unused-expressions
+
+D:\deretsolver\e2e\edge-cases.spec.js
+  7:46  error  Unexpected dangling '_' in '__coverage__'  no-underscore-dangle
+
+D:\deretsolver\e2e\feedback.spec.js
+   7:46  error  Unexpected dangling '_' in '__coverage__'                              no-underscore-dangle
+  35:5   error  Expected an assignment or function call and instead saw an expression  no-unused-expressions
+  73:5   error  Expected an assignment or function call and instead saw an expression  no-unused-expressions
+
+D:\deretsolver\e2e\input.spec.js
+   7:46  error  Unexpected dangling '_' in '__coverage__'                              no-underscore-dangle
+  46:5   error  Expected an assignment or function call and instead saw an expression  no-unused-expressions
+
+D:\deretsolver\e2e\layout.spec.js
+    7:46  error  Unexpected dangling '_' in '__coverage__'                              no-underscore-dangle
+   24:5   error  Expected an assignment or function call and instead saw an expression  no-unused-expressions
+   38:5   error  Expected an assignment or function call and instead saw an expression  no-unused-expressions
+   48:5   error  Expected an assignment or function call and instead saw an expression  no-unused-expressions
+  107:5   error  Expected an assignment or function call and instead saw an expression  no-unused-expressions
+
+D:\deretsolver\e2e\navigation.spec.js
+  7:46  error  Unexpected dangling '_' in '__coverage__'  no-underscore-dangle
+
+D:\deretsolver\e2e\privacy.spec.js
+   7:46  error  Unexpected dangling '_' in '__coverage__'                              no-underscore-dangle
+  34:5   error  Expected an assignment or function call and instead saw an expression  no-unused-expressions
+  41:5   error  Expected an assignment or function call and instead saw an expression  no-unused-expressions
+  50:5   error  Expected an assignment or function call and instead saw an expression  no-unused-expressions
+
+D:\deretsolver\e2e\result.spec.js
+   7:46  error  Unexpected dangling '_' in '__coverage__'                              no-underscore-dangle
+  38:5   error  Expected an assignment or function call and instead saw an expression  no-unused-expressions
+  47:5   error  Expected an assignment or function call and instead saw an expression  no-unused-expressions
+  58:5   error  Expected an assignment or function call and instead saw an expression  no-unused-expressions
+  67:5   error  Expected an assignment or function call and instead saw an expression  no-unused-expressions
+  77:5   error  Expected an assignment or function call and instead saw an expression  no-unused-expressions
+  86:5   error  Expected an assignment or function call and instead saw an expression  no-unused-expressions
+
+D:\deretsolver\e2e\solver.spec.js
+  145:5  error  Expected an assignment or function call and instead saw an expression  no-unused-expressions
+
+Γ£û 27 problems (27 errors, 0 warnings)
+

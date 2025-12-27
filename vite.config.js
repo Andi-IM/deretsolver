@@ -1,15 +1,25 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import istanbul from 'vite-plugin-istanbul';
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    // Only instrument code when running E2E coverage
+    istanbul({
+      include: 'src/*',
+      exclude: ['node_modules', 'test/', 'e2e/'],
+      extension: ['.js', '.jsx'],
+      requireEnv: true, // Only instrument when VITE_COVERAGE=true
+    }),
+  ],
   envPrefix: ['VITE_', 'GOOGLE_AI_APIKEY'],
   test: {
     globals: true,
     environment: 'jsdom',
     setupFiles: './src/test/setup.js',
-    exclude: ['**/node_modules/**', '**/dist/**', '**/*.browser.test.*'],
+    exclude: ['**/node_modules/**', '**/dist/**', '**/e2e/**'],
   },
   build: {
     target: 'es2017',

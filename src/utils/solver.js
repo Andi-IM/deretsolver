@@ -27,20 +27,20 @@ const solveSequence = (input) => {
   result = detectGeometric(nums);
   if (result) return result;
 
-  // 3. Fibonacci
+  // 3. Square/Cube (Check this early as it is specific)
+  result = detectPower(nums);
+  if (result) return result;
+
+  // 4. Fibonacci
   result = detectFibonacci(nums);
   if (result) return result;
 
-  // 4. Two-Level Difference
+  // 5. Two-Level Difference
   result = detectTwoLevel(nums);
   if (result) return result;
 
-  // 5. Interleaved (Alternating)
+  // 6. Interleaved (Alternating)
   result = detectInterleaved(nums);
-  if (result) return result;
-
-  // 6. Square/Cube
-  result = detectPower(nums);
   if (result) return result;
 
   return { error: 'Pattern not found.' };
@@ -342,10 +342,10 @@ function detectPower(nums) {
   // Check if n = i^2 or i^3 (assuming 1-based or 0-based index?)
   // Or just check if sqrt is int?
   // 1, 4, 9, 16
-  const roots = nums.map((n) => Math.sqrt(n));
-  if (roots.every((r) => Number.isInteger(r))) {
+  const roots2 = nums.map((n) => Math.sqrt(n));
+  if (roots2.every((r) => Number.isInteger(r))) {
     // Check if roots are arithmetic
-    const rootResult = detectArithmetic(roots);
+    const rootResult = detectArithmetic(roots2);
     if (rootResult) {
       const nextRoot = rootResult.next;
       const next = nextRoot * nextRoot;
@@ -374,6 +374,43 @@ function detectPower(nums) {
       };
     }
   }
+
+  // Check for Cubes
+  const roots3 = nums.map((n) => Math.cbrt(n));
+  // Use a small epsilon for float precision issues with cbrt, or Math.round if expected int
+  // Math.cbrt(8) is 2. Math.cbrt(64) is 4.
+  if (roots3.every((r) => Math.abs(r - Math.round(r)) < 0.0001)) {
+    const roundedRoots = roots3.map(Math.round);
+    const rootResult = detectArithmetic(roundedRoots);
+    if (rootResult) {
+      const nextRoot = rootResult.next;
+      const next = nextRoot * nextRoot * nextRoot;
+
+      const connections = [];
+      for (let i = 0; i < nums.length; i += 1) {
+        connections.push({
+          fromIndex: i,
+          toIndex: i + 1,
+          label: '^3',
+          type: 'pow',
+        });
+      }
+
+      return {
+        type: 'Perfect Cubes',
+        rule: 'Cubes of integers',
+        next,
+        visualization: {
+          nodes: [
+            ...nums.map((n, i) => ({ value: n, label: `i=${i}` })),
+            { value: next, label: 'Next', isPrediction: true },
+          ],
+          connections,
+        },
+      };
+    }
+  }
+
   return null;
 }
 
