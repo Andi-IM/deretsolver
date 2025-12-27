@@ -1,16 +1,91 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import logger from '../utils/logger';
 
-function FeedbackDialog({ result, input }) {
+function FeedbackDialogContent({ result, input }) {
   const [status, setStatus] = useState('idle'); // idle, helpful, not_helpful_form, submitting, submitted
   const [reason, setReason] = useState('');
   const [comment, setComment] = useState('');
+  const [recaptchaReady, setRecaptchaReady] = useState(false);
   const { t } = useTranslation();
+
+  // Lazy load reCAPTCHA script
+  useEffect(() => {
+    let mounted = true;
+
+    const loadReCaptchaScript = () =>
+      new Promise((resolve, reject) => {
+        // Check if already loaded
+        if (window.grecaptcha) {
+          resolve();
+          return;
+        }
+
+        // Create script element
+        const script = document.createElement('script');
+        script.src = `https://www.google.com/recaptcha/api.js?render=${
+          import.meta.env.VITE_RECAPTCHA_SITE_KEY
+        }`;
+        script.async = true;
+        script.defer = true;
+
+        script.onload = () => {
+          // Wait for grecaptcha to be ready
+          if (window.grecaptcha && window.grecaptcha.ready) {
+            window.grecaptcha.ready(() => {
+              resolve();
+            });
+          } else {
+            resolve();
+          }
+        };
+
+        script.onerror = (error) => {
+          reject(error);
+        };
+
+        document.head.appendChild(script);
+      });
+
+    loadReCaptchaScript()
+      .then(() => {
+        if (mounted) {
+          setRecaptchaReady(true);
+          logger.info('reCAPTCHA loaded successfully');
+        }
+      })
+      .catch((error) => {
+        logger.error('Failed to load reCAPTCHA script:', error);
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const getRecaptchaToken = useCallback(async () => {
+    if (!recaptchaReady || !window.grecaptcha) {
+      logger.warn('reCAPTCHA not ready, skipping token generation');
+      return null;
+    }
+
+    try {
+      const token = await window.grecaptcha.execute(import.meta.env.VITE_RECAPTCHA_SITE_KEY, {
+        action: 'submit_feedback',
+      });
+      return token;
+    } catch (error) {
+      logger.error('Failed to execute reCAPTCHA:', error);
+      return null;
+    }
+  }, [recaptchaReady]);
 
   const handleHelpful = async () => {
     setStatus('submitting');
     try {
+      // Get reCAPTCHA token
+      const recaptchaToken = await getRecaptchaToken();
+
       // Lazy load Firebase
       const { initializeFirebase } = await import('../utils/firebase');
       const { db } = await initializeFirebase();
@@ -22,6 +97,7 @@ function FeedbackDialog({ result, input }) {
         answer: result.predictions ? result.predictions.join(', ') : result.next,
         resultType: result.type,
         resultRule: result.rule,
+        recaptchaToken,
         timestamp: serverTimestamp(),
       });
       setStatus('submitted');
@@ -39,6 +115,9 @@ function FeedbackDialog({ result, input }) {
     if (!reason) return;
     setStatus('submitting');
     try {
+      // Get reCAPTCHA token
+      const recaptchaToken = await getRecaptchaToken();
+
       // Lazy load Firebase
       const { initializeFirebase } = await import('../utils/firebase');
       const { db } = await initializeFirebase();
@@ -52,6 +131,7 @@ function FeedbackDialog({ result, input }) {
         answer: result?.predictions ? result.predictions.join(', ') : result?.next,
         resultType: result?.type || 'unknown',
         resultRule: result?.rule || 'unknown',
+        recaptchaToken,
         timestamp: serverTimestamp(),
       });
       setStatus('submitted');
@@ -184,6 +264,17 @@ function FeedbackDialog({ result, input }) {
       </div>
     </div>
   );
+}
+
+/**
+ * Wrapper component that only loads reCAPTCHA when FeedbackDialog is rendered
+ */
+function FeedbackDialog({ result, input }) {
+  // Only render if there's a result
+  if (!result) return null;
+
+  // Render the dialog content, which will trigger lazy loading of reCAPTCHA
+  return <FeedbackDialogContent result={result} input={input} />;
 }
 
 export default FeedbackDialog;

@@ -17,16 +17,7 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          react: [
-            'react',
-            'react-dom',
-            'react-router-dom',
-            'react-google-recaptcha-v3',
-            'react-helmet-async',
-            'react-i18next',
-            'react-router-dom',
-            'react-router-dom',
-          ],
+          react: ['react', 'react-dom', 'react-router-dom', 'react-helmet-async', 'react-i18next'],
           zod: ['zod', 'zod-to-json-schema'],
           material: ['@fontsource/material-symbols-outlined', 'lucide-react'],
           firebase: ['firebase', '@google/genai'],
