@@ -203,7 +203,7 @@
       "intro": "When you use Deret Solver, we may collect the following information:",
       "usage_data": {
         "title": "Usage Data:",
-        "content": "We collect information about how you interact with our service, including the sequences you solve and features you use."
+        "content": "We collect information about how you interact with our service, including the sequences you solve and features you use. User feedback (ratings, comments) and related sequence data are stored to improve our service."
       },
       "analytics_data": {
         "title": "Analytics Data:",
@@ -239,7 +239,11 @@
       },
       "firebase": {
         "title": "Firebase:",
-        "content": "For hosting and analytics services"
+        "content": "For hosting, database storage (Firestore), and analytics services"
+      },
+      "gemini_api": {
+        "title": "Google Gemini API:",
+        "content": "We use Google's Gemini AI to process and solve advanced number sequences. Your input data is sent to Google for this specific processing purpose."
       }
     },
     "cookies": {

@@ -101,6 +101,10 @@ function PrivacyPolicyPage() {
                 <strong>{t('privacy.third_party.firebase.title')}</strong>{' '}
                 {t('privacy.third_party.firebase.content')}
               </li>
+              <li>
+                <strong>{t('privacy.third_party.gemini_api.title')}</strong>{' '}
+                {t('privacy.third_party.gemini_api.content')}
+              </li>
             </ul>
           </section>
 

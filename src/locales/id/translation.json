@@ -203,7 +203,7 @@
       "intro": "Saat Anda menggunakan Deret Solver, kami dapat mengumpulkan informasi berikut:",
       "usage_data": {
         "title": "Data Penggunaan:",
-        "content": "Kami mengumpulkan informasi tentang bagaimana Anda berinteraksi dengan layanan kami, termasuk deret yang Anda pecahkan dan fitur yang Anda gunakan."
+        "content": "Kami mengumpulkan informasi tentang interaksi Anda dengan layanan kami, termasuk deret yang Anda pecahkan. Umpan balik pengguna (penilaian, komentar) dan data deret terkait disimpan untuk meningkatkan layanan kami."
       },
       "analytics_data": {
         "title": "Data Analitik:",
@@ -239,7 +239,11 @@
       },
       "firebase": {
         "title": "Firebase:",
-        "content": "Untuk hosting dan layanan analitik"
+        "content": "Untuk hosting, penyimpanan basis data (Firestore), dan layanan analitik"
+      },
+      "gemini_api": {
+        "title": "Google Gemini API:",
+        "content": "Kami menggunakan AI Gemini Google untuk memproses dan memecahkan deret angka tingkat lanjut. Data input Anda dikirim ke Google untuk tujuan pemrosesan spesifik ini."
       }
     },
     "cookies": {
