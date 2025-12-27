@@ -1,5 +1,7 @@
 import { useTranslation } from 'react-i18next';
 
+import { sanitize } from '@/utils/security';
+
 function ResultSection({ result }) {
   const { t } = useTranslation();
   if (!result) return null;
@@ -35,13 +37,15 @@ function ResultSection({ result }) {
               <h4 className="text-xs font-bold text-slate-600 mb-1 uppercase tracking-wider">
                 {t('result.pattern_type')}
               </h4>
-              <p className="text-lg font-bold text-slate-900 leading-tight">{result.type}</p>
+              <p className="text-lg font-bold text-slate-900 leading-tight">
+                {sanitize(result.type)}
+              </p>
             </div>
             <div>
               <h4 className="text-xs font-bold text-slate-600 mb-1 uppercase tracking-wider">
                 {t('result.rule')}
               </h4>
-              <p className="text-base text-slate-600 leading-relaxed">{result.rule}</p>
+              <p className="text-base text-slate-600 leading-relaxed">{sanitize(result.rule)}</p>
             </div>
           </div>
 

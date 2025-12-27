@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import logger from '@/utils/logger';
+import { sanitize } from '@/utils/security';
 
 function FeedbackDialogContent({ result, input }) {
   const [status, setStatus] = useState('idle'); // idle, helpful, not_helpful_form, submitting, submitted
@@ -79,10 +80,10 @@ function FeedbackDialogContent({ result, input }) {
 
       await addDoc(collection(db, 'feedback'), {
         isHelpful: true,
-        question: input,
+        question: sanitize(input),
         answer: result.predictions ? result.predictions.join(', ') : result.next,
-        resultType: result.type,
-        resultRule: result.rule,
+        resultType: sanitize(result.type),
+        resultRule: sanitize(result.rule),
         recaptchaToken,
         timestamp: serverTimestamp(),
       });
@@ -112,11 +113,11 @@ function FeedbackDialogContent({ result, input }) {
       await addDoc(collection(db, 'feedback'), {
         isHelpful: false,
         reason,
-        comment,
-        question: input,
+        comment: sanitize(comment),
+        question: sanitize(input),
         answer: result?.predictions ? result.predictions.join(', ') : result?.next,
-        resultType: result?.type || 'unknown',
-        resultRule: result?.rule || 'unknown',
+        resultType: sanitize(result?.type || 'unknown'),
+        resultRule: sanitize(result?.rule || 'unknown'),
         recaptchaToken,
         timestamp: serverTimestamp(),
       });
