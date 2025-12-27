@@ -79,13 +79,13 @@ function Layout({ children }) {
           <p className="text-sm text-slate-600">
             © {new Date().getFullYear()} Deret Solver. Mathematics made visual.
           </p>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-slate-600">
             This site is protected by reCAPTCHA and the Google{' '}
             <a
               href="https://policies.google.com/privacy"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-600 hover:underline"
+              className="text-blue-700 underline hover:text-blue-800"
             >
               Privacy Policy
             </a>{' '}
@@ -94,7 +94,7 @@ function Layout({ children }) {
               href="https://policies.google.com/terms"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-600 hover:underline"
+              className="text-blue-700 underline hover:text-blue-800"
             >
               Terms of Service
             </a>{' '}

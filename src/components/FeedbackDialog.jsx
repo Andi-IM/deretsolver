@@ -13,39 +13,22 @@ function FeedbackDialogContent({ result, input }) {
   useEffect(() => {
     let mounted = true;
 
-    const loadReCaptchaScript = () =>
-      new Promise((resolve, reject) => {
-        // Check if already loaded
-        if (window.grecaptcha) {
-          resolve();
-          return;
-        }
-
-        // Create script element
+    const loadReCaptchaScript = () => {
+      if (window.grecaptcha) return Promise.resolve();
+      return new Promise((resolve, reject) => {
         const script = document.createElement('script');
         script.src = `https://www.google.com/recaptcha/api.js?render=${
           import.meta.env.VITE_RECAPTCHA_SITE_KEY
         }`;
         script.async = true;
-        script.defer = true;
-
         script.onload = () => {
-          // Wait for grecaptcha to be ready
-          if (window.grecaptcha && window.grecaptcha.ready) {
-            window.grecaptcha.ready(() => {
-              resolve();
-            });
-          } else {
-            resolve();
-          }
+          if (window.grecaptcha?.ready) window.grecaptcha.ready(resolve);
+          else resolve();
         };
-
-        script.onerror = (error) => {
-          reject(error);
-        };
-
+        script.onerror = reject;
         document.head.appendChild(script);
       });
+    };
 
     loadReCaptchaScript()
       .then(() => {
