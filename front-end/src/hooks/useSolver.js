@@ -5,9 +5,7 @@ import solveSequence from '@/utils/solver';
 
 export const useSolver = () => {
   const [input, setInput] = useState('');
-  const [apiKey, setApiKey] = useState(
-    import.meta.env.GOOGLE_AI_APIKEY || import.meta.env.VITE_GEMINI_API_KEY || '',
-  );
+  const [apiKey, setApiKey] = useState('');
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);

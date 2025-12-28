@@ -35,11 +35,19 @@ const solveSequence = (input) => {
   result = detectFibonacci(nums);
   if (result) return result;
 
-  // 5. Two-Level Difference
+  // 5. Prime Numbers
+  result = detectPrimes(nums);
+  if (result) return result;
+
+  // 6. Factorials
+  result = detectFactorials(nums);
+  if (result) return result;
+
+  // 7. Two-Level Difference
   result = detectTwoLevel(nums);
   if (result) return result;
 
-  // 6. Interleaved (Alternating)
+  // 8. Interleaved (Alternating)
   result = detectInterleaved(nums);
   if (result) return result;
 
@@ -409,6 +417,139 @@ function detectPower(nums) {
         },
       };
     }
+  }
+
+  return null;
+}
+
+function detectPrimes(nums) {
+  // Primes: 2, 3, 5, 7, 11...
+  // Check if all numbers are valid consecutive primes
+
+  const isPrime = (num) => {
+    if (num < 2) return false;
+    for (let i = 2; i <= Math.sqrt(num); i++) {
+      if (num % i === 0) return false;
+    }
+    return true;
+  };
+
+  // 1. All must be prime
+  if (!nums.every(isPrime)) return null;
+
+  // 2. Must be consecutive primes in ascending order
+  // Generate primes up to the last number + gap to verify consecutiveness
+  // Heuristic: Find index of first number in prime list
+
+  const generatePrimes = (max) => {
+    const primes = [];
+    for (let i = 2; i <= max; i++) {
+      if (isPrime(i)) primes.push(i);
+    }
+    return primes;
+  };
+
+  // Generate enough primes to cover the range significantly
+  // (Assuming reasonable input size < 1000 for local solver)
+  const lastNum = nums[nums.length - 1];
+  // Generate a bit more to find the next one
+  const referencePrimes = generatePrimes(lastNum + 100);
+
+  const startIndex = referencePrimes.indexOf(nums[0]);
+  if (startIndex === -1) return null; // Should not happen if isPrime check passed
+
+  // Check if input sequence matches the reference slice
+  const slice = referencePrimes.slice(startIndex, startIndex + nums.length);
+  const isConsecutivePrimes = JSON.stringify(slice) === JSON.stringify(nums);
+
+  if (isConsecutivePrimes) {
+    const nextFn = referencePrimes[startIndex + nums.length]; // The one after the slice
+
+    // Visualization
+    const nodes = nums.map((n, i) => ({ value: n, label: `p${i + 1}` }));
+    nodes.push({ value: nextFn, label: 'Next Prime', isPrediction: true });
+
+    const connections = nums.slice(0, nums.length - 1).map((_, i) => ({
+      fromIndex: i,
+      toIndex: i + 1,
+      label: 'prime',
+      type: 'other',
+    }));
+    // Connect to prediction
+    connections.push({
+      fromIndex: nums.length - 1,
+      toIndex: nums.length,
+      label: 'prime',
+      type: 'other',
+    });
+
+    return {
+      type: 'Prime Numbers',
+      rule: 'Sequence of consecutive prime numbers',
+      next: nextFn,
+      visualization: { nodes, connections },
+    };
+  }
+
+  return null;
+}
+
+function detectFactorials(nums) {
+  // 1, 2, 6, 24, 120... (n!)
+  // Check if nums[i] == (i+1)! or similar offset?
+  // Or just check if each number is a factorial.
+
+  const getFactorialMap = (maxVal) => {
+    const map = new Map();
+    let f = 1;
+    let i = 1;
+    while (f <= maxVal) {
+      map.set(f, i); // value -> index (1->1, 2->2, 6->3, 24->4)
+      i++;
+      f *= i;
+    }
+    return map;
+  };
+
+  const lastNum = nums[nums.length - 1];
+  const factorialMap = getFactorialMap(Math.max(lastNum, 120)); // Ensure at least some range
+
+  if (!nums.every((n) => factorialMap.has(n))) return null;
+
+  // Check consecutiveness of the factorial indices
+  const indices = nums.map((n) => factorialMap.get(n));
+  const detectIndices = detectArithmetic(indices);
+
+  if (detectIndices && detectIndices.rule.includes('Add 1')) {
+    // Valid consecutive factorials
+    const nextIndex = indices[indices.length - 1] + 1;
+
+    // Calculate next factorial
+    let nextFreq = 1;
+    for (let k = 1; k <= nextIndex; k++) nextFreq *= k;
+
+    const nodes = nums.map((n, i) => ({ value: n, label: `${indices[i]}!` }));
+    nodes.push({ value: nextFreq, label: `${nextIndex}!`, isPrediction: true });
+
+    const connections = nums.slice(0, nums.length - 1).map((_, i) => ({
+      fromIndex: i,
+      toIndex: i + 1,
+      label: `x${indices[i + 1]}`, // 2 -> 6 is x3
+      type: 'mul',
+    }));
+    connections.push({
+      fromIndex: nums.length - 1,
+      toIndex: nums.length,
+      label: `x${nextIndex}`,
+      type: 'mul',
+    });
+
+    return {
+      type: 'Factorial Sequence',
+      rule: 'Factorials of consecutive integers',
+      next: nextFreq,
+      visualization: { nodes, connections },
+    };
   }
 
   return null;

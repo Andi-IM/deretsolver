@@ -1,13 +1,15 @@
 import { GoogleGenAI } from '@google/genai';
+import { httpsCallable } from 'firebase/functions';
 import { z } from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 
+import { getFirebaseFunctions } from '@/utils/firebase';
 import logger from '@/utils/logger';
 
 /**
  * Solves a number sequence using the Gemini API.
  * @param {string} input - The standard input string (e.g., "1, 2, 3").
- * @param {string} apiKey - The user's Gemini API Key.
+ * @param {string} apiKey - The user's Gemini API Key (Optional). If missing, uses Cloud Proxy.
  * @returns {Promise<Object>} - The sequence analysis result or an error object.
  */
 const solveWithGemini = async (input, apiKey) => {
@@ -20,11 +22,31 @@ const solveWithGemini = async (input, apiKey) => {
     };
   }
 
+  // PROXY MODE: If no API Key is provided, use the secure Cloud Function
   if (!apiKey) {
-    return {
-      error:
-        'Complex patterns require a Gemini API Key. Please enter it in the Input section settings.',
-    };
+    try {
+      const functions = getFirebaseFunctions();
+      if (!functions) {
+        throw new Error('Firebase Functions not initialized.');
+      }
+
+      logger.info('Using Cloud Proxy for Gemini...');
+      const solveSequence = httpsCallable(functions, 'solveSequence');
+
+      const response = await solveSequence({ input });
+      const result = response.data;
+
+      if (result.error) {
+        return { error: result.error };
+      }
+
+      return result;
+    } catch (err) {
+      logger.error('Cloud Proxy Error:', err);
+      return {
+        error: `Failed to connect to Cloud Service: ${err.message}. Please try again later.`,
+      };
+    }
   }
 
   try {

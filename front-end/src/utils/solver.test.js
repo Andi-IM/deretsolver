@@ -125,4 +125,17 @@ describe('solveSequence', () => {
     expect(result.type).toBe('Arithmetic Progression');
     expect(result.next).toBe(7.5);
   });
+  it('detects prime numbers correctly', () => {
+    const result = solveSequence('2, 3, 5, 7');
+    expect(result).not.toBeNull();
+    expect(result.type).toBe('Prime Numbers');
+    expect(result.next).toBe(11);
+  });
+
+  it('detects factorial sequence correctly', () => {
+    const result = solveSequence('1, 2, 6, 24');
+    expect(result).not.toBeNull();
+    expect(result.type).toBe('Factorial Sequence');
+    expect(result.next).toBe(120);
+  });
 });
