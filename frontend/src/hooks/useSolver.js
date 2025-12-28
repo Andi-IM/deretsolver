@@ -50,12 +50,25 @@ export const useSolver = () => {
       setIsLoading(false);
 
       if (geminiRes.error) {
-        setError(geminiRes.error || localRes.error); // Prioritize Gemini error (e.g. Auth failure) if fallback was attempted
+        // Fallback to local hints if available
+        if (localRes && localRes.isHint) {
+          logger.warn('Gemini failed, falling back to local hints:', geminiRes.error);
+          setResult({ ...localRes, id: Date.now() });
+          // Optional: Show a toast/banner that AI failed but we are showing hints?
+          // Since we set 'error' state alongside 'result' state, the UI might show both.
+          // InputSection usually displays error. ResultSection displays result.
+          setError(
+            geminiRes.error + ' Showing manual hints instead.',
+          );
+        } else {
+          setError(geminiRes.error || localRes.error);
+        }
       } else {
         const nestedResult = transformToNestedFormat(geminiRes);
         setResult({ ...nestedResult, id: Date.now() });
       }
     } else {
+      // Empty input or invalid locally, fallback to hint if exists (usually won't for empty input)
       setError(localRes.error);
     }
   };

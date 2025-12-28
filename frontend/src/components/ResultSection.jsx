@@ -15,22 +15,41 @@ function ResultSection({ result }) {
             {t('result.analysis_title')}
           </h3>
 
-          {/* Success Badge */}
-          <div className="bg-emerald-50 border border-emerald-100 rounded-lg p-4 mb-6">
-            <div className="flex items-center gap-2 mb-1.5">
-              <div className="w-4 h-4 rounded-full bg-emerald-500 flex items-center justify-center shrink-0">
-                <span className="material-symbols-outlined text-white text-[10px] font-bold">
-                  check
+          {/* Success / Hint Badge */}
+          {result.isHint ? (
+            <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-6">
+              <div className="flex items-center gap-2 mb-1.5">
+                <div className="w-4 h-4 rounded-full bg-slate-400 flex items-center justify-center shrink-0">
+                  <span className="material-symbols-outlined text-white text-[10px] font-bold">
+                    priority_high
+                  </span>
+                </div>
+                <span className="text-[11px] font-bold text-slate-600 uppercase tracking-wide">
+                  {t('result.hint_title') || 'Pattern Not Found'}
                 </span>
               </div>
-              <span className="text-[11px] font-bold text-emerald-800 uppercase tracking-wide">
-                {t('result.success')}
-              </span>
+              <p className="text-sm text-slate-600 font-medium leading-relaxed">
+                {t('result.hint_message') ||
+                  "We couldn't automatically identify the pattern. The visualization below shows the differences between numbers to help you spot it manually."}
+              </p>
             </div>
-            <p className="text-sm text-emerald-900 font-medium leading-relaxed">
-              {t('result.success_message')}
-            </p>
-          </div>
+          ) : (
+            <div className="bg-emerald-50 border border-emerald-100 rounded-lg p-4 mb-6">
+              <div className="flex items-center gap-2 mb-1.5">
+                <div className="w-4 h-4 rounded-full bg-emerald-500 flex items-center justify-center shrink-0">
+                  <span className="material-symbols-outlined text-white text-[10px] font-bold">
+                    check
+                  </span>
+                </div>
+                <span className="text-[11px] font-bold text-emerald-800 uppercase tracking-wide">
+                  {t('result.success')}
+                </span>
+              </div>
+              <p className="text-sm text-emerald-900 font-medium leading-relaxed">
+                {t('result.success_message')}
+              </p>
+            </div>
+          )}
 
           <div className="space-y-6 flex-grow">
             <div>

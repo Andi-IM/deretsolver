@@ -17,5 +17,5 @@ Based on the [Strategic Blueprint Validation Report](./VALIDATION_REPORT.md), th
 ## 3. UX Improvments (Priority: Medium)
 
 - [x] **Optimistic UI Correction:** Modify `ResultSection.jsx` to show optimistic predictions in a "Ghost State" (50% opacity, potentially with a question mark) until verified, to reduce cognitive dissonance if the prediction changes.
-- **Error State "Hint Overlay":** If no pattern is found, instead of a blank slate, display "Ghost Arcs" or highlight the differences (Diff 1, Diff 2) to help the user manually spot patterns (Cognitive Offloading).
+- [x] **Error State "Hint Overlay":** If no pattern is found, instead of a blank slate, display "Ghost Arcs" or highlight the differences (Diff 1, Diff 2) to help the user manually spot patterns (Cognitive Offloading).
 - **"Buy Pro" Waitlist:** Add a simple modal to the "Buy Pro" button to collect emails ("Notify Me") instead of doing nothing, mitigating user churn/trust issues.

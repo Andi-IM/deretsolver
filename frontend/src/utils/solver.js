@@ -51,8 +51,44 @@ const solveSequence = (input) => {
   result = detectInterleaved(nums);
   if (result) return result;
 
-  return { error: 'Pattern not found.' };
+  return generateHints(nums);
 };
+
+function generateHints(nums) {
+  // If no pattern found, calculate simple diffs to give a hint
+  const connections = [];
+  for (let i = 0; i < nums.length - 1; i += 1) {
+    const diff = nums[i + 1] - nums[i];
+    connections.push({
+      fromIndex: i,
+      toIndex: i + 1,
+      label: diff >= 0 ? `+${diff}` : `${diff}`,
+      type: 'other', // Gray color
+    });
+  }
+
+  const nodes = nums.map((n, i) => ({ value: n, label: `i=${i}` }));
+
+  // We do NOT predict next value in hint mode
+  // But resultSection expects 'next' property to be displayed or it might crash if accessed?
+  // ResultSection handles missing predictions[] but usually expects result.next?
+  // Let's set result.next to "?" or handle it in UI.
+  // ResultSection: {result.next} is used if predictions.length <= 1.
+
+  return {
+    type: 'Unknown Pattern',
+    rule: 'Showing differences to help you find the pattern manually.',
+    next: '?',
+    isHint: true,
+    visualization: { nodes, connections },
+    // Include error message so useSolver can still detect it as a "failure" of the local solver
+    // to trigger Gemini fallback if needed.
+    error: 'Pattern not found locally.', 
+    // Wait, if I include 'error', useSolver will treat it as failure and NOT set result.
+    // I need to separate "Failure that triggers Gemini" vs "Final Result if Gemini fails".
+    // I will return the hint object. useSolver needs to know it's a hint.
+  };
+}
 
 function detectInterleaved(nums) {
   // Requires at least 4 numbers to reliably detect 2 patterns (2 for each)
