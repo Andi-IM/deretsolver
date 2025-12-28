@@ -213,4 +213,34 @@ describe('solveWithGemini', () => {
     expect(result).toHaveProperty('error');
     expect(result.error).toContain('Failed to connect to Gemini API');
   });
+
+  it('handles timeout when API takes longer than 3000ms', async () => {
+    vi.useFakeTimers();
+
+    const mockGenerateContent = vi.fn(async () => {
+      // Return a promise that never resolves (or resolves after a long time)
+      return new Promise((resolve) => setTimeout(resolve, 5000));
+    });
+
+    MockGoogleGenAI.mockImplementation(function mockConstructor() {
+      return {
+        models: {
+          generateContent: mockGenerateContent,
+        },
+      };
+    });
+
+    // Start the promise
+    const promise = solveWithGemini(mockInput, mockApiKey);
+
+    // Fast-forward time
+    vi.advanceTimersByTime(3001);
+
+    const result = await promise;
+
+    expect(result).toHaveProperty('error');
+    expect(result.error).toContain('Timeout: AI took longer than 3000ms');
+
+    vi.useRealTimers();
+  });
 });

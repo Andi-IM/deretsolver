@@ -159,14 +159,30 @@ Important:
 Provide accurate and consistent data for all fields.
     `.trim();
 
-    const response = await client.models.generateContent({
-      model,
-      contents: prompt,
-      config: {
-        responseMimeType: 'application/json',
-        responseSchema: zodToJsonSchema(providedSchema),
-      },
-    });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3000);
+
+    let response;
+    try {
+      const apiCall = client.models.generateContent({
+        model,
+        contents: prompt,
+        config: {
+          responseMimeType: 'application/json',
+          responseSchema: zodToJsonSchema(providedSchema),
+        },
+      });
+
+      const timeoutProtection = new Promise((_, reject) => {
+        controller.signal.addEventListener('abort', () =>
+          reject(new Error('Timeout: AI took longer than 3000ms')),
+        );
+      });
+
+      response = await Promise.race([apiCall, timeoutProtection]);
+    } finally {
+      clearTimeout(timeoutId);
+    }
 
     logger.debug('Raw response:', response.text);
     logger.debug('Parsed JSON: ', JSON.parse(response.text));
