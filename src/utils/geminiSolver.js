@@ -11,6 +11,15 @@ import logger from '@/utils/logger';
  * @returns {Promise<Object>} - The sequence analysis result or an error object.
  */
 const solveWithGemini = async (input, apiKey) => {
+  // Poin 4: Local Pre-Validation
+  // Ensure at least 3 numbers are present to avoid junk queries
+  const numberMatches = input.match(/[-+]?\d*\.?\d+/g);
+  if (!numberMatches || numberMatches.length < 3) {
+    return {
+      error: 'Please enter at least 3 numbers to identify a pattern.',
+    };
+  }
+
   if (!apiKey) {
     return {
       error:

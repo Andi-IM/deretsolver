@@ -30,6 +30,12 @@ describe('solveWithGemini', () => {
     vi.clearAllMocks();
   });
 
+  it('returns error if input contains fewer than 3 numbers', async () => {
+    const result = await solveWithGemini('1, 2', mockApiKey);
+    expect(result).toHaveProperty('error');
+    expect(result.error).toContain('Please enter at least 3 numbers');
+  });
+
   it('returns error if API key is missing', async () => {
     const result = await solveWithGemini(mockInput, '');
     expect(result).toHaveProperty('error');
