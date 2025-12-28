@@ -10,7 +10,7 @@ Based on the [Strategic Blueprint Validation Report](./VALIDATION_REPORT.md), th
 
 ## 2. Feature Gaps (Priority: Medium)
 
-- **Expand Local Solver:** Update `solver.js` to include logic for:
+- [x] **Expand Local Solver:** Update `solver.js` to include logic for:
   - **Prime Number Sequences** (e.g., 2, 3, 5, 7, 11) - _Critical for "Hard" difficulty._
   - **Factorial Sequences** (e.g., 1, 2, 6, 24) - _Distinct pattern type._
 
