@@ -1,16 +1,6 @@
 {
-  "functions": {
-    "source": "functions",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ],
-    "runtime": "nodejs22",
-    "minNodeVersion": "22.12.0"
-  },
   "hosting": {
-    "public": "front-end/dist",
+    "public": "dist",
     "ignore": [
       "firebase.json",
       "**/.*",

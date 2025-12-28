@@ -1,9 +1,8 @@
 import { GoogleGenAI } from '@google/genai';
-import { httpsCallable } from 'firebase/functions';
+
 import { z } from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 
-import { getFirebaseFunctions } from '@/utils/firebase';
 import logger from '@/utils/logger';
 
 /**
@@ -22,31 +21,10 @@ const solveWithGemini = async (input, apiKey) => {
     };
   }
 
-  // PROXY MODE: If no API Key is provided, use the secure Cloud Function
   if (!apiKey) {
-    try {
-      const functions = getFirebaseFunctions();
-      if (!functions) {
-        throw new Error('Firebase Functions not initialized.');
-      }
-
-      logger.info('Using Cloud Proxy for Gemini...');
-      const solveSequence = httpsCallable(functions, 'solveSequence');
-
-      const response = await solveSequence({ input });
-      const result = response.data;
-
-      if (result.error) {
-        return { error: result.error };
-      }
-
-      return result;
-    } catch (err) {
-      logger.error('Cloud Proxy Error:', err);
-      return {
-        error: `Failed to connect to Cloud Service: ${err.message}. Please try again later.`,
-      };
-    }
+    return {
+      error: 'Please provide a valid Gemini API Key in the settings to use the AI solver.',
+    };
   }
 
   try {
