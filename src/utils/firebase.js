@@ -17,7 +17,6 @@ const firebaseConfig = {
 let app = null;
 let analytics = null;
 let db = null;
-let functions = null;
 let initPromise = null;
 
 /**
@@ -31,28 +30,19 @@ export function initializeFirebase() {
     import('firebase/app'),
     import('firebase/analytics'),
     import('firebase/firestore'),
-    import('firebase/functions'),
   ])
-    .then(
-      ([
-        { initializeApp },
-        { getAnalytics },
-        { getFirestore },
-        { getFunctions, connectFunctionsEmulator },
-      ]) => {
-        app = initializeApp(firebaseConfig);
-        analytics = getAnalytics(app);
-        db = getFirestore(app);
-        functions = getFunctions(app);
+    .then(([{ initializeApp }, { getAnalytics }, { getFirestore }]) => {
+      app = initializeApp(firebaseConfig);
+      analytics = getAnalytics(app);
+      db = getFirestore(app);
 
-        // Connect to emulator if in localhost dev mode
-        if (window.location.hostname === 'localhost') {
-          // connectFunctionsEmulator(functions, '127.0.0.1', 5001);
-        }
+      // Connect to emulator if in localhost dev mode
+      if (window.location.hostname === 'localhost') {
+        // connectFunctionsEmulator(functions, '127.0.0.1', 5001);
+      }
 
-        return { app, analytics, db, functions };
-      },
-    )
+      return { app, analytics, db };
+    })
     .catch((error) => {
       // eslint-disable-next-line no-console
       console.error('Failed to initialize Firebase:', error);
@@ -81,11 +71,4 @@ export function getFirebaseAnalytics() {
  */
 export function getFirebaseDB() {
   return db;
-}
-
-/**
- * Get Firebase Functions instance (may be null if not initialized)
- */
-export function getFirebaseFunctions() {
-  return functions;
 }

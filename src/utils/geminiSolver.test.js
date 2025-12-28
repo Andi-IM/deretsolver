@@ -22,15 +22,9 @@ vi.mock('@/utils/logger', () => ({
   },
 }));
 
-// Mock Firebase Functions SDK
-const mockHttpsCallable = vi.fn();
-vi.mock('firebase/functions', () => ({
-  httpsCallable: (functionsInstance, name) => (data) => mockHttpsCallable(name, data),
-}));
-
 // Mock Firebase Utils
 vi.mock('@/utils/firebase', () => ({
-  getFirebaseFunctions: vi.fn(() => ({})), // Return dummy object
+  // getFirebaseFunctions is removed
 }));
 
 describe('solveWithGemini', () => {
@@ -253,35 +247,5 @@ describe('solveWithGemini', () => {
     expect(result.error).toContain('Timeout: AI took longer than 3000ms');
 
     vi.useRealTimers();
-  });
-
-  it('falls back to Cloud Proxy when API key is missing', async () => {
-    // Reset mocks
-    vi.clearAllMocks();
-
-    // Define the mock return data
-    const mockProxyResult = {
-      data: {
-        type: 'Arithmetic Sequence',
-        rule: 'Add 1',
-        next: 4,
-        sequenceValues: [1, 2, 3, 4],
-        sequenceLabels: ['n1', 'n2', 'n3', 'pred'],
-        connections: [],
-        isInterleaved: false,
-        predictions: [4],
-      },
-    };
-
-    // Configure the mock to return data
-    mockHttpsCallable.mockReturnValue(Promise.resolve(mockProxyResult));
-
-    // Call solver without API key
-    const result = await solveWithGemini('1, 2, 3', '');
-
-    expect(result).not.toHaveProperty('error');
-    expect(result.type).toBe('Arithmetic Sequence');
-    // Verify httpsCallable was called
-    expect(mockHttpsCallable).toHaveBeenCalled();
   });
 });
