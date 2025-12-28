@@ -61,21 +61,31 @@ function ResultSection({ result }) {
                   <div
                     // eslint-disable-next-line react/no-array-index-key
                     key={idx}
-                    className="bg-emerald-500 hover:bg-emerald-600 transition-colors cursor-default text-white rounded-xl py-3 flex flex-col items-center justify-center shadow-lg shadow-emerald-500/20 group"
+                    className="bg-emerald-500/90 border-2 border-dashed border-emerald-300 hover:bg-emerald-500 transition-colors cursor-default text-white rounded-xl py-3 flex flex-col items-center justify-center shadow-lg shadow-emerald-500/20 group relative overflow-hidden"
                   >
-                    <span className="text-[10px] uppercase font-bold opacity-70 mb-0.5">
+                    {/* Ghost Icon Background */}
+                    <span className="material-symbols-outlined absolute -right-2 -top-2 text-white/10 text-4xl rotate-12 pointer-events-none">
+                      help
+                    </span>
+                    <span className="text-[10px] uppercase font-bold opacity-80 mb-0.5">
                       Seq {idx + 1}
                     </span>
-                    <span className="text-2xl font-bold font-mono tracking-tight group-hover:scale-110 transition-transform">
+                    <span className="text-2xl font-bold font-mono tracking-tight group-hover:scale-110 transition-transform flex items-center gap-1">
                       {val}
+                      <span className="material-symbols-outlined text-sm opacity-60">help</span>
                     </span>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="w-full bg-emerald-500 hover:bg-emerald-600 transition-colors cursor-default text-white rounded-xl py-3 flex items-center justify-center shadow-lg shadow-emerald-500/20 group">
-                <span className="text-3xl font-bold font-mono tracking-tight group-hover:scale-110 transition-transform">
+              <div className="w-full bg-emerald-500/90 border-2 border-dashed border-emerald-300 hover:bg-emerald-500 transition-colors cursor-default text-white rounded-xl py-3 flex items-center justify-center shadow-lg shadow-emerald-500/20 group relative overflow-hidden">
+                {/* Ghost Icon Background */}
+                <span className="material-symbols-outlined absolute -right-4 -top-4 text-white/10 text-6xl rotate-12 pointer-events-none">
+                  help
+                </span>
+                <span className="text-3xl font-bold font-mono tracking-tight group-hover:scale-110 transition-transform flex items-center gap-2">
                   {result.next}
+                  <span className="material-symbols-outlined text-xl opacity-60">help</span>
                 </span>
               </div>
             )}
@@ -256,17 +266,20 @@ function VisualizerContent({ visualization }) {
             className={`w-14 h-14 rounded-full border-2 flex items-center justify-center text-lg font-bold font-mono shadow-sm bg-white transition-all duration-300
                         ${
                           node.isPrediction
-                            ? 'border-emerald-400 text-emerald-600 ring-4 ring-emerald-50 scale-110'
+                            ? 'border-dashed border-emerald-400 text-emerald-600 ring-4 ring-emerald-50 scale-110 opacity-90'
                             : 'border-slate-300 text-slate-700'
                         }`}
           >
             {node.value}
           </div>
           <div
-            className={`absolute -bottom-8 w-max text-center text-[10px] font-mono font-medium
+            className={`absolute -bottom-8 w-max text-center text-[10px] font-mono font-medium flex flex-col items-center justify-center
                         ${node.isPrediction ? 'text-emerald-600' : 'text-slate-600'}`}
           >
             {node.label || (node.isPrediction ? 'NEXT' : `i=${i}`)}
+            {node.isPrediction && (
+              <span className="material-symbols-outlined text-[10px] opacity-60">help</span>
+            )}
           </div>
         </div>
       ))}
