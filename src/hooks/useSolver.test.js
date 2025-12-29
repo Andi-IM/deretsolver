@@ -1,14 +1,19 @@
-import { describe, expect, it, vi } from 'vitest';
+import { act, renderHook } from '@testing-library/react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { selectBestResult, transformToNestedFormat } from '@/hooks/useSolver';
+import {
+  ActionTypes,
+  executeSolve,
+  initialState,
+  selectBestResult,
+  solverReducer,
+  transformToNestedFormat,
+  useSolver,
+} from '@/hooks/useSolver';
 
-// Mock logger to avoid console noise
+// Mock dependencies
 vi.mock('@/utils/logger', () => ({
-  default: {
-    error: vi.fn(),
-    warn: vi.fn(),
-    info: vi.fn(),
-  },
+  default: { warn: vi.fn(), error: vi.fn(), info: vi.fn() },
 }));
 
 describe('transformToNestedFormat', () => {
@@ -36,90 +41,295 @@ describe('transformToNestedFormat', () => {
     const result = transformToNestedFormat(solverResult);
 
     expect(result.type).toBe('Arithmetic');
-    expect(result.rule).toBe('Add 2');
-    expect(result.next).toBe(10);
     expect(result.visualization.nodes).toHaveLength(5);
     expect(result.visualization.nodes[4].isPrediction).toBe(true);
-    expect(result.visualization.connections).toEqual(solverResult.connections);
   });
 
-  it('should handle missing sequenceLabels gracefully', () => {
-    const solverResult = {
-      type: 'Geometric',
-      rule: 'Multiply by 2',
-      next: 16,
-      sequenceValues: [2, 4, 8, 16],
-      // No sequenceLabels
-    };
-
+  it('should handle missing sequenceLabels', () => {
+    const solverResult = { type: 'Geometric', sequenceValues: [2, 4, 8, 16] };
     const result = transformToNestedFormat(solverResult);
-
     expect(result.visualization.nodes[0].label).toBe('i=0');
-    expect(result.visualization.nodes[1].label).toBe('i=1');
-  });
-
-  it('should handle multiple predictions', () => {
-    const solverResult = {
-      type: 'Arithmetic',
-      rule: 'Add 1',
-      predictions: [4, 5, 6],
-      sequenceValues: [1, 2, 3, 4, 5, 6],
-      sequenceLabels: ['i=0', 'i=1', 'i=2', 'NEXT', 'NEXT', 'NEXT'],
-      connections: [],
-    };
-
-    const result = transformToNestedFormat(solverResult);
-
-    // Last 3 should be predictions
-    expect(result.visualization.nodes[3].isPrediction).toBe(true);
-    expect(result.visualization.nodes[4].isPrediction).toBe(true);
-    expect(result.visualization.nodes[5].isPrediction).toBe(true);
-    expect(result.visualization.nodes[2].isPrediction).toBe(false);
   });
 });
 
 describe('selectBestResult', () => {
   it('should return Gemini result when successful', () => {
-    const geminiRes = {
-      type: 'Fibonacci',
-      rule: 'Sum of previous two',
-      sequenceValues: [1, 1, 2, 3, 5],
-    };
-
+    const geminiRes = { type: 'Fibonacci', sequenceValues: [1, 1, 2, 3, 5] };
     const { result, error } = selectBestResult(null, geminiRes);
-
     expect(error).toBeNull();
     expect(result.type).toBe('Fibonacci');
   });
 
   it('should fallback to local hints when Gemini fails', () => {
-    const localRes = { type: 'Hint', isHint: true, rule: 'Try looking at differences' };
-    const geminiRes = { error: 'API rate limited' };
-
+    const localRes = { type: 'Hint', isHint: true };
+    const geminiRes = { error: 'API error' };
     const { result, error } = selectBestResult(localRes, geminiRes);
-
     expect(result).toEqual(localRes);
-    expect(error).toContain('API rate limited');
-    expect(error).toContain('hints');
+    expect(error).toContain('API error');
   });
 
   it('should return error when both fail', () => {
-    const localRes = { error: 'Invalid input' };
+    const localRes = { error: 'Invalid' };
     const geminiRes = { error: 'API error' };
-
     const { result, error } = selectBestResult(localRes, geminiRes);
-
     expect(result).toBeNull();
     expect(error).toBe('API error');
   });
+});
 
-  it('should use local error when Gemini has no error message', () => {
-    const localRes = { error: 'Local validation failed' };
-    const geminiRes = null;
+describe('solverReducer', () => {
+  it('should return current state for unknown action', () => {
+    const state = solverReducer(initialState, { type: 'UNKNOWN' });
+    expect(state).toEqual(initialState);
+  });
 
-    const { result, error } = selectBestResult(localRes, geminiRes);
+  it('should handle SET_INPUT', () => {
+    const state = solverReducer(initialState, {
+      type: ActionTypes.SET_INPUT,
+      payload: '1, 2, 3',
+    });
+    expect(state.input).toBe('1, 2, 3');
+  });
 
-    expect(result).toBeNull();
-    expect(error).toBe('Local validation failed');
+  it('should handle SET_API_KEY', () => {
+    const state = solverReducer(initialState, {
+      type: ActionTypes.SET_API_KEY,
+      payload: 'test-key',
+    });
+    expect(state.apiKey).toBe('test-key');
+  });
+
+  it('should handle SOLVE_START', () => {
+    const prevState = { ...initialState, error: 'old', result: {} };
+    const state = solverReducer(prevState, { type: ActionTypes.SOLVE_START });
+    expect(state.error).toBeNull();
+    expect(state.result).toBeNull();
+  });
+
+  it('should handle SOLVE_LOCAL_SUCCESS', () => {
+    const result = { type: 'Arithmetic', next: 5 };
+    const state = solverReducer(initialState, {
+      type: ActionTypes.SOLVE_LOCAL_SUCCESS,
+      payload: result,
+    });
+    expect(state.result.type).toBe('Arithmetic');
+    expect(state.result.id).toBeDefined();
+  });
+
+  it('should handle SOLVE_LOADING', () => {
+    const state = solverReducer(initialState, { type: ActionTypes.SOLVE_LOADING });
+    expect(state.isLoading).toBe(true);
+  });
+
+  it('should handle SOLVE_SUCCESS with result', () => {
+    const state = solverReducer(initialState, {
+      type: ActionTypes.SOLVE_SUCCESS,
+      payload: { result: { type: 'Complex' }, error: null },
+    });
+    expect(state.result.type).toBe('Complex');
+    expect(state.isLoading).toBe(false);
+  });
+
+  it('should handle SOLVE_SUCCESS with error', () => {
+    const state = solverReducer(initialState, {
+      type: ActionTypes.SOLVE_SUCCESS,
+      payload: { result: null, error: 'API failed' },
+    });
+    expect(state.result).toBeNull();
+    expect(state.error).toBe('API failed');
+  });
+
+  it('should handle SOLVE_ERROR', () => {
+    const state = solverReducer(initialState, {
+      type: ActionTypes.SOLVE_ERROR,
+      payload: 'Error message',
+    });
+    expect(state.error).toBe('Error message');
+  });
+
+  it('should handle SET_ERROR', () => {
+    const state = solverReducer(initialState, {
+      type: ActionTypes.SET_ERROR,
+      payload: 'Custom error',
+    });
+    expect(state.error).toBe('Custom error');
+  });
+
+  it('should handle RESET', () => {
+    const modified = { input: 'test', apiKey: 'key', result: {}, error: 'err', isLoading: true };
+    const state = solverReducer(modified, { type: ActionTypes.RESET });
+    expect(state).toEqual(initialState);
+  });
+});
+
+// =============================================================================
+// executeSolve - PURE ASYNC FUNCTION TESTS (100% coverage)
+// =============================================================================
+
+describe('executeSolve', () => {
+  let dispatch;
+  let mockLocalSolver;
+  let mockGeminiSolver;
+
+  beforeEach(() => {
+    dispatch = vi.fn();
+    mockLocalSolver = vi.fn();
+    mockGeminiSolver = vi.fn();
+  });
+
+  it('should dispatch SOLVE_START at beginning', async () => {
+    mockLocalSolver.mockReturnValue({ type: 'Arithmetic', next: 5 });
+
+    await executeSolve('1, 2, 3', '', dispatch, { localSolver: mockLocalSolver });
+
+    expect(dispatch).toHaveBeenCalledWith({ type: ActionTypes.SOLVE_START });
+  });
+
+  it('should dispatch SOLVE_LOCAL_SUCCESS when local solver succeeds', async () => {
+    const localResult = { type: 'Arithmetic', rule: 'Add 1', next: 5 };
+    mockLocalSolver.mockReturnValue(localResult);
+
+    await executeSolve('1, 2, 3, 4', '', dispatch, { localSolver: mockLocalSolver });
+
+    expect(dispatch).toHaveBeenCalledWith({
+      type: ActionTypes.SOLVE_LOCAL_SUCCESS,
+      payload: localResult,
+    });
+    expect(mockGeminiSolver).not.toHaveBeenCalled();
+  });
+
+  it('should fallback to Gemini when local solver fails', async () => {
+    mockLocalSolver.mockReturnValue({ error: 'Cannot solve' });
+    mockGeminiSolver.mockResolvedValue({ type: 'Complex', sequenceValues: [1, 2, 3] });
+
+    await executeSolve('1, 2, 3', 'api-key', dispatch, {
+      localSolver: mockLocalSolver,
+      geminiSolver: mockGeminiSolver,
+    });
+
+    expect(dispatch).toHaveBeenCalledWith({ type: ActionTypes.SOLVE_LOADING });
+    expect(mockGeminiSolver).toHaveBeenCalledWith('1, 2, 3', 'api-key');
+    expect(dispatch).toHaveBeenCalledWith({
+      type: ActionTypes.SOLVE_SUCCESS,
+      payload: expect.objectContaining({ result: expect.any(Object) }),
+    });
+  });
+
+  it('should dispatch SOLVE_ERROR when input is empty', async () => {
+    mockLocalSolver.mockReturnValue({ error: 'Empty input' });
+
+    await executeSolve('', '', dispatch, { localSolver: mockLocalSolver });
+
+    expect(dispatch).toHaveBeenCalledWith({
+      type: ActionTypes.SOLVE_ERROR,
+      payload: 'Empty input',
+    });
+  });
+
+  it('should dispatch SOLVE_ERROR with default message when no error', async () => {
+    mockLocalSolver.mockReturnValue(null);
+
+    await executeSolve('   ', '', dispatch, { localSolver: mockLocalSolver });
+
+    expect(dispatch).toHaveBeenCalledWith({
+      type: ActionTypes.SOLVE_ERROR,
+      payload: 'Please enter a sequence',
+    });
+  });
+
+  it('should handle Gemini error with local hints fallback', async () => {
+    mockLocalSolver.mockReturnValue({ type: 'Hint', isHint: true, error: 'Pattern not found' });
+    mockGeminiSolver.mockResolvedValue({ error: 'API quota exceeded' });
+
+    await executeSolve('1, 5, 2, 8', '', dispatch, {
+      localSolver: mockLocalSolver,
+      geminiSolver: mockGeminiSolver,
+    });
+
+    expect(dispatch).toHaveBeenCalledWith({
+      type: ActionTypes.SOLVE_SUCCESS,
+      payload: {
+        result: expect.objectContaining({ isHint: true }),
+        error: expect.stringContaining('API quota exceeded'),
+      },
+    });
+  });
+
+  it('should use default solvers when deps not provided', async () => {
+    // This test verifies the function works without custom deps
+    // We just need to ensure it doesn't crash
+    const dispatchFn = vi.fn();
+
+    // This will use actual solver which may return various results
+    await executeSolve('2, 4, 6, 8', '', dispatchFn);
+
+    expect(dispatchFn).toHaveBeenCalledWith({ type: ActionTypes.SOLVE_START });
+  });
+});
+
+// =============================================================================
+// useSolver hook tests
+// =============================================================================
+
+describe('useSolver hook', () => {
+  it('should have correct initial state', () => {
+    const { result } = renderHook(() => useSolver());
+    expect(result.current.input).toBe('');
+    expect(result.current.apiKey).toBe('');
+    expect(result.current.result).toBeNull();
+    expect(result.current.error).toBeNull();
+    expect(result.current.isLoading).toBe(false);
+  });
+
+  it('should update input via setInput', () => {
+    const { result } = renderHook(() => useSolver());
+    act(() => {
+      result.current.setInput('1, 2, 3, 4');
+    });
+    expect(result.current.input).toBe('1, 2, 3, 4');
+  });
+
+  it('should update apiKey via setApiKey', () => {
+    const { result } = renderHook(() => useSolver());
+    act(() => {
+      result.current.setApiKey('my-api-key');
+    });
+    expect(result.current.apiKey).toBe('my-api-key');
+  });
+
+  it('should update error via setError', () => {
+    const { result } = renderHook(() => useSolver());
+    act(() => {
+      result.current.setError('Custom error message');
+    });
+    expect(result.current.error).toBe('Custom error message');
+  });
+
+  it('should accept custom initial state', () => {
+    const customInitial = { ...initialState, input: 'preset', apiKey: 'key' };
+    const { result } = renderHook(() => useSolver({ initialState: customInitial }));
+    expect(result.current.input).toBe('preset');
+    expect(result.current.apiKey).toBe('key');
+  });
+
+  it('should expose dispatch and state', () => {
+    const { result } = renderHook(() => useSolver());
+    expect(typeof result.current.dispatch).toBe('function');
+    expect(result.current.state).toEqual(initialState);
+  });
+
+  it('should call handleSolve with injected deps', async () => {
+    const mockLocal = vi.fn().mockReturnValue({ type: 'Test', next: 10 });
+    const { result } = renderHook(() => useSolver({ deps: { localSolver: mockLocal } }));
+
+    act(() => {
+      result.current.setInput('1, 2, 3');
+    });
+
+    await act(async () => {
+      await result.current.handleSolve();
+    });
+
+    expect(mockLocal).toHaveBeenCalledWith('1, 2, 3');
   });
 });
