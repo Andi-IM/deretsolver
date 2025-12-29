@@ -1,160 +1,248 @@
 /* eslint-disable no-console */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import {
+  LOG_LEVELS,
+  Logger,
+  createConsoleTransport,
+  createFirebaseTransport,
+} from '@/utils/logger';
 import logger from '@/utils/logger';
 
-describe('Logger', () => {
-  beforeEach(() => {
-    vi.spyOn(console, 'debug').mockImplementation(() => {});
-    vi.spyOn(console, 'info').mockImplementation(() => {});
-    vi.spyOn(console, 'warn').mockImplementation(() => {});
-    vi.spyOn(console, 'error').mockImplementation(() => {});
-    vi.spyOn(console, 'log').mockImplementation(() => {});
+describe('Logger with Dependency Injection', () => {
+  // Create a mock console for testing
+  const createMockConsole = () => ({
+    debug: vi.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+    log: vi.fn(),
   });
 
-  afterEach(() => {
-    vi.restoreAllMocks();
-    // Reset logger level to default
-    logger.setLevel('INFO');
+  describe('createConsoleTransport', () => {
+    it('should call debug for DEBUG level', () => {
+      const mockConsole = createMockConsole();
+      const transport = createConsoleTransport(mockConsole);
+
+      transport('DEBUG', 'test message', null);
+
+      expect(mockConsole.debug).toHaveBeenCalledWith(expect.stringContaining('test message'));
+    });
+
+    it('should call info for INFO level', () => {
+      const mockConsole = createMockConsole();
+      const transport = createConsoleTransport(mockConsole);
+
+      transport('INFO', 'info message', null);
+
+      expect(mockConsole.info).toHaveBeenCalledWith(expect.stringContaining('info message'));
+    });
+
+    it('should call warn for WARN level', () => {
+      const mockConsole = createMockConsole();
+      const transport = createConsoleTransport(mockConsole);
+
+      transport('WARN', 'warning', null);
+
+      expect(mockConsole.warn).toHaveBeenCalledWith(expect.stringContaining('warning'));
+    });
+
+    it('should call error for ERROR level', () => {
+      const mockConsole = createMockConsole();
+      const transport = createConsoleTransport(mockConsole);
+
+      transport('ERROR', 'error message', null);
+
+      expect(mockConsole.error).toHaveBeenCalledWith(expect.stringContaining('error message'));
+    });
+
+    it('should call log for unknown level', () => {
+      const mockConsole = createMockConsole();
+      const transport = createConsoleTransport(mockConsole);
+
+      transport('UNKNOWN', 'unknown level', null);
+
+      expect(mockConsole.log).toHaveBeenCalledWith(expect.stringContaining('unknown level'));
+    });
+
+    it('should include timestamp in output', () => {
+      const mockConsole = createMockConsole();
+      const transport = createConsoleTransport(mockConsole);
+
+      transport('INFO', 'test', null);
+
+      const output = mockConsole.info.mock.calls[0][0];
+      expect(output).toMatch(/\[\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/);
+    });
+
+    it('should include metadata when provided', () => {
+      const mockConsole = createMockConsole();
+      const transport = createConsoleTransport(mockConsole);
+
+      transport('INFO', 'test', { userId: 123 });
+
+      const output = mockConsole.info.mock.calls[0][0];
+      expect(output).toContain('"userId":123');
+    });
   });
 
-  it('should log debug messages when level is DEBUG', () => {
-    logger.setLevel('DEBUG');
-    logger.debug('Test debug message');
-    expect(console.debug).toHaveBeenCalled();
+  describe('createFirebaseTransport', () => {
+    it('should skip non-error/warn levels', async () => {
+      const mockGetter = vi.fn();
+      const transport = createFirebaseTransport(mockGetter);
+
+      await transport('INFO', 'info message', null);
+      await transport('DEBUG', 'debug message', null);
+
+      expect(mockGetter).not.toHaveBeenCalled();
+    });
+
+    it('should call getter for ERROR level', async () => {
+      const mockAnalytics = { name: 'mock-analytics' };
+      const mockGetter = vi.fn().mockResolvedValue(mockAnalytics);
+      const transport = createFirebaseTransport(mockGetter);
+
+      // Mock the firebase/analytics import
+      vi.mock('firebase/analytics', () => ({
+        logEvent: vi.fn(),
+      }));
+
+      await transport('ERROR', 'error message', null);
+
+      expect(mockGetter).toHaveBeenCalled();
+    });
+
+    it('should call getter for WARN level', async () => {
+      const mockAnalytics = { name: 'mock-analytics' };
+      const mockGetter = vi.fn().mockResolvedValue(mockAnalytics);
+      const transport = createFirebaseTransport(mockGetter);
+
+      await transport('WARN', 'warning message', null);
+
+      expect(mockGetter).toHaveBeenCalled();
+    });
   });
 
-  it('should not log debug messages when level is INFO', () => {
-    logger.setLevel('INFO');
-    logger.debug('Test debug message');
-    expect(console.debug).not.toHaveBeenCalled();
+  describe('Logger class', () => {
+    let testLogger;
+    let mockConsole;
+
+    beforeEach(() => {
+      mockConsole = createMockConsole();
+      testLogger = new Logger({ console: mockConsole });
+    });
+
+    afterEach(() => {
+      testLogger.reset();
+    });
+
+    it('should use injected console', () => {
+      testLogger.info('test message');
+
+      expect(mockConsole.info).toHaveBeenCalled();
+    });
+
+    it('should respect log level filtering', () => {
+      testLogger.setLevel('WARN');
+
+      testLogger.debug('debug');
+      testLogger.info('info');
+      testLogger.warn('warn');
+      testLogger.error('error');
+
+      expect(mockConsole.debug).not.toHaveBeenCalled();
+      expect(mockConsole.info).not.toHaveBeenCalled();
+      expect(mockConsole.warn).toHaveBeenCalled();
+      expect(mockConsole.error).toHaveBeenCalled();
+    });
+
+    it('should set level to DEBUG', () => {
+      testLogger.setLevel('DEBUG');
+
+      testLogger.debug('debug message');
+
+      expect(mockConsole.debug).toHaveBeenCalled();
+    });
+
+    it('should get current level', () => {
+      testLogger.setLevel('ERROR');
+
+      expect(testLogger.getLevel()).toBe('ERROR');
+    });
+
+    it('should ignore invalid log levels', () => {
+      const originalLevel = testLogger.level;
+      testLogger.setLevel('INVALID');
+
+      expect(testLogger.level).toBe(originalLevel);
+    });
+
+    it('should add custom transport', () => {
+      const customTransport = vi.fn();
+      testLogger.addTransport(customTransport);
+
+      testLogger.info('test');
+
+      expect(customTransport).toHaveBeenCalledWith('INFO', 'test', undefined);
+    });
+
+    it('should remove transport', () => {
+      const customTransport = vi.fn();
+      testLogger.addTransport(customTransport);
+      testLogger.removeTransport(customTransport);
+
+      testLogger.info('test');
+
+      expect(customTransport).not.toHaveBeenCalled();
+    });
+
+    it('should clear all transports', () => {
+      testLogger.clearTransports();
+
+      testLogger.info('test');
+
+      // No console call since transports are cleared
+      expect(mockConsole.info).not.toHaveBeenCalled();
+    });
+
+    it('should reset to initial state', () => {
+      testLogger.setLevel('ERROR');
+      testLogger.clearTransports();
+
+      testLogger.reset();
+
+      expect(testLogger.level).toBe(LOG_LEVELS.INFO);
+      expect(testLogger.transports.length).toBe(1);
+    });
+
+    it('should handle metadata in log calls', () => {
+      testLogger.warn('test', { key: 'value' });
+
+      const output = mockConsole.warn.mock.calls[0][0];
+      expect(output).toContain('"key":"value"');
+    });
   });
 
-  it('should log info messages when level is INFO or lower', () => {
-    logger.setLevel('INFO');
-    logger.info('Test info message');
-    expect(console.info).toHaveBeenCalled();
-  });
+  describe('default logger singleton', () => {
+    beforeEach(() => {
+      vi.spyOn(console, 'info').mockImplementation(() => {});
+      logger.reset();
+    });
 
-  it('should log warn messages', () => {
-    logger.setLevel('INFO');
-    logger.warn('Test warn message');
-    expect(console.warn).toHaveBeenCalled();
-  });
+    afterEach(() => {
+      vi.restoreAllMocks();
+      logger.reset();
+    });
 
-  it('should log error messages', () => {
-    logger.setLevel('INFO');
-    logger.error('Test error message');
-    expect(console.error).toHaveBeenCalled();
-  });
+    it('should exist as singleton', () => {
+      expect(logger).toBeDefined();
+      expect(typeof logger.info).toBe('function');
+    });
 
-  it('should log info messages with metadata', () => {
-    logger.setLevel('INFO');
-    logger.info('Test message', { key: 'value' });
-    expect(console.info).toHaveBeenCalledWith(expect.stringContaining('Test message'));
-  });
+    it('should log to real console', () => {
+      logger.info('singleton test');
 
-  it('should filter messages based on log level', () => {
-    logger.setLevel('ERROR');
-
-    logger.debug('Debug message');
-    logger.info('Info message');
-    logger.warn('Warn message');
-    logger.error('Error message');
-
-    expect(console.debug).not.toHaveBeenCalled();
-    expect(console.info).not.toHaveBeenCalled();
-    expect(console.warn).not.toHaveBeenCalled();
-    expect(console.error).toHaveBeenCalled();
-  });
-
-  it('should accept valid log levels', () => {
-    logger.setLevel('DEBUG');
-    logger.setLevel('INFO');
-    logger.setLevel('WARN');
-    logger.setLevel('ERROR');
-    logger.setLevel('info'); // lowercase should also work
-
-    // Should not throw errors
-    expect(() => logger.setLevel('INVALID')).not.toThrow();
-  });
-
-  it('should handle metadata in console transport', () => {
-    logger.setLevel('INFO');
-    const metadata = { userId: 123, action: 'click' };
-    logger.info('User action', metadata);
-
-    expect(console.info).toHaveBeenCalledWith(expect.stringContaining(JSON.stringify(metadata)));
-  });
-
-  it('should include timestamp in log output', () => {
-    logger.setLevel('INFO');
-    logger.info('Test message');
-
-    // Check that console.info was called with a timestamp
-    const call = console.info.mock.calls[0][0];
-    expect(call).toMatch(/\[\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/);
-  });
-
-  it('should handle warn level correctly', () => {
-    logger.setLevel('WARN');
-
-    logger.debug('Debug');
-    logger.info('Info');
-    logger.warn('Warn');
-    logger.error('Error');
-
-    expect(console.debug).not.toHaveBeenCalled();
-    expect(console.info).not.toHaveBeenCalled();
-    expect(console.warn).toHaveBeenCalled();
-    expect(console.error).toHaveBeenCalled();
-  });
-
-  it('should allow adding custom transports', () => {
-    const customTransport = vi.fn();
-    logger.addTransport(customTransport);
-
-    logger.setLevel('INFO');
-    logger.info('Test message');
-
-    // Note: Custom transport won't be called in current implementation
-    // as they're checked by reference. This tests the addTransport method exists
-    expect(logger.transports.length).toBeGreaterThan(1);
-  });
-
-  it('should handle cases with no metadata', () => {
-    logger.setLevel('INFO');
-    logger.info('Test message without metadata');
-
-    expect(console.info).toHaveBeenCalled();
-    const call = console.info.mock.calls[0][0];
-    expect(call).toContain('Test message without metadata');
-  });
-
-  it('should handle different log levels in consoleTransport', () => {
-    logger.setLevel('DEBUG');
-
-    logger.debug('Debug test');
-    logger.info('Info test');
-    logger.warn('Warn test');
-    logger.error('Error test');
-
-    expect(console.debug).toHaveBeenCalledTimes(1);
-    expect(console.info).toHaveBeenCalledTimes(1);
-    expect(console.warn).toHaveBeenCalledTimes(1);
-    expect(console.error).toHaveBeenCalledTimes(1);
-  });
-
-  it('should handle invalid log level gracefully', () => {
-    logger.setLevel('INVALID_LEVEL');
-    // Should not throw error and should keep existing level
-    logger.info('Test message');
-    expect(console.info).toHaveBeenCalled();
-  });
-
-  it('should use console.log as fallback for unknown level', () => {
-    // Directly call consoleTransport with unknown level
-    logger.consoleTransport('UNKNOWN', 'test message', null);
-    expect(console.log).toHaveBeenCalled();
+      expect(console.info).toHaveBeenCalled();
+    });
   });
 });

@@ -1,8 +1,7 @@
-// Import the functions you need from the SDKs you need
-// Lazy initialization to avoid blocking critical render path
+// Firebase Service with Dependency Injection for Testability
+// ============================================================
 
 // Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: 'AIzaSyBmfQUl0LgFk5pQl95Yos3-hQyygPdReIc',
   authDomain: 'deretsolver.firebaseapp.com',
@@ -20,26 +19,37 @@ let db = null;
 let initPromise = null;
 
 /**
+ * Firebase SDK loader abstraction for dependency injection.
+ * This allows tests to inject mock SDK modules.
+ */
+export const defaultFirebaseLoader = {
+  loadApp: () => import('firebase/app'),
+  loadAnalytics: () => import('firebase/analytics'),
+  loadFirestore: () => import('firebase/firestore'),
+};
+
+/**
  * Lazily initialize Firebase (loads in background)
+ * @param {Object} options - Optional configuration for testing
+ * @param {Object} options.loader - Custom SDK loader (for testing)
+ * @param {Object} options.config - Custom Firebase config (for testing)
  * @returns {Promise<{app, analytics, db}>}
  */
-export function initializeFirebase() {
-  if (initPromise) return initPromise;
+export function initializeFirebase(options = {}) {
+  const { loader = defaultFirebaseLoader, config = firebaseConfig } = options;
 
-  initPromise = Promise.all([
-    import('firebase/app'),
-    import('firebase/analytics'),
-    import('firebase/firestore'),
-  ])
-    .then(([{ initializeApp }, { getAnalytics }, { getFirestore }]) => {
-      app = initializeApp(firebaseConfig);
+  // If already initializing/initialized, return existing promise
+  if (initPromise && !options.forceReinit) return initPromise;
+
+  initPromise = Promise.all([loader.loadApp(), loader.loadAnalytics(), loader.loadFirestore()])
+    .then(([appModule, analyticsModule, firestoreModule]) => {
+      const { initializeApp } = appModule;
+      const { getAnalytics } = analyticsModule;
+      const { getFirestore } = firestoreModule;
+
+      app = initializeApp(config);
       analytics = getAnalytics(app);
       db = getFirestore(app);
-
-      // Connect to emulator if in localhost dev mode
-      if (window.location.hostname === 'localhost') {
-        // connectFunctionsEmulator(functions, '127.0.0.1', 5001);
-      }
 
       return { app, analytics, db };
     })
@@ -50,6 +60,16 @@ export function initializeFirebase() {
     });
 
   return initPromise;
+}
+
+/**
+ * Reset Firebase state - for testing only
+ */
+export function resetFirebaseState() {
+  app = null;
+  analytics = null;
+  db = null;
+  initPromise = null;
 }
 
 /**

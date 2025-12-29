@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
 
@@ -14,11 +14,7 @@ function QuizMode() {
   const [difficulty, setDifficulty] = useState('MEDIUM'); // Default
   const [streak, setStreak] = useState(0);
 
-  useEffect(() => {
-    loadNewQuestion();
-  }, []);
-
-  const loadNewQuestion = () => {
+  const loadNewQuestion = useCallback(() => {
     try {
       const q = generateQuestion(difficulty);
       setQuestion(q);
@@ -28,7 +24,12 @@ function QuizMode() {
     } catch (err) {
       logger.error('Failed to generate quiz question', err);
     }
-  };
+  }, [difficulty]);
+
+  // Load initial question on mount
+  useEffect(() => {
+    loadNewQuestion();
+  }, [loadNewQuestion]);
 
   const handleOptionClick = (option) => {
     if (selectedOption !== null) return; // Prevent changing answer
@@ -148,7 +149,7 @@ function QuizMode() {
               generateQuestion.name === 'generateQuestion' ? { EASY: 1, MEDIUM: 1, HARD: 1 } : {},
             ).map(
               (
-                d, // Hack to just show buttons
+                _d, // Hack to just show buttons
               ) =>
                 // Actually I should allow changing difficulty.
                 // But for now hardcoded keys since I know them.
