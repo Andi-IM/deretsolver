@@ -57,22 +57,49 @@ test.describe('FeedbackDialog E2E', () => {
     await saveCoverage(page, 'helpful_click');
   });
 
-  test.skip('clicks not helpful button and shows form', async ({ page }) => {
+  test('clicks not helpful button and shows form', async ({ page }) => {
     await solveAndGetResult(page);
 
-    // Click "Not really" button using locator
-    await page.locator('button').filter({ hasText: 'Not really' }).click();
+    // Wait for animation
     await page.waitForTimeout(1000);
 
-    // Verification: Reason buttons should appear
-    // "Incorrect Result" is one of the reasons
-    const reasonBtn = page.getByRole('button', { name: 'Incorrect Result' });
-    await expect(reasonBtn).toBeVisible({ timeout: 5000 });
+    // Scroll to bottom to ensure visibility
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await page.waitForTimeout(500);
+
+    // Click "Not really" button using locator
+    const notHelpfulBtn = page.locator('button').filter({ hasText: 'Not really' });
+
+    console.log('Checking visibility of Not really button...');
+    await expect(notHelpfulBtn).toBeVisible();
+
+    console.log('Clicking Not really button...');
+    await notHelpfulBtn.click({ force: true });
+
+    console.log('Waiting for state change...');
+    await page.waitForTimeout(1000);
+
+    // Verify state transition
+    const notHelpfulVisible = await notHelpfulBtn.isVisible();
+    console.log(`Is "Not really" still visible? ${notHelpfulVisible}`);
+
+    if (notHelpfulVisible) {
+      console.log('Click apparently failed to change state. Trying click again...');
+      await notHelpfulBtn.click();
+      await page.waitForTimeout(1000);
+    }
+
+    // Verification: The "not helpful" form should now be visible
+    // Wait for the issue prompt text to appear (more reliable than button role)
+    const issuePrompt = page.getByText('What was the issue?');
+    await expect(issuePrompt).toBeVisible({ timeout: 5000 });
+
+    // Also verify at least one reason button is visible
+    const reasonButtons = page.locator('button').filter({ hasText: /Incorrect|Unclear|Other/ });
+    await expect(reasonButtons.first()).toBeVisible({ timeout: 3000 });
 
     const content = await page.content();
-    expect(content).toContain('issue') ||
-      expect(content).toContain('reason') ||
-      expect(content).toContain('Incorrect');
+    expect(content).toContain('issue');
 
     await saveCoverage(page, 'not_helpful_form');
   });
