@@ -26,6 +26,18 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: './src/test/setup.js',
     exclude: ['**/node_modules/**', '**/dist/**', '**/e2e/**', '**/functions/**'],
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'html', 'lcov'],
+      include: ['src/**/*.{js,jsx}'],
+      exclude: ['src/test/**', 'src/**/*.test.{js,jsx}', 'src/main.jsx', 'src/i18n.js'],
+      thresholds: {
+        statements: 84,
+        branches: 74,
+        functions: 85,
+        lines: 84,
+      },
+    },
   },
   build: {
     target: 'es2017',
