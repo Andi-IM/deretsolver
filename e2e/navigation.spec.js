@@ -16,6 +16,7 @@ async function saveCoverage(page, testTitle) {
 }
 
 test.describe('Navigation E2E', () => {
+  test.use({ locale: 'en-US' });
   test('navigates to Documentation page', async ({ page }) => {
     await page.goto('/');
     await page.waitForSelector('nav', { state: 'visible' });
@@ -60,31 +61,33 @@ test.describe('Navigation E2E', () => {
     await page.goto('/');
     await page.waitForSelector('#input-sequence', { state: 'visible' });
 
-    // Click language switcher
-    await page.evaluate(() => {
-      const buttons = Array.from(document.querySelectorAll('button'));
-      const langBtn = buttons.find(
-        (b) => b.textContent.includes('EN') || b.textContent.includes('ID'),
-      );
-      if (langBtn) langBtn.click();
-    });
-    await page.waitForTimeout(300);
+    // The button shows current language (e.g., "EN")
+    // Use aria-label for precise targeting
+    const langBtn = page.getByLabel('Switch Language');
+    await expect(langBtn).toBeVisible();
 
-    // Click Indonesian option
-    await page.evaluate(() => {
-      const options = Array.from(document.querySelectorAll('button, li, a'));
-      const idOption = options.find(
-        (el) => el.textContent.includes('Indonesia') || el.textContent === 'ID',
-      );
-      if (idOption) idOption.click();
-    });
-    await page.waitForTimeout(500);
+    const initialText = await langBtn.innerText();
+    console.log('Initial language button text:', initialText);
 
-    const content = await page.content();
-    // Check for Indonesian text
-    expect(
-      content.includes('Pola') || content.includes('Urutan') || content.includes('Selesaikan'),
-    ).toBeTruthy();
+    // Ensure we start from EN to test the switch to ID
+    if ((await langBtn.innerText()).includes('ID')) {
+      await langBtn.click();
+      await expect(langBtn).toContainText('EN');
+    }
+
+    // Ensure we are in EN
+    await expect(langBtn).toContainText('EN');
+
+    // Click to toggle
+    await langBtn.click();
+    console.log('Clicked language button');
+
+    // Now it should show ID
+    await expect(langBtn).toContainText('ID');
+    console.log('Language button text changed to ID');
+
+    // Verify content translation (Title matches "Pemecah Pola Deret Angka")
+    await expect(page.getByRole('heading', { name: 'Pemecah Pola Deret Angka' })).toBeVisible();
 
     await saveCoverage(page, 'language_switch');
   });

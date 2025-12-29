@@ -4,7 +4,7 @@ function LanguageSwitcher() {
   const { i18n } = useTranslation();
 
   const toggleLanguage = () => {
-    const newLang = i18n.language === 'en' ? 'id' : 'en';
+    const newLang = i18n.language.startsWith('en') ? 'id' : 'en';
     i18n.changeLanguage(newLang);
   };
 
@@ -16,7 +16,7 @@ function LanguageSwitcher() {
       aria-label="Switch Language"
     >
       <span className="material-symbols-outlined text-lg">language</span>
-      <span className="uppercase">{i18n.language === 'en' ? 'EN' : 'ID'}</span>
+      <span className="uppercase">{i18n.language.startsWith('en') ? 'EN' : 'ID'}</span>
     </button>
   );
 }

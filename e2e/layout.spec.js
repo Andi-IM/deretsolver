@@ -104,9 +104,9 @@ test.describe('Layout E2E', () => {
     await page.waitForTimeout(500);
 
     const content = await page.content();
-    expect(content).toContain('EN') ||
-      expect(content).toContain('ID') ||
-      expect(content).toContain('language');
+    const hasLanguageIndicator =
+      content.includes('EN') || content.includes('ID') || content.includes('language');
+    expect(hasLanguageIndicator).toBeTruthy();
 
     await saveCoverage(page, 'lang_switcher_header');
   });

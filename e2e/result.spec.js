@@ -28,7 +28,8 @@ test.describe('ResultSection E2E', () => {
       const solveBtn = buttons.find((b) => b.textContent.includes('Solve'));
       if (solveBtn) solveBtn.click();
     });
-    await page.waitForTimeout(1000);
+    // Wait for result section to appear (using a specific text that appears in the result)
+    await page.waitForSelector('text=Result Analysis', { state: 'visible' });
   }
 
   test('shows pattern type in result', async ({ page }) => {
@@ -43,10 +44,9 @@ test.describe('ResultSection E2E', () => {
   test('shows rule in result', async ({ page }) => {
     await solveSequence(page, '2, 4, 8, 16');
 
-    const content = await page.content();
-    expect(content).toContain('Rule') ||
-      expect(content).toContain('Multiply') ||
-      expect(content).toContain('×2');
+    // Use locators for better stability
+    await expect(page.getByText('Rule')).toBeVisible();
+    await expect(page.getByText(/Multiply|×2/)).toBeVisible();
 
     await saveCoverage(page, 'rule_display');
   });
