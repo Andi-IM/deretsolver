@@ -39,7 +39,7 @@ test.describe('Documentation Page E2E', () => {
 
   test('shows how to use section', async ({ page }) => {
     const content = await page.content();
-    expect(content).toContain('How to Use') || expect(content).toContain('Usage');
+    expect(content).toContain('How to Use');
 
     await saveCoverage(page, 'how_to_use');
   });

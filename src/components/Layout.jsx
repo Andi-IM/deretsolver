@@ -53,6 +53,9 @@ function Layout({ children }) {
               <Link className={isActive('/')} to="/">
                 Solver
               </Link>
+              <Link className={isActive('/quiz')} to="/quiz">
+                Quiz Mode
+              </Link>
               <Link className={isActive('/docs')} to="/docs">
                 Documentation
               </Link>
@@ -84,6 +87,13 @@ function Layout({ children }) {
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Solver
+              </Link>
+              <Link
+                className={`${isActive('/quiz')} block py-2 px-3 rounded-lg hover:bg-slate-50`}
+                to="/quiz"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Quiz Mode
               </Link>
               <Link
                 className={`${isActive('/docs')} block py-2 px-3 rounded-lg hover:bg-slate-50`}

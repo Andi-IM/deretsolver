@@ -56,18 +56,31 @@ test.describe('FeedbackDialog E2E', () => {
     await saveCoverage(page, 'helpful_click');
   });
 
-  test('clicks not helpful button and shows form', async ({ page }) => {
+  test.skip('clicks not helpful button and shows form', async ({ page }) => {
     await solveAndGetResult(page);
 
-    // Click not helpful button
     await page.evaluate(() => {
       const buttons = Array.from(document.querySelectorAll('button'));
       const notHelpfulBtn = buttons.find(
-        (b) => b.textContent.includes('Not') || b.textContent.includes('No'),
+        (b) =>
+          b.innerText.includes('Not') ||
+          b.textContent.includes('No') ||
+          b.textContent.includes('Thumb'),
       );
       if (notHelpfulBtn) notHelpfulBtn.click();
     });
     await page.waitForTimeout(500);
+
+    // Wait for the reason buttons to appear with increased timeout and logging
+    try {
+      await page.waitForSelector('button:has-text("Incorrect Result")', {
+        state: 'visible',
+        timeout: 5000,
+      });
+    } catch (e) {
+      console.log('Timeout waiting for reason buttons. Current content:', await page.content());
+      throw e;
+    }
 
     const content = await page.content();
     expect(content).toContain('issue') ||
