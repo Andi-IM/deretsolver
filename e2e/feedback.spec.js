@@ -16,6 +16,7 @@ async function saveCoverage(page, testTitle) {
 }
 
 test.describe('FeedbackDialog E2E', () => {
+  test.use({ locale: 'en-US' });
   async function solveAndGetResult(page) {
     await page.goto('/');
     await page.waitForSelector('#input-sequence', { state: 'visible' });
@@ -59,28 +60,14 @@ test.describe('FeedbackDialog E2E', () => {
   test.skip('clicks not helpful button and shows form', async ({ page }) => {
     await solveAndGetResult(page);
 
-    await page.evaluate(() => {
-      const buttons = Array.from(document.querySelectorAll('button'));
-      const notHelpfulBtn = buttons.find(
-        (b) =>
-          b.innerText.includes('Not') ||
-          b.textContent.includes('No') ||
-          b.textContent.includes('Thumb'),
-      );
-      if (notHelpfulBtn) notHelpfulBtn.click();
-    });
-    await page.waitForTimeout(500);
+    // Click "Not really" button using locator
+    await page.locator('button').filter({ hasText: 'Not really' }).click();
+    await page.waitForTimeout(1000);
 
-    // Wait for the reason buttons to appear with increased timeout and logging
-    try {
-      await page.waitForSelector('button:has-text("Incorrect Result")', {
-        state: 'visible',
-        timeout: 5000,
-      });
-    } catch (e) {
-      console.log('Timeout waiting for reason buttons. Current content:', await page.content());
-      throw e;
-    }
+    // Verification: Reason buttons should appear
+    // "Incorrect Result" is one of the reasons
+    const reasonBtn = page.getByRole('button', { name: 'Incorrect Result' });
+    await expect(reasonBtn).toBeVisible({ timeout: 5000 });
 
     const content = await page.content();
     expect(content).toContain('issue') ||

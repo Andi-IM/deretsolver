@@ -3,6 +3,8 @@ import fs from 'fs';
 import path from 'path';
 
 test.describe('SolverPage E2E', async () => {
+  test.use({ locale: 'en-US' });
+
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
     // Wait for the app to fully load
@@ -126,11 +128,11 @@ test.describe('SolverPage E2E', async () => {
     expect(content).toContain('500');
   });
 
-  test.skip('solves fractional geometric 1, 0.5, 0.25, 0.125 -> 0.0625', async ({ page }) => {
+  test('solves fractional geometric 1, 0.5, 0.25, 0.125 -> 0.0625', async ({ page }) => {
     await solveSequence(page, '1, 0.5, 0.25, 0.125');
     // Wait for the result to be visible and contain the expected value
-    await expect(page.locator('.text-3xl.font-bold.text-slate-900')).toContainText('0.0625', {
-      timeout: 10000,
+    await expect(page.locator('.text-3xl.font-bold.font-mono')).toContainText('0.0625', {
+      timeout: 5000,
     });
   });
 

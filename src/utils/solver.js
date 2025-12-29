@@ -83,7 +83,7 @@ function generateHints(nums) {
     visualization: { nodes, connections },
     // Include error message so useSolver can still detect it as a "failure" of the local solver
     // to trigger Gemini fallback if needed.
-    error: 'Pattern not found locally.', 
+    error: 'Pattern not found locally.',
     // Wait, if I include 'error', useSolver will treat it as failure and NOT set result.
     // I need to separate "Failure that triggers Gemini" vs "Final Result if Gemini fails".
     // I will return the hint object. useSolver needs to know it's a hint.
@@ -272,12 +272,12 @@ function detectGeometric(nums) {
 
   if (isGeometric) {
     const next = nums[nums.length - 1] * ratio;
-    const rule = `Multiply by ${parseFloat(ratio.toFixed(2))}`;
+    const rule = `Multiply by ${parseFloat(ratio.toFixed(6))}`;
 
     // Visualization
     const nodes = nums.map((n, i) => ({ value: n, label: `i=${i}` }));
     nodes.push({
-      value: parseFloat(next.toFixed(2)),
+      value: parseFloat(next.toFixed(6)),
       label: 'Next',
       isPrediction: true,
     });
@@ -287,7 +287,7 @@ function detectGeometric(nums) {
       connections.push({
         fromIndex: i,
         toIndex: i + 1,
-        label: `x${parseFloat(ratio.toFixed(2))}`,
+        label: `x${parseFloat(ratio.toFixed(6))}`,
         type: 'mul',
       });
     }
@@ -295,7 +295,7 @@ function detectGeometric(nums) {
     return {
       type: 'Geometric Progression',
       rule,
-      next: parseFloat(next.toFixed(2)),
+      next: parseFloat(next.toFixed(6)),
       visualization: { nodes, connections },
     };
   }
