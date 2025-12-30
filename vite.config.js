@@ -28,7 +28,7 @@ export default defineConfig({
     exclude: ['**/node_modules/**', '**/dist/**', '**/e2e/**', '**/functions/**'],
     coverage: {
       provider: 'v8',
-      reporter: ['text', 'html', 'lcov'],
+      reporter: ['text', 'html', 'lcov', 'json'],
       include: ['src/**/*.{js,jsx}'],
       exclude: ['src/test/**', 'src/**/*.test.{js,jsx}', 'src/main.jsx', 'src/i18n.js'],
       thresholds: {
