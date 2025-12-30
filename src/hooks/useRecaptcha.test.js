@@ -14,6 +14,13 @@ vi.mock('@/utils/logger', () => ({
   },
 }));
 
+// Mock firebase/analytics to prevent IndexedDB warnings
+vi.mock('firebase/analytics', () => ({
+  getAnalytics: vi.fn(),
+  logEvent: vi.fn(),
+  isSupported: vi.fn(() => Promise.resolve(true)),
+}));
+
 describe('useRecaptcha Hook', () => {
   beforeEach(() => {
     vi.clearAllMocks();

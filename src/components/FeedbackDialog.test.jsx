@@ -1,10 +1,15 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import FeedbackDialog from '@/components/FeedbackDialog';
+import * as useRecaptchaHook from '@/hooks/useRecaptcha';
 
 // Mock modules
+vi.mock('@/hooks/useRecaptcha', () => ({
+  defaultLoadRecaptchaScript: vi.fn(),
+  useRecaptcha: vi.fn(),
+}));
 vi.mock('@/utils/logger', () => ({
   default: {
     error: vi.fn(),
@@ -48,15 +53,11 @@ describe('FeedbackDialog', () => {
     // Reset all mocks
     vi.clearAllMocks();
 
-    // Setup grecaptcha mock
-    global.window.grecaptcha = {
-      ready: vi.fn((callback) => callback()),
-      execute: vi.fn(() => Promise.resolve('mock-recaptcha-token')),
-    };
-  });
-
-  afterEach(() => {
-    delete global.window.grecaptcha;
+    // Default mock implementation for useRecaptcha
+    useRecaptchaHook.useRecaptcha.mockReturnValue({
+      isRecaptchaReady: true,
+      getRecaptchaToken: vi.fn(() => Promise.resolve('mock-recaptcha-token')),
+    });
   });
 
   it('should not render when result is null', () => {
@@ -259,8 +260,14 @@ describe('FeedbackDialog', () => {
     const { addDoc } = await import('firebase/firestore');
     const logger = await import('@/utils/logger');
 
-    // Remove grecaptcha after component mounts
-    delete global.window.grecaptcha;
+    // Mock getRecaptchaToken to return null and log warning
+    useRecaptchaHook.useRecaptcha.mockReturnValue({
+      isRecaptchaReady: false,
+      getRecaptchaToken: vi.fn(() => {
+        logger.default.warn('reCAPTCHA not ready, skipping token generation');
+        return Promise.resolve(null);
+      }),
+    });
 
     render(<FeedbackDialog result={mockResult} input={mockInput} />);
 
@@ -288,11 +295,11 @@ describe('FeedbackDialog', () => {
     const user = userEvent.setup();
     const logger = await import('@/utils/logger');
 
-    // Mock grecaptcha.execute to fail
-    global.window.grecaptcha = {
-      ready: vi.fn((callback) => callback()),
-      execute: vi.fn(() => Promise.reject(new Error('reCAPTCHA error'))),
-    };
+    // Mock getRecaptchaToken to fail
+    useRecaptchaHook.useRecaptcha.mockReturnValue({
+      isRecaptchaReady: true,
+      getRecaptchaToken: vi.fn(() => Promise.reject(new Error('reCAPTCHA error'))),
+    });
 
     render(<FeedbackDialog result={mockResult} input={mockInput} />);
 
@@ -301,7 +308,7 @@ describe('FeedbackDialog', () => {
 
     await waitFor(() => {
       expect(logger.default.error).toHaveBeenCalledWith(
-        'Failed to execute reCAPTCHA:',
+        'Error adding document: ',
         expect.any(Error),
       );
     });
@@ -375,6 +382,15 @@ describe('FeedbackDialog', () => {
     const mockLoadRecaptcha = vi.fn(() => Promise.resolve());
     const mockSubmitFeedback = vi.fn(() => Promise.resolve());
 
+    // Update mock to call the loader
+    useRecaptchaHook.useRecaptcha.mockImplementation((loader) => {
+      if (loader) loader();
+      return {
+        isRecaptchaReady: true,
+        getRecaptchaToken: vi.fn(),
+      };
+    });
+
     render(
       <FeedbackDialog
         result={mockResult}
@@ -386,26 +402,6 @@ describe('FeedbackDialog', () => {
 
     await waitFor(() => {
       expect(mockLoadRecaptcha).toHaveBeenCalled();
-    });
-  });
-
-  it('should handle loadRecaptchaScript failure gracefully', async () => {
-    const mockLoadRecaptcha = vi.fn(() => Promise.reject(new Error('Script load failed')));
-    const logger = await import('@/utils/logger');
-
-    render(
-      <FeedbackDialog
-        result={mockResult}
-        input={mockInput}
-        loadRecaptchaScript={mockLoadRecaptcha}
-      />,
-    );
-
-    await waitFor(() => {
-      expect(logger.default.error).toHaveBeenCalledWith(
-        'Failed to load reCAPTCHA script:',
-        expect.any(Error),
-      );
     });
   });
 

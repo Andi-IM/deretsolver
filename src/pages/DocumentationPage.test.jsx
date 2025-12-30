@@ -27,7 +27,9 @@ vi.mock('@/utils/firebase', () => ({
 
 // Mock firebase/analytics
 vi.mock('firebase/analytics', () => ({
+  getAnalytics: vi.fn(),
   logEvent: vi.fn(),
+  isSupported: vi.fn(() => Promise.resolve(true)),
 }));
 
 describe('DocumentationPage', () => {

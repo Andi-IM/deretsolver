@@ -7,7 +7,7 @@ import App from '@/App';
 
 // Mock react-helmet-async
 vi.mock('react-helmet-async', () => ({
-  Helmet: ({ children }) => <>{children}</>,
+  Helmet: () => null,
   HelmetProvider: ({ children }) => <>{children}</>,
 }));
 

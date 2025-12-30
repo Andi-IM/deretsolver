@@ -7,7 +7,7 @@ import SolverPage from '@/pages/SolverPage';
 
 // Mock react-helmet-async
 vi.mock('react-helmet-async', () => ({
-  Helmet: ({ children }) => <>{children}</>,
+  Helmet: () => null,
 }));
 
 // Mock react-i18next

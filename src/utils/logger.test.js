@@ -105,6 +105,8 @@ describe('Logger with Dependency Injection', () => {
       // Mock the firebase/analytics import
       vi.mock('firebase/analytics', () => ({
         logEvent: vi.fn(),
+        getAnalytics: vi.fn(),
+        isSupported: vi.fn(() => Promise.resolve(true)),
       }));
 
       await transport('ERROR', 'error message', null);
