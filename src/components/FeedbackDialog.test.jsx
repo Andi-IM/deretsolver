@@ -366,4 +366,120 @@ describe('FeedbackDialog', () => {
       );
     });
   });
+
+  // =====================
+  // NEW TESTS FOR DI COVERAGE
+  // =====================
+
+  it('should call injected loadRecaptchaScript on mount', async () => {
+    const mockLoadRecaptcha = vi.fn(() => Promise.resolve());
+    const mockSubmitFeedback = vi.fn(() => Promise.resolve());
+
+    render(
+      <FeedbackDialog
+        result={mockResult}
+        input={mockInput}
+        loadRecaptchaScript={mockLoadRecaptcha}
+        submitFeedback={mockSubmitFeedback}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(mockLoadRecaptcha).toHaveBeenCalled();
+    });
+  });
+
+  it('should handle loadRecaptchaScript failure gracefully', async () => {
+    const mockLoadRecaptcha = vi.fn(() => Promise.reject(new Error('Script load failed')));
+    const logger = await import('@/utils/logger');
+
+    render(
+      <FeedbackDialog
+        result={mockResult}
+        input={mockInput}
+        loadRecaptchaScript={mockLoadRecaptcha}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(logger.default.error).toHaveBeenCalledWith(
+        'Failed to load reCAPTCHA script:',
+        expect.any(Error),
+      );
+    });
+  });
+
+  it('should use injected submitFeedback when helpful is clicked', async () => {
+    const user = userEvent.setup();
+    const mockSubmitFeedback = vi.fn(() => Promise.resolve());
+
+    render(
+      <FeedbackDialog result={mockResult} input={mockInput} submitFeedback={mockSubmitFeedback} />,
+    );
+
+    const yesButton = screen.getByRole('button', { name: /feedback.yes/i });
+    await user.click(yesButton);
+
+    await waitFor(() => {
+      expect(mockSubmitFeedback).toHaveBeenCalledWith(
+        expect.objectContaining({
+          isHelpful: true,
+          question: mockInput,
+        }),
+      );
+    });
+  });
+
+  it('should use injected submitFeedback when not helpful is submitted', async () => {
+    const user = userEvent.setup();
+    const mockSubmitFeedback = vi.fn(() => Promise.resolve());
+
+    render(
+      <FeedbackDialog result={mockResult} input={mockInput} submitFeedback={mockSubmitFeedback} />,
+    );
+
+    const noButton = screen.getByRole('button', { name: /feedback.no/i });
+    await user.click(noButton);
+
+    await waitFor(() => {
+      expect(screen.getByText('feedback.issue_prompt')).toBeInTheDocument();
+    });
+
+    const incorrectButton = screen.getByRole('button', { name: /feedback.reasons.incorrect/i });
+    await user.click(incorrectButton);
+
+    const submitButton = screen.getByRole('button', { name: /feedback.submit/i });
+    await user.click(submitButton);
+
+    await waitFor(() => {
+      expect(mockSubmitFeedback).toHaveBeenCalledWith(
+        expect.objectContaining({
+          isHelpful: false,
+          reason: 'Incorrect Result',
+        }),
+      );
+    });
+  });
+
+  it('should handle submitFeedback failure gracefully', async () => {
+    const user = userEvent.setup();
+    const mockSubmitFeedback = vi.fn(() => Promise.reject(new Error('Submit failed')));
+    const logger = await import('@/utils/logger');
+
+    render(
+      <FeedbackDialog result={mockResult} input={mockInput} submitFeedback={mockSubmitFeedback} />,
+    );
+
+    const yesButton = screen.getByRole('button', { name: /feedback.yes/i });
+    await user.click(yesButton);
+
+    await waitFor(() => {
+      expect(logger.default.error).toHaveBeenCalledWith(
+        'Error adding document: ',
+        expect.any(Error),
+      );
+      // Should still show thank you (optimistic UI)
+      expect(screen.getByText('feedback.thank_you')).toBeInTheDocument();
+    });
+  });
 });

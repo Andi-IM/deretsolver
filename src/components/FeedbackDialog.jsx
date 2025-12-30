@@ -4,7 +4,42 @@ import { useTranslation } from 'react-i18next';
 import logger from '@/utils/logger';
 import { sanitize } from '@/utils/security';
 
-function FeedbackDialogContent({ result, input }) {
+// Default implementation for loading reCAPTCHA script
+const defaultLoadRecaptchaScript = () => {
+  if (window.grecaptcha) return Promise.resolve();
+  return new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    const timestamp = Math.floor(Date.now() / 3600000);
+    script.src = `https://www.google.com/recaptcha/api.js?render=${
+      import.meta.env.VITE_RECAPTCHA_SITE_KEY
+    }&t=${timestamp}`;
+    script.async = true;
+    script.onload = () => {
+      if (window.grecaptcha?.ready) window.grecaptcha.ready(resolve);
+      else resolve();
+    };
+    script.onerror = reject;
+    document.head.appendChild(script);
+  });
+};
+
+// Default implementation for submitting feedback to Firebase
+const defaultSubmitFeedback = async (data) => {
+  const { initializeFirebase } = await import('@/utils/firebase');
+  const { db } = await initializeFirebase();
+  const { collection, addDoc, serverTimestamp } = await import('firebase/firestore');
+  return addDoc(collection(db, 'feedback'), {
+    ...data,
+    timestamp: serverTimestamp(),
+  });
+};
+
+function FeedbackDialogContent({
+  result,
+  input,
+  loadRecaptchaScript = defaultLoadRecaptchaScript,
+  submitFeedback = defaultSubmitFeedback,
+}) {
   const [status, setStatus] = useState('idle'); // idle, helpful, not_helpful_form, submitting, submitted
   const [reason, setReason] = useState('');
   const [comment, setComment] = useState('');
@@ -15,26 +50,7 @@ function FeedbackDialogContent({ result, input }) {
   useEffect(() => {
     let mounted = true;
 
-    const loadReCaptchaScript = () => {
-      if (window.grecaptcha) return Promise.resolve();
-      return new Promise((resolve, reject) => {
-        const script = document.createElement('script');
-        // Cache reCAPTCHA script for 1 hour (3600000 ms)
-        const timestamp = Math.floor(Date.now() / 3600000);
-        script.src = `https://www.google.com/recaptcha/api.js?render=${
-          import.meta.env.VITE_RECAPTCHA_SITE_KEY
-        }&t=${timestamp}`;
-        script.async = true;
-        script.onload = () => {
-          if (window.grecaptcha?.ready) window.grecaptcha.ready(resolve);
-          else resolve();
-        };
-        script.onerror = reject;
-        document.head.appendChild(script);
-      });
-    };
-
-    loadReCaptchaScript()
+    loadRecaptchaScript()
       .then(() => {
         if (mounted) {
           setRecaptchaReady(true);
@@ -48,7 +64,7 @@ function FeedbackDialogContent({ result, input }) {
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [loadRecaptchaScript]);
 
   const getRecaptchaToken = useCallback(async () => {
     if (!recaptchaReady || !window.grecaptcha) {
@@ -70,22 +86,14 @@ function FeedbackDialogContent({ result, input }) {
   const handleHelpful = async () => {
     setStatus('submitting');
     try {
-      // Get reCAPTCHA token
       const recaptchaToken = await getRecaptchaToken();
-
-      // Lazy load Firebase
-      const { initializeFirebase } = await import('@/utils/firebase');
-      const { db } = await initializeFirebase();
-      const { collection, addDoc, serverTimestamp } = await import('firebase/firestore');
-
-      await addDoc(collection(db, 'feedback'), {
+      await submitFeedback({
         isHelpful: true,
         question: sanitize(input),
         answer: result.predictions ? result.predictions.join(', ') : result.next,
         resultType: sanitize(result.type),
         resultRule: sanitize(result.rule),
         recaptchaToken,
-        timestamp: serverTimestamp(),
       });
       setStatus('submitted');
     } catch (error) {
@@ -102,15 +110,8 @@ function FeedbackDialogContent({ result, input }) {
     if (!reason) return;
     setStatus('submitting');
     try {
-      // Get reCAPTCHA token
       const recaptchaToken = await getRecaptchaToken();
-
-      // Lazy load Firebase
-      const { initializeFirebase } = await import('@/utils/firebase');
-      const { db } = await initializeFirebase();
-      const { collection, addDoc, serverTimestamp } = await import('firebase/firestore');
-
-      await addDoc(collection(db, 'feedback'), {
+      await submitFeedback({
         isHelpful: false,
         reason,
         comment: sanitize(comment),
@@ -119,7 +120,6 @@ function FeedbackDialogContent({ result, input }) {
         resultType: sanitize(result?.type || 'unknown'),
         resultRule: sanitize(result?.rule || 'unknown'),
         recaptchaToken,
-        timestamp: serverTimestamp(),
       });
       setStatus('submitted');
     } catch (error) {
@@ -264,12 +264,19 @@ function FeedbackDialogContent({ result, input }) {
 /**
  * Wrapper component that only loads reCAPTCHA when FeedbackDialog is rendered
  */
-function FeedbackDialog({ result, input }) {
+function FeedbackDialog({ result, input, loadRecaptchaScript, submitFeedback }) {
   // Only render if there's a result
   if (!result) return null;
 
   // Render the dialog content, which will trigger lazy loading of reCAPTCHA
-  return <FeedbackDialogContent result={result} input={input} />;
+  return (
+    <FeedbackDialogContent
+      result={result}
+      input={input}
+      loadRecaptchaScript={loadRecaptchaScript}
+      submitFeedback={submitFeedback}
+    />
+  );
 }
 
 export default FeedbackDialog;

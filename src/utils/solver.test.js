@@ -221,4 +221,22 @@ describe('solveSequence', () => {
     expect(result).not.toBeNull();
     expect(result.type).toBe('Interleaved Sequence');
   });
+
+  // Unknown Pattern / Hints
+  it('falls back to hints for unknown patterns', () => {
+    // Truly random sequence provided by user
+    const result = solveSequence('47, 3, 89, 12, 56, 94, 21, 68, 7, 73');
+    expect(result).not.toBeNull();
+    expect(result.type).toBe('Unknown Pattern');
+    expect(result.isHint).toBe(true);
+    expect(result.next).toBe('?');
+    expect(result.visualization.connections.length).toBe(9);
+  });
+
+  // Geometric edge case: ratio near 1 but not 1
+  it('handles float precision in geometric detection', () => {
+    const result = solveSequence('1, 1.1, 1.21, 1.331');
+    expect(result.type).toBe('Geometric Progression');
+    expect(result.next).toBeCloseTo(1.4641);
+  });
 });
