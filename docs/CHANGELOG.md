@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.5.2] - 2025-12-30
+
+### Added
+
+- **E2E Testing:** Implemented comprehensive localization tests in `e2e/localization.spec.js` to verify language switching and persistence.
+- **Localization:** Added missing `hint_title` and `hint_message` translations for English and Indonesian.
+
+### Fixed
+
+- **Tests:** Added unit test to cover `useTheme` error case in `ThemeContext.jsx`.
+
+### Changed
+
+- **Refactoring:** Refactored `ResultSection.jsx` to use semantic CSS variables and removed hardcoded translation fallbacks.
+
 ## [1.5.1] - 2025-12-30
 
 ### Fixed
