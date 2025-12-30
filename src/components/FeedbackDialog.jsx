@@ -1,38 +1,11 @@
-import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import logger from '@/utils/logger';
-import { sanitize } from '@/utils/security';
-
-// Default implementation for loading reCAPTCHA script
-const defaultLoadRecaptchaScript = () => {
-  if (window.grecaptcha) return Promise.resolve();
-  return new Promise((resolve, reject) => {
-    const script = document.createElement('script');
-    const timestamp = Math.floor(Date.now() / 3600000);
-    script.src = `https://www.google.com/recaptcha/api.js?render=${
-      import.meta.env.VITE_RECAPTCHA_SITE_KEY
-    }&t=${timestamp}`;
-    script.async = true;
-    script.onload = () => {
-      if (window.grecaptcha?.ready) window.grecaptcha.ready(resolve);
-      else resolve();
-    };
-    script.onerror = reject;
-    document.head.appendChild(script);
-  });
-};
-
-// Default implementation for submitting feedback to Firebase
-const defaultSubmitFeedback = async (data) => {
-  const { initializeFirebase } = await import('@/utils/firebase');
-  const { db } = await initializeFirebase();
-  const { collection, addDoc, serverTimestamp } = await import('firebase/firestore');
-  return addDoc(collection(db, 'feedback'), {
-    ...data,
-    timestamp: serverTimestamp(),
-  });
-};
+import {
+  FEEDBACK_STATUS,
+  defaultSubmitFeedback,
+  useFeedbackSubmission,
+} from '@/hooks/useFeedbackSubmission';
+import { defaultLoadRecaptchaScript, useRecaptcha } from '@/hooks/useRecaptcha';
 
 function FeedbackDialogContent({
   result,
@@ -40,95 +13,24 @@ function FeedbackDialogContent({
   loadRecaptchaScript = defaultLoadRecaptchaScript,
   submitFeedback = defaultSubmitFeedback,
 }) {
-  const [status, setStatus] = useState('idle'); // idle, helpful, not_helpful_form, submitting, submitted
-  const [reason, setReason] = useState('');
-  const [comment, setComment] = useState('');
-  const [recaptchaReady, setRecaptchaReady] = useState(false);
   const { t } = useTranslation();
-
-  // Lazy load reCAPTCHA script
-  useEffect(() => {
-    let mounted = true;
-
-    loadRecaptchaScript()
-      .then(() => {
-        if (mounted) {
-          setRecaptchaReady(true);
-          logger.info('reCAPTCHA loaded successfully');
-        }
-      })
-      .catch((error) => {
-        logger.error('Failed to load reCAPTCHA script:', error);
-      });
-
-    return () => {
-      mounted = false;
-    };
-  }, [loadRecaptchaScript]);
-
-  const getRecaptchaToken = useCallback(async () => {
-    if (!recaptchaReady || !window.grecaptcha) {
-      logger.warn('reCAPTCHA not ready, skipping token generation');
-      return null;
-    }
-
-    try {
-      const token = await window.grecaptcha.execute(import.meta.env.VITE_RECAPTCHA_SITE_KEY, {
-        action: 'submit_feedback',
-      });
-      return token;
-    } catch (error) {
-      logger.error('Failed to execute reCAPTCHA:', error);
-      return null;
-    }
-  }, [recaptchaReady]);
-
-  const handleHelpful = async () => {
-    setStatus('submitting');
-    try {
-      const recaptchaToken = await getRecaptchaToken();
-      await submitFeedback({
-        isHelpful: true,
-        question: sanitize(input),
-        answer: result.predictions ? result.predictions.join(', ') : result.next,
-        resultType: sanitize(result.type),
-        resultRule: sanitize(result.rule),
-        recaptchaToken,
-      });
-      setStatus('submitted');
-    } catch (error) {
-      logger.error('Error adding document: ', error);
-      setStatus('submitted'); // Optimistic UI
-    }
-  };
-
-  const handleNotHelpful = () => {
-    setStatus('not_helpful_form');
-  };
-
-  const handleSubmitNotHelpful = async () => {
-    if (!reason) return;
-    setStatus('submitting');
-    try {
-      const recaptchaToken = await getRecaptchaToken();
-      await submitFeedback({
-        isHelpful: false,
-        reason,
-        comment: sanitize(comment),
-        question: sanitize(input),
-        answer: result?.predictions ? result.predictions.join(', ') : result?.next,
-        resultType: sanitize(result?.type || 'unknown'),
-        resultRule: sanitize(result?.rule || 'unknown'),
-        recaptchaToken,
-      });
-      setStatus('submitted');
-    } catch (error) {
-      logger.error('Error adding document: ', error);
-      setStatus('submitted');
-    }
-  };
-
-  if (!result) return null;
+  const { getRecaptchaToken } = useRecaptcha(loadRecaptchaScript);
+  const {
+    status,
+    reason,
+    comment,
+    setReason,
+    setComment,
+    handleHelpful,
+    handleNotHelpful,
+    handleSubmitNotHelpful,
+    resetForm,
+  } = useFeedbackSubmission({
+    result,
+    input,
+    getRecaptchaToken,
+    submitFeedback,
+  });
 
   const reasons = [
     { label: t('feedback.reasons.incorrect'), value: 'Incorrect Result' },
@@ -139,7 +41,7 @@ function FeedbackDialogContent({
   return (
     <div className="max-w-3xl mx-auto mt-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-none border border-slate-100 dark:border-slate-800 p-6">
-        {status === 'submitted' ? (
+        {status === FEEDBACK_STATUS.SUBMITTED ? (
           <div className="text-center py-4 animate-in zoom-in-95 duration-300">
             <div className="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 rounded-full flex items-center justify-center mx-auto mb-3">
               <span className="material-symbols-outlined text-2xl">thumb_up</span>
@@ -157,7 +59,7 @@ function FeedbackDialogContent({
               </h3>
             </div>
 
-            {status === 'idle' && (
+            {status === FEEDBACK_STATUS.IDLE && (
               <div className="text-center py-2">
                 <p className="text-slate-700 dark:text-white font-medium mb-6 text-lg">
                   {t('feedback.question')}
@@ -183,7 +85,7 @@ function FeedbackDialogContent({
               </div>
             )}
 
-            {status === 'not_helpful_form' && (
+            {status === FEEDBACK_STATUS.NOT_HELPFUL_FORM && (
               <div className="animate-in fade-in slide-in-from-right-4 duration-300">
                 <p className="text-slate-700 dark:text-slate-200 font-medium mb-4">
                   {t('feedback.issue_prompt')}
@@ -225,7 +127,7 @@ function FeedbackDialogContent({
                 <div className="flex items-center justify-end gap-3">
                   <button
                     type="button"
-                    onClick={() => setStatus('idle')}
+                    onClick={resetForm}
                     className="px-5 py-2.5 text-slate-700 dark:text-slate-400 font-bold hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors text-sm"
                   >
                     {t('feedback.cancel')}
@@ -246,7 +148,7 @@ function FeedbackDialogContent({
               </div>
             )}
 
-            {status === 'submitting' && (
+            {status === FEEDBACK_STATUS.SUBMITTING && (
               <div className="py-8 flex flex-col items-center justify-center">
                 <div className="w-8 h-8 border-4 border-slate-200 dark:border-slate-800 border-t-emerald-500 rounded-full animate-spin mb-3" />
                 <p className="text-slate-600 dark:text-slate-400 text-sm font-medium">

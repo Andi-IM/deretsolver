@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.5.4] - 2025-12-30
+
+### Added
+
+- **Testing:** Achieved 100% line coverage for `Layout.jsx` and `ResultSection.jsx`.
+- **Testing:** Added 30+ new unit and integration tests.
+
+### Changed
+
+- **Refactoring:** Extracted `InputSection.jsx` into 5 single-responsibility components (`ErrorNotification`, `SequenceInput`, `InputHelperBar`, `ApiKeyInput`, `SolveButton`) following SRP.
+
 ## [1.5.3] - 2025-12-30
 
 ### Added

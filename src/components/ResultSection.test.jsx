@@ -147,4 +147,80 @@ describe('ResultSection', () => {
     render(<ResultSection result={dashedResult} />);
     expect(screen.getByText('...')).toBeInTheDocument();
   });
+
+  it('should display singular prediction label when only one prediction', () => {
+    const singlePredictionArray = { ...mockResult, predictions: [42] };
+    render(<ResultSection result={singlePredictionArray} />);
+    expect(screen.getByText('result.predicted_next')).toBeInTheDocument();
+  });
+
+  it('should handle node without label (fallback to index)', () => {
+    const noLabelNodes = {
+      ...mockResult,
+      visualization: {
+        nodes: [
+          { value: 1, isPrediction: false },
+          { value: 2, isPrediction: false },
+        ],
+        connections: [],
+      },
+    };
+    render(<ResultSection result={noLabelNodes} />);
+    expect(screen.getByText('i=0')).toBeInTheDocument();
+    expect(screen.getByText('i=1')).toBeInTheDocument();
+  });
+
+  it('should handle node with isPrediction and no label (shows NEXT)', () => {
+    const predictionNoLabel = {
+      ...mockResult,
+      visualization: {
+        nodes: [{ value: 99, isPrediction: true }],
+        connections: [],
+      },
+    };
+    render(<ResultSection result={predictionNoLabel} />);
+    expect(screen.getByText('NEXT')).toBeInTheDocument();
+  });
+
+  it('should handle unknown connection type with fallback color', () => {
+    const unknownType = {
+      ...mockResult,
+      visualization: {
+        nodes: mockResult.visualization.nodes,
+        connections: [{ fromIndex: 0, toIndex: 1, type: 'unknown', label: '?' }],
+      },
+    };
+    render(<ResultSection result={unknownType} />);
+    expect(screen.getByText('?')).toBeInTheDocument();
+  });
+
+  it('should display hint message when isHint is true', () => {
+    const hintResult = { ...mockResult, isHint: true };
+    render(<ResultSection result={hintResult} />);
+    expect(screen.getByText('result.hint_message')).toBeInTheDocument();
+  });
+
+  it('should render sub connection type', () => {
+    const subResult = {
+      ...mockResult,
+      visualization: {
+        nodes: mockResult.visualization.nodes,
+        connections: [{ fromIndex: 0, toIndex: 1, type: 'sub', label: '-5' }],
+      },
+    };
+    render(<ResultSection result={subResult} />);
+    expect(screen.getByText('-5')).toBeInTheDocument();
+  });
+
+  it('should render pow connection type', () => {
+    const powResult = {
+      ...mockResult,
+      visualization: {
+        nodes: mockResult.visualization.nodes,
+        connections: [{ fromIndex: 0, toIndex: 1, type: 'pow', label: '^2' }],
+      },
+    };
+    render(<ResultSection result={powResult} />);
+    expect(screen.getByText('^2')).toBeInTheDocument();
+  });
 });
