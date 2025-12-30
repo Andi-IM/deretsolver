@@ -5,7 +5,6 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
 import Layout from '@/components/Layout';
-import { ThemeProvider } from '@/context/ThemeContext';
 
 // Mock language switcher to avoid complex setup
 vi.mock('@/components/LanguageSwitcher', () => ({
@@ -21,11 +20,9 @@ vi.mock('react-i18next', () => ({
 const renderWithRouter = (initialRoute = '/') => {
   return render(
     <MemoryRouter initialEntries={[initialRoute]}>
-      <ThemeProvider>
-        <Layout>
-          <div>Child Content</div>
-        </Layout>
-      </ThemeProvider>
+      <Layout>
+        <div>Child Content</div>
+      </Layout>
     </MemoryRouter>,
   );
 };
