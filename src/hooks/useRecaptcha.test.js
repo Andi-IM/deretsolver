@@ -28,7 +28,7 @@ describe('useRecaptcha Hook', () => {
     window.grecaptcha = undefined;
 
     // Clean up document head
-    document.head.innerHTML = '';
+    document.head.textContent = '';
   });
 
   afterEach(() => {
