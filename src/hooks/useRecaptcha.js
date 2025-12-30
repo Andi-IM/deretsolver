@@ -58,7 +58,8 @@ export function useRecaptcha(loadRecaptchaScript = defaultLoadRecaptchaScript) {
     }
 
     try {
-      const token = await window.grecaptcha.execute(import.meta.env.VITE_RECAPTCHA_SITE_KEY, {
+      const siteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY ?? '';
+      const token = await window.grecaptcha.execute(siteKey, {
         action: 'submit_feedback',
       });
       return token;

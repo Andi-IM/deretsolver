@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "test": "vitest",
+    "test": "vitest run",
     "test:e2e": "playwright test",
     "test:e2e:coverage": "cross-env VITE_COVERAGE=true playwright test",
     "coverage:e2e": "npm run test:e2e:coverage && nyc report --reporter=text --reporter=html",
@@ -46,7 +46,6 @@
     "@vitejs/plugin-react": "^5.1.1",
     "@vitest/coverage-v8": "^4.0.16",
     "autoprefixer": "^10.4.23",
-    "codecov": "^3.8.2",
     "cross-env": "^10.1.0",
     "jsdom": "^27.3.0",
     "nyc": "^17.1.0",
