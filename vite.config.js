@@ -2,6 +2,7 @@ import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
 import { defineConfig } from 'vite';
 import istanbul from 'vite-plugin-istanbul';
+import { codecovVitePlugin } from "@codecov/vite-plugin";
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -18,6 +19,11 @@ export default defineConfig({
       exclude: ['node_modules', 'test/', 'e2e/'],
       extension: ['.js', '.jsx'],
       requireEnv: true, // Only instrument when VITE_COVERAGE=true
+    }),
+    codecovVitePlugin({
+      enableBundleAnalysis: process.env.CODECOV_TOKEN !== undefined,
+      bundleName: "deretsolver",
+      uploadToken: process.env.CODECOV_TOKEN,
     }),
   ],
   envPrefix: ['VITE_', 'GOOGLE_AI_APIKEY'],
