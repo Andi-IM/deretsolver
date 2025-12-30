@@ -22,7 +22,9 @@
       "sub": "Sub",
       "mul": "Mul",
       "pow": "Pow"
-    }
+    },
+    "hint_title": "Pattern Not Found",
+    "hint_message": "We couldn't automatically identify the pattern. The visualization below shows the differences between numbers to help you spot it manually."
   },
   "feedback": {
     "title": "Feedback",

@@ -111,4 +111,13 @@ describe('ThemeContext', () => {
     expect(screen.getByTestId('theme-value')).toHaveTextContent('dark');
     expect(document.documentElement).toHaveClass('dark');
   });
+
+  it('throws an error when used outside of ThemeProvider', () => {
+    // Suppress console.error for this test as Vitest/React will log the error
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    expect(() => render(<TestComponent />)).toThrow('useTheme must be used within a ThemeProvider');
+
+    consoleSpy.mockRestore();
+  });
 });

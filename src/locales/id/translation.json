@@ -22,7 +22,9 @@
       "sub": "Kur",
       "mul": "Kal",
       "pow": "Pangk"
-    }
+    },
+    "hint_title": "Pola Tidak Ditemukan",
+    "hint_message": "Kami tidak dapat mengidentifikasi pola secara otomatis. Visualisasi di bawah menunjukkan selisih antar angka untuk membantu Anda menemukannya secara manual."
   },
   "feedback": {
     "title": "Umpan Balik",

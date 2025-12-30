@@ -25,12 +25,11 @@ function ResultSection({ result }) {
                   </span>
                 </div>
                 <span className="text-[11px] font-bold text-text-muted uppercase tracking-wide">
-                  {t('result.hint_title') || 'Pattern Not Found'}
+                  {t('result.hint_title')}
                 </span>
               </div>
               <p className="text-sm text-text-muted font-medium leading-relaxed font-mono tracking-tight">
-                {t('result.hint_message') ||
-                  "We couldn't automatically identify the pattern. The visualization below shows the differences between numbers to help you spot it manually."}
+                {t('result.hint_message')}
               </p>
             </div>
           ) : (
