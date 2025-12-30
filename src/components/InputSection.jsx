@@ -8,9 +8,9 @@ function InputSection({ input, setInput, onSolve, error, isLoading, apiKey, setA
   const { t } = useTranslation();
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-none border border-slate-100 dark:border-slate-800 p-8 mb-8 relative overflow-hidden">
+    <div className="bg-bg-surface rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-none border border-border-base p-8 mb-8 relative overflow-hidden">
       {/* Top Decoration */}
-      <div className="absolute top-0 right-0 w-64 h-64 bg-slate-50 dark:bg-slate-800 rounded-bl-full -mr-20 -mt-20 -z-0 pointer-events-none opacity-50 dark:opacity-20" />
+      <div className="absolute top-0 right-0 w-64 h-64 bg-bg-base rounded-bl-full -mr-20 -mt-20 -z-0 pointer-events-none opacity-50 dark:opacity-20" />
 
       {/* Error Notification */}
       {error && (
@@ -28,7 +28,7 @@ function InputSection({ input, setInput, onSolve, error, isLoading, apiKey, setA
           </div>
           <button
             type="button"
-            className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300"
+            className="text-red-600 dark:text-red-400 hover:opacity-80 transition-opacity"
           >
             <span className="material-symbols-outlined text-[20px]">close</span>
           </button>
@@ -38,7 +38,7 @@ function InputSection({ input, setInput, onSolve, error, isLoading, apiKey, setA
       <div className="relative z-10 space-y-4">
         <label
           htmlFor="input-sequence"
-          className="block text-xs font-bold text-slate-700 dark:text-slate-400 uppercase tracking-widest ml-1"
+          className="block text-xs font-bold text-text-muted uppercase tracking-widest ml-1"
         >
           {t('input.label')}
         </label>
@@ -46,13 +46,13 @@ function InputSection({ input, setInput, onSolve, error, isLoading, apiKey, setA
         <div className="relative group">
           <textarea
             id="input-sequence"
-            className={`w-full min-h-[160px] p-6 text-xl font-mono text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-950 rounded-xl border-2 shadow-sm
+            className={`w-full min-h-[160px] p-6 text-xl font-mono text-text-base bg-bg-surface rounded-xl border-2 shadow-sm
               ${
                 error
                   ? 'border-red-300 dark:border-red-900 focus:border-red-400 dark:focus:border-red-800 focus:ring-4 focus:ring-red-50 dark:focus:ring-red-900/20'
-                  : 'border-slate-200 dark:border-slate-800 focus:border-blue-500 dark:focus:border-blue-600 focus:ring-4 focus:ring-blue-50 dark:focus:ring-blue-900/20'
+                  : 'border-border-base focus:border-primary focus:ring-4 focus:ring-primary/10'
               } 
-              transition-all duration-200 resize-y outline-none placeholder:text-slate-400 dark:placeholder:text-slate-600`}
+              transition-all duration-200 resize-y outline-none placeholder:text-text-muted/50`}
             placeholder={t('input.placeholder')}
             value={input}
             onChange={(e) => setInput(e.target.value)}
@@ -61,19 +61,17 @@ function InputSection({ input, setInput, onSolve, error, isLoading, apiKey, setA
         </div>
 
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center px-1 gap-3 sm:gap-0">
-          <span className="text-xs text-slate-600 dark:text-slate-400 font-medium">
-            {t('input.helper')}
-          </span>
+          <span className="text-xs text-text-muted font-medium">{t('input.helper')}</span>
           <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-4">
             <button
               type="button"
               onClick={() => setShowKeyInput(!showKeyInput)}
-              className="text-xs text-slate-600 dark:text-slate-400 hover:text-blue-500 dark:hover:text-blue-400 flex items-center gap-1 transition-colors"
+              className="text-xs text-text-muted hover:text-primary flex items-center gap-1 transition-colors"
             >
               <Key className="w-3 h-3" />
               {apiKey ? t('input.api_key_set') : t('input.add_api_key')}
             </button>
-            <span className="text-xs text-slate-600 dark:text-slate-400 font-mono tracking-tight shrink-0">
+            <span className="text-xs text-text-muted font-mono tracking-tight shrink-0">
               {t('input.items_count', {
                 count: input.split(',').filter((x) => x.trim()).length,
               })}
@@ -87,13 +85,11 @@ function InputSection({ input, setInput, onSolve, error, isLoading, apiKey, setA
             <input
               type="password"
               placeholder={t('input.api_key_placeholder')}
-              className="w-full p-3 text-sm border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-200 rounded-lg focus:border-blue-500 dark:focus:border-blue-600 focus:ring-2 focus:ring-blue-50 dark:focus:ring-blue-900/20 outline-none"
+              className="w-full p-3 text-sm border border-border-base bg-bg-surface text-text-base rounded-lg focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none"
               value={apiKey}
               onChange={(e) => setApiKey(e.target.value)}
             />
-            <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1 ml-1">
-              {t('input.api_key_helper')}
-            </p>
+            <p className="text-[10px] text-text-muted mt-1 ml-1">{t('input.api_key_helper')}</p>
           </div>
         )}
       </div>
@@ -101,8 +97,8 @@ function InputSection({ input, setInput, onSolve, error, isLoading, apiKey, setA
       <div className="relative z-10 mt-8 flex justify-end">
         <button
           type="button"
-          className={`bg-blue-500 hover:bg-blue-600 active:bg-blue-700 active:scale-95 text-white font-bold text-sm px-10 py-3.5 rounded-lg shadow-xl shadow-blue-500/20 dark:shadow-none transition-all flex items-center gap-2 
-                  ${isLoading ? 'opacity-80 cursor-wait' : ''}`}
+          className={`bg-primary hover:opacity-90 active:scale-95 text-white font-bold text-sm px-10 py-3.5 rounded-lg shadow-xl shadow-primary/20 dark:shadow-none transition-all flex items-center gap-2 
+105:                   ${isLoading ? 'opacity-80 cursor-wait' : ''}`}
           onClick={onSolve}
           disabled={!input.trim() || isLoading}
         >

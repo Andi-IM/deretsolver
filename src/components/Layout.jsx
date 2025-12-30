@@ -16,13 +16,13 @@ function Layout({ children }) {
       : 'hover:text-slate-900 dark:hover:text-white transition-colors';
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 font-sans text-slate-800 dark:text-slate-200 antialiased">
+    <div className="min-h-screen flex flex-col bg-bg-base font-sans text-text-base antialiased">
       {/* Top Navigation */}
-      <header className="sticky top-0 z-40 w-full bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800">
+      <header className="sticky top-0 z-40 w-full bg-bg-surface border-b border-border-base">
         <div className="max-w-7xl mx-auto px-4 md:px-8 h-16 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3">
             {/* Logo */}
-            <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center text-white shadow-sm">
+            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white shadow-sm">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -48,13 +48,11 @@ function Layout({ children }) {
                 />
               </svg>
             </div>
-            <h1 className="text-lg font-bold tracking-tight text-slate-900 dark:text-white">
-              Deret Solver
-            </h1>
+            <h1 className="text-lg font-bold tracking-tight text-text-base">Deret Solver</h1>
           </Link>
 
           <div className="flex items-center gap-4 sm:gap-8">
-            <nav className="hidden sm:flex items-center gap-8 text-sm font-medium text-slate-700 dark:text-slate-300">
+            <nav className="hidden sm:flex items-center gap-8 text-sm font-medium text-text-muted">
               <Link className={isActive('/')} to="/">
                 Solver
               </Link>
@@ -71,7 +69,7 @@ function Layout({ children }) {
               <LanguageSwitcher />
               <button
                 type="button"
-                className="sm:hidden p-2 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                className="sm:hidden p-2 text-text-muted hover:bg-bg-base rounded-lg transition-colors"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 aria-label="Toggle menu"
               >
@@ -85,24 +83,24 @@ function Layout({ children }) {
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="sm:hidden border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900">
+          <div className="sm:hidden border-t border-border-base bg-bg-surface">
             <nav className="flex flex-col p-4 space-y-4">
               <Link
-                className={`${isActive('/')} block py-2 px-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800`}
+                className={`${isActive('/')} block py-2 px-3 rounded-lg hover:bg-bg-base`}
                 to="/"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Solver
               </Link>
               <Link
-                className={`${isActive('/quiz')} block py-2 px-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800`}
+                className={`${isActive('/quiz')} block py-2 px-3 rounded-lg hover:bg-bg-base`}
                 to="/quiz"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Quiz Mode
               </Link>
               <Link
-                className={`${isActive('/docs')} block py-2 px-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800`}
+                className={`${isActive('/docs')} block py-2 px-3 rounded-lg hover:bg-bg-base`}
                 to="/docs"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
@@ -117,26 +115,23 @@ function Layout({ children }) {
         {children}
       </main>
 
-      <footer className="mt-auto py-8 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+      <footer className="mt-auto py-8 border-t border-border-base bg-bg-surface">
         <div className="max-w-5xl mx-auto px-4 text-center space-y-2">
           <div className="flex items-center justify-center gap-4 text-sm">
-            <Link
-              to="/privacy"
-              className="text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-            >
+            <Link to="/privacy" className="text-text-muted hover:text-primary transition-colors">
               {t('page.privacy')}
             </Link>
           </div>
-          <p className="text-sm text-slate-600 dark:text-slate-400">
+          <p className="text-sm text-text-muted">
             © {new Date().getFullYear()} Deret Solver. Mathematics made visual.
           </p>
-          <p className="text-xs text-slate-600 dark:text-slate-400">
+          <p className="text-xs text-text-muted">
             This site is protected by reCAPTCHA and the Google{' '}
             <a
               href="https://policies.google.com/privacy"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-700 dark:text-blue-400 underline hover:text-blue-800 dark:hover:text-blue-300"
+              className="text-primary underline hover:opacity-80 transition-opacity"
             >
               Privacy Policy
             </a>{' '}
@@ -145,7 +140,7 @@ function Layout({ children }) {
               href="https://policies.google.com/terms"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-700 dark:text-blue-400 underline hover:text-blue-800 dark:hover:text-blue-300"
+              className="text-primary underline hover:opacity-80 transition-opacity"
             >
               Terms of Service
             </a>{' '}
