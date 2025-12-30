@@ -2,7 +2,7 @@
 [![Deploy to Firebase Hosting on merge](https://github.com/Andi-IM/deretsolver/actions/workflows/firebase-hosting-merge.yml/badge.svg)](https://github.com/Andi-IM/deretsolver/actions/workflows/firebase-hosting-merge.yml)
 [![codecov](https://codecov.io/github/Andi-IM/deretsolver/graph/badge.svg?token=4TKB07CI3X)](https://codecov.io/github/Andi-IM/deretsolver)
 
-# Deret Solver (v1.4.0)
+# Deret Solver (v1.5.1)
 
 **Deret Solver** is an intelligent number sequence solver that combines local pattern detection with AI-powered analysis. It helps users identify, visualize, and understand various types of number sequences including arithmetic, geometric, Fibonacci, interleaved patterns, and more complex logic-based sequences.
 
@@ -11,7 +11,7 @@
 Deret Solver uses a dual-solver approach to handle both simple and complex number sequences:
 
 - **Local Solver**: Fast, offline detection of common patterns (arithmetic, geometric, Fibonacci, primes, factorials, etc.).
-- **Gemini AI Solver**: AI-powered analysis for complex, abstract, and logic-based sequences using Google's Gemini API (`gemini-2.0-flash`).
+- **Gemini AI Solver**: AI-powered analysis for complex, abstract, and logic-based sequences using Google's Gemini API (`gemini-2.5-flash`).
 
 Built with **React 19** and **Vite 7** for cutting-edge performance and developer experience.
 
@@ -21,6 +21,7 @@ Built with **React 19** and **Vite 7** for cutting-edge performance and develope
   - **Local Solver**: Instantly solves Arithmetic, Geometric, Fibonacci, Two-Level Difference, Power, **Prime Numbers**, **Factorials**, and **Interleaved Sequences**.
   - **Gemini AI Solver**: Handles complex and logic-based sequences with AI assistance.
 - **Quiz Mode**: Test your skills! Generate sequence questions, choose the right answer, and track your progress.
+- **Dark Mode Support**: Full theme switching with system preference detection and state persistence.
 - **Internationalization (i18n)**: Full support for **English** and **Indonesian** languages.
 - **Advanced Visualization**:
   - Dynamic **SVG-based visualization** with arcs for interleaved sequences and straight connections for standard patterns.
