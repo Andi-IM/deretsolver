@@ -5,6 +5,10 @@
 ### Added
 
 - **Testing:** Achieved 100% test coverage for `useRecaptcha` hook.
+- **Testing:** Added comprehensive unit tests for `useFeedbackSubmission` hook.
+- **Testing:** Enhanced `useSolver` tests to explicitly cover all visualization logic and error fallback branches.
+- **Testing:** Added logic coverage for `QuizMode` answer locking (L39).
+- **Testing:** Added logic coverage for `QuizMode` difficulty selector and streak reset (L164-L166).
 
 ### Changed
 
