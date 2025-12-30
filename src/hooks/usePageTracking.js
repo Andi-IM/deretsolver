@@ -16,7 +16,7 @@ export function usePageTracking(pageTitle) {
       .then(({ initializeFirebase }) => initializeFirebase())
       .then(({ analytics }) => {
         if (analytics) {
-          import('firebase/analytics').then(({ logEvent }) => {
+          return import('firebase/analytics').then(({ logEvent }) => {
             logEvent(analytics, 'page_view', {
               page_path: location.pathname,
               page_title: pageTitle,
