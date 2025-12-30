@@ -5,6 +5,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
 import Layout from '@/components/Layout';
+import { ThemeProvider } from '@/context/ThemeContext';
 
 // Mock language switcher to avoid complex setup
 vi.mock('@/components/LanguageSwitcher', () => ({
@@ -22,9 +23,11 @@ describe('Layout Component', () => {
     const user = userEvent.setup();
     render(
       <MemoryRouter>
-        <Layout>
-          <div>Child Content</div>
-        </Layout>
+        <ThemeProvider>
+          <Layout>
+            <div>Child Content</div>
+          </Layout>
+        </ThemeProvider>
       </MemoryRouter>,
     );
 
@@ -69,7 +72,9 @@ describe('Layout Component', () => {
     const user = userEvent.setup();
     render(
       <MemoryRouter>
-        <Layout>content</Layout>
+        <ThemeProvider>
+          <Layout>content</Layout>
+        </ThemeProvider>
       </MemoryRouter>,
     );
 

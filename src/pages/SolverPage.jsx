@@ -44,11 +44,13 @@ function SolverPage() {
         <html lang={i18n.language} />
       </Helmet>
 
-      <div className="text-center max-w-3xl mx-auto space-y-4 mb-8 pt-8">
-        <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-900">
+      <div className="text-center max-w-3xl mx-auto space-y-4 mb-8 pt-8 text-balance">
+        <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-900 dark:text-white">
           {t('app.title')}
         </h2>
-        <p className="text-lg text-slate-500 leading-relaxed font-normal">{t('app.description')}</p>
+        <p className="text-lg text-slate-500 dark:text-slate-400 leading-relaxed font-normal">
+          {t('app.description')}
+        </p>
       </div>
 
       <InputSection

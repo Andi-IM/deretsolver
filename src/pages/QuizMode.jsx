@@ -48,15 +48,15 @@ function QuizMode() {
 
   const getOptionColor = (option) => {
     if (selectedOption === null)
-      return 'bg-white hover:bg-slate-50 border-slate-200 text-slate-700';
+      return 'bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200';
 
     if (option === question.correctAnswer) {
-      return 'bg-green-100 border-green-500 text-green-700 font-bold';
+      return 'bg-green-100 dark:bg-green-900/30 border-green-500 dark:border-green-600 text-green-700 dark:text-green-400 font-bold';
     }
     if (option === selectedOption && !isCorrect) {
-      return 'bg-red-100 border-red-500 text-red-700';
+      return 'bg-red-100 dark:bg-red-900/30 border-red-500 dark:border-red-600 text-red-700 dark:text-red-400';
     }
-    return 'bg-slate-50 text-slate-400 border-slate-200 opacity-50';
+    return 'bg-slate-50 dark:bg-slate-950 text-slate-400 dark:text-slate-600 border-slate-200 dark:border-slate-800 opacity-50';
   };
 
   return (
@@ -69,38 +69,40 @@ function QuizMode() {
         {/* Header */}
         <div className="text-center space-y-2">
           <div className="flex justify-center items-center gap-2 mb-4">
-            <span className="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">
+            <span className="bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">
               {difficulty}
             </span>
-            <span className="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">
+            <span className="bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-300 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">
               Streak: {streak} 🔥
             </span>
           </div>
-          <h1 className="text-3xl font-bold text-slate-900">Pattern Quiz</h1>
-          <p className="text-slate-500">Find the missing number in the sequence.</p>
+          <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Pattern Quiz</h1>
+          <p className="text-slate-500 dark:text-slate-400">
+            Find the missing number in the sequence.
+          </p>
         </div>
 
         {/* Question Card */}
         {question && (
-          <div className="bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl dark:shadow-none border border-slate-100 dark:border-slate-800 overflow-hidden">
             <div className="p-8 text-center space-y-6">
               <div className="flex justify-center flex-wrap gap-3">
                 {question.sequence.map((num, i) => (
                   <span
                     key={i}
-                    className="text-2xl md:text-3xl font-mono font-semibold text-slate-800"
+                    className="text-2xl md:text-3xl font-mono font-semibold text-slate-800 dark:text-slate-200"
                   >
                     {num}
                     {i < question.sequence.length - 1 ? ',' : ''}
                   </span>
                 ))}
-                <span className="text-2xl md:text-3xl font-mono font-bold text-indigo-600 bg-indigo-50 px-3 rounded-lg border-2 border-dashed border-indigo-200">
+                <span className="text-2xl md:text-3xl font-mono font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/50 px-3 rounded-lg border-2 border-dashed border-indigo-200 dark:border-indigo-800">
                   ?
                 </span>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-8 bg-slate-50/50 border-t border-slate-100">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-8 bg-slate-50/50 dark:bg-slate-950/50 border-t border-slate-100 dark:border-slate-800">
               {question.options.map((option, idx) => (
                 <button
                   key={idx}
@@ -116,23 +118,25 @@ function QuizMode() {
             {/* Explanation / Feedback */}
             {showExplanation && (
               <div
-                className={`p-6 border-t ${isCorrect ? 'bg-green-50 border-green-100' : 'bg-red-50 border-red-100'} animate-in fade-in slide-in-from-bottom-4 duration-300`}
+                className={`p-6 border-t ${isCorrect ? 'bg-green-50 dark:bg-green-950/30 border-green-100 dark:border-green-900/50' : 'bg-red-50 dark:bg-red-950/30 border-red-100 dark:border-red-900/50'} animate-in fade-in slide-in-from-bottom-4 duration-300`}
               >
                 <div className="flex flex-col md:flex-row items-center justify-between gap-4">
                   <div className="text-left w-full">
                     <h3
-                      className={`font-bold text-lg mb-2 ${isCorrect ? 'text-green-800' : 'text-red-800'}`}
+                      className={`font-bold text-lg mb-2 ${isCorrect ? 'text-green-800 dark:text-green-300' : 'text-red-800 dark:text-red-300'}`}
                     >
                       {isCorrect ? 'Correct! 🎉' : 'Incorrect 😔'}
                     </h3>
-                    <p className="text-slate-700 mb-1">
+                    <p className="text-slate-700 dark:text-slate-300 mb-1">
                       <span className="font-semibold">Rule:</span> {question.rule}
                     </p>
-                    <p className="text-slate-600 text-sm">{question.explanation}</p>
+                    <p className="text-slate-600 dark:text-slate-400 text-sm">
+                      {question.explanation}
+                    </p>
                   </div>
                   <button
                     onClick={loadNewQuestion}
-                    className="bg-slate-900 text-white px-6 py-3 rounded-xl font-bold hover:bg-slate-800 transition-colors shadow-lg shadow-slate-900/10 whitespace-nowrap w-full md:w-auto"
+                    className="bg-slate-900 dark:bg-slate-800 text-white px-6 py-3 rounded-xl font-bold hover:bg-slate-800 dark:hover:bg-slate-700 transition-colors shadow-lg shadow-slate-900/10 dark:shadow-none whitespace-nowrap w-full md:w-auto"
                   >
                     Next Question
                   </button>

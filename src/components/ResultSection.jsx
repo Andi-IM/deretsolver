@@ -10,42 +10,42 @@ function ResultSection({ result }) {
     <div className="flex flex-col lg:flex-row gap-6 animate-in fade-in slide-in-from-bottom-8 duration-500">
       {/* LEFT COLUMN: Result Analysis */}
       <div className="lg:w-[350px] flex-shrink-0 flex flex-col">
-        <div className="bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 p-6 flex flex-col h-full">
-          <h3 className="text-[11px] font-bold text-slate-600 uppercase tracking-widest mb-6">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-none border border-slate-100 dark:border-slate-800 p-6 flex flex-col h-full">
+          <h3 className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest mb-6">
             {t('result.analysis_title')}
           </h3>
 
           {/* Success / Hint Badge */}
           {result.isHint ? (
-            <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-6">
+            <div className="bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-lg p-4 mb-6">
               <div className="flex items-center gap-2 mb-1.5">
-                <div className="w-4 h-4 rounded-full bg-slate-400 flex items-center justify-center shrink-0">
+                <div className="w-4 h-4 rounded-full bg-slate-400 dark:bg-slate-600 flex items-center justify-center shrink-0">
                   <span className="material-symbols-outlined text-white text-[10px] font-bold">
                     priority_high
                   </span>
                 </div>
-                <span className="text-[11px] font-bold text-slate-600 uppercase tracking-wide">
+                <span className="text-[11px] font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wide">
                   {t('result.hint_title') || 'Pattern Not Found'}
                 </span>
               </div>
-              <p className="text-sm text-slate-600 font-medium leading-relaxed">
+              <p className="text-sm text-slate-600 dark:text-slate-400 font-medium leading-relaxed font-mono tracking-tight">
                 {t('result.hint_message') ||
                   "We couldn't automatically identify the pattern. The visualization below shows the differences between numbers to help you spot it manually."}
               </p>
             </div>
           ) : (
-            <div className="bg-emerald-50 border border-emerald-100 rounded-lg p-4 mb-6">
+            <div className="bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/50 rounded-lg p-4 mb-6">
               <div className="flex items-center gap-2 mb-1.5">
                 <div className="w-4 h-4 rounded-full bg-emerald-500 flex items-center justify-center shrink-0">
                   <span className="material-symbols-outlined text-white text-[10px] font-bold">
                     check
                   </span>
                 </div>
-                <span className="text-[11px] font-bold text-emerald-800 uppercase tracking-wide">
+                <span className="text-[11px] font-bold text-emerald-800 dark:text-emerald-300 uppercase tracking-wide">
                   {t('result.success')}
                 </span>
               </div>
-              <p className="text-sm text-emerald-900 font-medium leading-relaxed">
+              <p className="text-sm text-emerald-900 dark:text-emerald-100 font-medium leading-relaxed">
                 {t('result.success_message')}
               </p>
             </div>
@@ -53,23 +53,25 @@ function ResultSection({ result }) {
 
           <div className="space-y-6 flex-grow">
             <div>
-              <h4 className="text-xs font-bold text-slate-600 mb-1 uppercase tracking-wider">
+              <h4 className="text-xs font-bold text-slate-600 dark:text-slate-400 mb-1 uppercase tracking-wider">
                 {t('result.pattern_type')}
               </h4>
-              <p className="text-lg font-bold text-slate-900 leading-tight">
+              <p className="text-lg font-bold text-slate-900 dark:text-white leading-tight">
                 {sanitize(result.type)}
               </p>
             </div>
             <div>
-              <h4 className="text-xs font-bold text-slate-600 mb-1 uppercase tracking-wider">
+              <h4 className="text-xs font-bold text-slate-600 dark:text-slate-400 mb-1 uppercase tracking-wider">
                 {t('result.rule')}
               </h4>
-              <p className="text-base text-slate-600 leading-relaxed">{sanitize(result.rule)}</p>
+              <p className="text-base text-slate-600 dark:text-slate-300 leading-relaxed">
+                {sanitize(result.rule)}
+              </p>
             </div>
           </div>
 
-          <div className="pt-8 mt-4 border-t border-slate-50">
-            <p className="text-center text-xs font-medium text-slate-600 mb-3 uppercase tracking-wide">
+          <div className="pt-8 mt-4 border-t border-slate-50 dark:border-slate-800">
+            <p className="text-center text-xs font-medium text-slate-600 dark:text-slate-400 mb-3 uppercase tracking-wide">
               {result.predictions && result.predictions.length > 1
                 ? t('result.predicted_next_plural')
                 : t('result.predicted_next')}
@@ -80,7 +82,7 @@ function ResultSection({ result }) {
                   <div
                     // eslint-disable-next-line react/no-array-index-key
                     key={idx}
-                    className="bg-emerald-500/90 border-2 border-dashed border-emerald-300 hover:bg-emerald-500 transition-colors cursor-default text-white rounded-xl py-3 flex flex-col items-center justify-center shadow-lg shadow-emerald-500/20 group relative overflow-hidden"
+                    className="bg-emerald-500/90 border-2 border-dashed border-emerald-300 dark:border-emerald-700 hover:bg-emerald-500 transition-colors cursor-default text-white rounded-xl py-3 flex flex-col items-center justify-center shadow-lg shadow-emerald-500/20 dark:shadow-none group relative overflow-hidden"
                   >
                     {/* Ghost Icon Background */}
                     <span className="material-symbols-outlined absolute -right-2 -top-2 text-white/10 text-4xl rotate-12 pointer-events-none">
@@ -97,7 +99,7 @@ function ResultSection({ result }) {
                 ))}
               </div>
             ) : (
-              <div className="w-full bg-emerald-500/90 border-2 border-dashed border-emerald-300 hover:bg-emerald-500 transition-colors cursor-default text-white rounded-xl py-3 flex items-center justify-center shadow-lg shadow-emerald-500/20 group relative overflow-hidden">
+              <div className="w-full bg-emerald-500/90 border-2 border-dashed border-emerald-300 dark:border-emerald-700 hover:bg-emerald-500 transition-colors cursor-default text-white rounded-xl py-3 flex items-center justify-center shadow-lg shadow-emerald-500/20 dark:shadow-none group relative overflow-hidden">
                 {/* Ghost Icon Background */}
                 <span className="material-symbols-outlined absolute -right-4 -top-4 text-white/10 text-6xl rotate-12 pointer-events-none">
                   help
@@ -114,14 +116,14 @@ function ResultSection({ result }) {
 
       {/* RIGHT COLUMN: Sequence Visualization */}
       <div className="flex-grow flex flex-col min-w-0">
-        <div className="bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 p-6 h-full flex flex-col">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-none border border-slate-100 dark:border-slate-800 p-6 h-full flex flex-col">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-            <h3 className="text-[11px] font-bold text-slate-600 uppercase tracking-widest whitespace-nowrap">
+            <h3 className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest whitespace-nowrap">
               {t('result.visualization_title')}
             </h3>
 
             {/* Legend */}
-            <div className="flex flex-wrap items-center gap-3 text-[10px] font-bold uppercase tracking-wider text-slate-700">
+            <div className="flex flex-wrap items-center gap-3 text-[10px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
               <div className="flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-blue-500" /> {t('result.legend.add')}
               </div>
@@ -138,10 +140,10 @@ function ResultSection({ result }) {
           </div>
 
           {/* Visualization Canvas */}
-          <div className="relative flex-grow w-full min-h-[300px] bg-slate-50/30 rounded-xl border border-slate-100 overflow-hidden">
+          <div className="relative flex-grow w-full min-h-[300px] bg-slate-50/30 dark:bg-slate-950/50 rounded-xl border border-slate-100 dark:border-slate-800 overflow-hidden">
             {/* Dot Grid Background */}
             <div
-              className="absolute inset-0 opacity-40 pointer-events-none"
+              className="absolute inset-0 opacity-40 dark:opacity-20 pointer-events-none"
               style={{
                 backgroundImage: 'radial-gradient(#94a3b8 1px, transparent 1px)',
                 backgroundSize: '20px 20px',
@@ -198,7 +200,7 @@ function VisualizerContent({ visualization }) {
             refY="3.5"
             orient="auto"
           >
-            <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8" />
+            <polygon points="0 0, 10 3.5, 0 7" className="fill-slate-400 dark:fill-slate-600" />
           </marker>
         </defs>
 
@@ -255,14 +257,15 @@ function VisualizerContent({ visualization }) {
                 stroke={colorClass}
                 strokeWidth="2"
                 strokeDasharray={conn.label === '...' ? '4 4' : '0'}
-                className="transition-all duration-500"
+                markerEnd="url(#arrowhead)"
+                className="transition-all duration-500 opacity-60 dark:opacity-80"
               />
 
               {/* Label */}
               <foreignObject x={labelX - 25} y={labelY - 10} width="50" height="24">
                 <div className="flex items-center justify-center w-full h-full">
                   <span
-                    className="text-[10px] font-bold bg-white px-1.5 py-0.5 rounded-full shadow-sm border border-slate-100 whitespace-nowrap"
+                    className="text-[10px] font-bold bg-white dark:bg-slate-900 px-1.5 py-0.5 rounded-full shadow-sm border border-slate-100 dark:border-slate-800 whitespace-nowrap"
                     style={{ color: colorClass }}
                   >
                     {conn.label}
@@ -282,18 +285,22 @@ function VisualizerContent({ visualization }) {
           style={{ left: i * ITEM_WIDTH + NODE_SIZE / 2, top: MIDDLE_Y }}
         >
           <div
-            className={`w-14 h-14 rounded-full border-2 flex items-center justify-center text-lg font-bold font-mono shadow-sm bg-white transition-all duration-300
+            className={`w-14 h-14 rounded-full border-2 flex items-center justify-center text-lg font-bold font-mono shadow-sm bg-white dark:bg-slate-950 transition-all duration-300
                         ${
                           node.isPrediction
-                            ? 'border-dashed border-emerald-400 text-emerald-600 ring-4 ring-emerald-50 scale-110 opacity-90'
-                            : 'border-slate-300 text-slate-700'
+                            ? 'border-dashed border-emerald-400 dark:border-emerald-500 text-emerald-600 dark:text-emerald-400 ring-4 ring-emerald-50 dark:ring-emerald-900/20 scale-110 opacity-90'
+                            : 'border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300'
                         }`}
           >
             {node.value}
           </div>
           <div
             className={`absolute -bottom-8 w-max text-center text-[10px] font-mono font-medium flex flex-col items-center justify-center
-                        ${node.isPrediction ? 'text-emerald-600' : 'text-slate-600'}`}
+                        ${
+                          node.isPrediction
+                            ? 'text-emerald-600 dark:text-emerald-400'
+                            : 'text-slate-600 dark:text-slate-400'
+                        }`}
           >
             {node.label || (node.isPrediction ? 'NEXT' : `i=${i}`)}
             {node.isPrediction && (
