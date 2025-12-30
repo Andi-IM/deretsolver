@@ -5,6 +5,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
 import Layout from '@/components/Layout';
+import { ThemeProvider } from '@/context/ThemeContext';
 
 // Mock language switcher to avoid complex setup
 vi.mock('@/components/LanguageSwitcher', () => ({
@@ -17,73 +18,164 @@ vi.mock('react-i18next', () => ({
   }),
 }));
 
-describe('Layout Component', () => {
-  it('toggles mobile menu when hamburger button is clicked', async () => {
-    const user = userEvent.setup();
-    render(
-      <MemoryRouter>
+const renderWithRouter = (initialRoute = '/') => {
+  return render(
+    <MemoryRouter initialEntries={[initialRoute]}>
+      <ThemeProvider>
         <Layout>
           <div>Child Content</div>
         </Layout>
-      </MemoryRouter>,
-    );
+      </ThemeProvider>
+    </MemoryRouter>,
+  );
+};
 
-    // Menu should be initially hidden (or links not present in DOM if conditionally rendered)
-    // Note: In JSDOM with standard render, "hidden" class doesn't hide elements from getByRole unless we check visibility with style awareness,
-    // but our implementation conditionally renders the {isMobileMenuOpen && ...} block.
-    // So the mobile links should NOT be in the document initially.
+describe('Layout Component', () => {
+  describe('Header and Navigation', () => {
+    it('renders logo and app title', () => {
+      renderWithRouter();
+      expect(screen.getByText('Deret Solver')).toBeInTheDocument();
+      expect(screen.getByRole('link', { name: /Deret Solver/i })).toHaveAttribute('href', '/');
+    });
 
-    // Desktop links are always there. Mobile links are duplicates.
-    // Desktop links: "Solver", "Documentation"
-    // Mobile links: "Solver", "Documentation"
+    it('renders desktop navigation links', () => {
+      renderWithRouter();
+      expect(screen.getByRole('link', { name: 'Solver' })).toBeInTheDocument();
+      expect(screen.getByRole('link', { name: 'Quiz Mode' })).toBeInTheDocument();
+      expect(screen.getByRole('link', { name: 'Documentation' })).toBeInTheDocument();
+    });
 
-    // Initially, we should find desktop links.
-    // Let's rely on the fact that mobile links are wrapped in a container that appears only when open.
+    it('highlights active link for Solver page', () => {
+      renderWithRouter('/');
+      const solverLinks = screen.getAllByRole('link', { name: 'Solver' });
+      // Desktop nav link should have active class
+      expect(solverLinks[0]).toHaveClass('text-blue-600');
+    });
 
-    const toggleButton = screen.getByRole('button', { name: /Toggle menu/i });
+    it('highlights active link for Quiz page', () => {
+      renderWithRouter('/quiz');
+      const quizLinks = screen.getAllByRole('link', { name: 'Quiz Mode' });
+      expect(quizLinks[0]).toHaveClass('text-blue-600');
+    });
 
-    // Click to open
-    await user.click(toggleButton);
+    it('highlights active link for Documentation page', () => {
+      renderWithRouter('/docs');
+      const docLinks = screen.getAllByRole('link', { name: 'Documentation' });
+      expect(docLinks[0]).toHaveClass('text-blue-600');
+    });
 
-    // Now we expect mobile menu to be present.
-    // Since desktop and mobile links have same text, we might find multiple.
-    const allSolverLinks = screen.getAllByText('Solver');
-    // Logic: Desktop (1) + Mobile (1) = 2
-    expect(allSolverLinks.length).toBeGreaterThanOrEqual(1);
-
-    // Find the link that is inside the mobile nav (we can't easily distinguish by parent in simple query without helper)
-    // But we can check that *more* links are present than before?
-    // Or just check that the click handled the state.
-
-    // Let's verify the "close" icon appears
-    expect(screen.getByText('close')).toBeInTheDocument();
-
-    // Click to close
-    await user.click(toggleButton);
-
-    // "menu" icon should be back
-    expect(screen.getByText('menu')).toBeInTheDocument();
+    it('applies hover styles to inactive links', () => {
+      renderWithRouter('/');
+      const docLinks = screen.getAllByRole('link', { name: 'Documentation' });
+      // Inactive link should have hover transition class
+      expect(docLinks[0]).toHaveClass('transition-colors');
+    });
   });
 
-  it('closes mobile menu when validation link is clicked', async () => {
-    const user = userEvent.setup();
-    render(
-      <MemoryRouter>
-        <Layout>content</Layout>
-      </MemoryRouter>,
-    );
+  describe('Mobile Menu', () => {
+    it('toggles mobile menu when hamburger button is clicked', async () => {
+      const user = userEvent.setup();
+      renderWithRouter();
 
-    const toggleButton = screen.getByRole('button', { name: /Toggle menu/i });
-    await user.click(toggleButton);
+      const toggleButton = screen.getByRole('button', { name: /Toggle menu/i });
 
-    // Click a link in the mobile menu
-    // We get all links to "Documentation". The last one is likely the mobile one in DOM order (appended at end of header).
-    const docLinks = screen.getAllByRole('link', { name: /Documentation/i });
-    const mobileLink = docLinks[docLinks.length - 1];
+      // Click to open
+      await user.click(toggleButton);
 
-    await user.click(mobileLink);
+      // Mobile menu should be visible - check for close icon
+      expect(screen.getByText('close')).toBeInTheDocument();
 
-    // Menu should close -> "menu" icon visible
-    expect(screen.getByText('menu')).toBeInTheDocument();
+      // Verify we have duplicate links (desktop + mobile)
+      const solverLinks = screen.getAllByText('Solver');
+      expect(solverLinks.length).toBe(2);
+
+      // Click to close
+      await user.click(toggleButton);
+
+      // Menu icon should be back
+      expect(screen.getByText('menu')).toBeInTheDocument();
+    });
+
+    it('closes mobile menu when Solver link is clicked', async () => {
+      const user = userEvent.setup();
+      renderWithRouter();
+
+      const toggleButton = screen.getByRole('button', { name: /Toggle menu/i });
+      await user.click(toggleButton);
+
+      // Click mobile Solver link (last one in DOM)
+      const solverLinks = screen.getAllByRole('link', { name: 'Solver' });
+      await user.click(solverLinks[solverLinks.length - 1]);
+
+      expect(screen.getByText('menu')).toBeInTheDocument();
+    });
+
+    it('closes mobile menu when Quiz Mode link is clicked', async () => {
+      const user = userEvent.setup();
+      renderWithRouter();
+
+      const toggleButton = screen.getByRole('button', { name: /Toggle menu/i });
+      await user.click(toggleButton);
+
+      const quizLinks = screen.getAllByRole('link', { name: 'Quiz Mode' });
+      await user.click(quizLinks[quizLinks.length - 1]);
+
+      expect(screen.getByText('menu')).toBeInTheDocument();
+    });
+
+    it('closes mobile menu when Documentation link is clicked', async () => {
+      const user = userEvent.setup();
+      renderWithRouter();
+
+      const toggleButton = screen.getByRole('button', { name: /Toggle menu/i });
+      await user.click(toggleButton);
+
+      const docLinks = screen.getAllByRole('link', { name: 'Documentation' });
+      await user.click(docLinks[docLinks.length - 1]);
+
+      expect(screen.getByText('menu')).toBeInTheDocument();
+    });
+  });
+
+  describe('Main Content', () => {
+    it('renders children in main area', () => {
+      renderWithRouter();
+      expect(screen.getByText('Child Content')).toBeInTheDocument();
+    });
+  });
+
+  describe('Footer', () => {
+    it('renders copyright text with current year', () => {
+      renderWithRouter();
+      const currentYear = new Date().getFullYear();
+      expect(screen.getByText(new RegExp(`© ${currentYear}`))).toBeInTheDocument();
+    });
+
+    it('renders privacy policy link', () => {
+      renderWithRouter();
+      const privacyLink = screen.getByRole('link', { name: 'page.privacy' });
+      expect(privacyLink).toHaveAttribute('href', '/privacy');
+    });
+
+    it('renders Google Privacy Policy external link', () => {
+      renderWithRouter();
+      const googlePrivacy = screen.getByRole('link', { name: 'Privacy Policy' });
+      expect(googlePrivacy).toHaveAttribute('href', 'https://policies.google.com/privacy');
+      expect(googlePrivacy).toHaveAttribute('target', '_blank');
+      expect(googlePrivacy).toHaveAttribute('rel', 'noopener noreferrer');
+    });
+
+    it('renders Google Terms of Service external link', () => {
+      renderWithRouter();
+      const googleTerms = screen.getByRole('link', { name: 'Terms of Service' });
+      expect(googleTerms).toHaveAttribute('href', 'https://policies.google.com/terms');
+      expect(googleTerms).toHaveAttribute('target', '_blank');
+      expect(googleTerms).toHaveAttribute('rel', 'noopener noreferrer');
+    });
+
+    it('renders reCAPTCHA notice text', () => {
+      renderWithRouter();
+      expect(screen.getByText(/This site is protected by reCAPTCHA/)).toBeInTheDocument();
+    });
   });
 });
