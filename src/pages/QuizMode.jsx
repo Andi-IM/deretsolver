@@ -2,11 +2,15 @@ import { useCallback, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
 
+import { usePageTracking } from '@/hooks/usePageTracking';
 import logger from '@/utils/logger';
 import { generateQuestion } from '@/utils/quizGenerator';
 
 function QuizMode() {
   const { t } = useTranslation();
+
+  // Analytics: Log page view
+  usePageTracking('Quiz');
   const [question, setQuestion] = useState(null);
   const [selectedOption, setSelectedOption] = useState(null);
   const [isCorrect, setIsCorrect] = useState(null);
@@ -153,28 +157,19 @@ function QuizMode() {
         {/* Difficulty Selector (Optional footer) */}
         {!selectedOption && (
           <div className="flex justify-center gap-2 opacity-50 hover:opacity-100 transition-opacity">
-            {Object.keys(
-              generateQuestion.name === 'generateQuestion' ? { EASY: 1, MEDIUM: 1, HARD: 1 } : {},
-            ).map(
-              (
-                _d, // Hack to just show buttons
-              ) =>
-                // Actually I should allow changing difficulty.
-                // But for now hardcoded keys since I know them.
-                ['EASY', 'MEDIUM', 'HARD'].map((d) => (
-                  <button
-                    key={d}
-                    onClick={() => {
-                      setDifficulty(d);
-                      setStreak(0);
-                      loadNewQuestion();
-                    }}
-                    className={`px-3 py-1 rounded text-xs font-bold ${difficulty === d ? 'bg-slate-800 text-white' : 'bg-slate-200 text-slate-500'}`}
-                  >
-                    {t(`quiz.difficulty.${d}`)}
-                  </button>
-                )),
-            )}
+            {['EASY', 'MEDIUM', 'HARD'].map((d) => (
+              <button
+                key={d}
+                onClick={() => {
+                  setDifficulty(d);
+                  setStreak(0);
+                  loadNewQuestion();
+                }}
+                className={`px-3 py-1 rounded text-xs font-bold ${difficulty === d ? 'bg-slate-800 text-white' : 'bg-slate-200 text-slate-500'}`}
+              >
+                {t(`quiz.difficulty.${d}`)}
+              </button>
+            ))}
           </div>
         )}
       </div>

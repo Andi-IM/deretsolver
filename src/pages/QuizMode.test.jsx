@@ -1,3 +1,5 @@
+import { MemoryRouter } from 'react-router-dom';
+
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -12,6 +14,7 @@ vi.mock('react-helmet-async', () => ({
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key) => key,
+    i18n: { language: 'en' },
   }),
 }));
 
@@ -37,29 +40,34 @@ vi.mock('@/utils/quizGenerator', () => ({
   })),
 }));
 
+const renderWithRouter = (component) => {
+  return render(<MemoryRouter>{component}</MemoryRouter>);
+};
+
 describe('QuizMode', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   it('should render quiz page with header', () => {
-    render(<QuizMode />);
+    renderWithRouter(<QuizMode />);
     expect(screen.getByText('quiz.title')).toBeInTheDocument();
     expect(screen.getByText('quiz.description')).toBeInTheDocument();
   });
 
   it('should display difficulty badge', () => {
-    render(<QuizMode />);
-    expect(screen.getByText('quiz.difficulty.MEDIUM')).toBeInTheDocument();
+    renderWithRouter(<QuizMode />);
+    // Fixed: Now there are multiple instances (badge and selector)
+    expect(screen.getAllByText('quiz.difficulty.MEDIUM')[0]).toBeInTheDocument();
   });
 
   it('should display streak counter', () => {
-    render(<QuizMode />);
+    renderWithRouter(<QuizMode />);
     expect(screen.getByText(/quiz.streak/)).toBeInTheDocument();
   });
 
   it('should display question sequence', () => {
-    render(<QuizMode />);
+    renderWithRouter(<QuizMode />);
     expect(screen.getByText('2,')).toBeInTheDocument();
     expect(screen.getByText('4,')).toBeInTheDocument();
     expect(screen.getByText('6,')).toBeInTheDocument();
@@ -68,7 +76,7 @@ describe('QuizMode', () => {
   });
 
   it('should display answer options', () => {
-    render(<QuizMode />);
+    renderWithRouter(<QuizMode />);
     expect(screen.getByRole('button', { name: '10' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: '11' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: '12' })).toBeInTheDocument();
@@ -77,7 +85,7 @@ describe('QuizMode', () => {
 
   it('should show correct feedback when selecting correct answer', async () => {
     const user = userEvent.setup();
-    render(<QuizMode />);
+    renderWithRouter(<QuizMode />);
 
     const correctOption = screen.getByRole('button', { name: '10' });
     await user.click(correctOption);
@@ -89,7 +97,7 @@ describe('QuizMode', () => {
 
   it('should show incorrect feedback when selecting wrong answer', async () => {
     const user = userEvent.setup();
-    render(<QuizMode />);
+    renderWithRouter(<QuizMode />);
 
     const wrongOption = screen.getByRole('button', { name: '11' });
     await user.click(wrongOption);
@@ -101,7 +109,7 @@ describe('QuizMode', () => {
 
   it('should display rule and explanation after answering', async () => {
     const user = userEvent.setup();
-    render(<QuizMode />);
+    renderWithRouter(<QuizMode />);
 
     const option = screen.getByRole('button', { name: '10' });
     await user.click(option);
@@ -114,7 +122,7 @@ describe('QuizMode', () => {
 
   it('should increase streak on correct answer', async () => {
     const user = userEvent.setup();
-    render(<QuizMode />);
+    renderWithRouter(<QuizMode />);
 
     const correctOption = screen.getByRole('button', { name: '10' });
     await user.click(correctOption);
@@ -126,7 +134,7 @@ describe('QuizMode', () => {
 
   it('should reset streak on wrong answer', async () => {
     const user = userEvent.setup();
-    render(<QuizMode />);
+    renderWithRouter(<QuizMode />);
 
     // First correct answer
     const correctOption = screen.getByRole('button', { name: '10' });
@@ -139,7 +147,7 @@ describe('QuizMode', () => {
 
   it('should show Next Question button after answering', async () => {
     const user = userEvent.setup();
-    render(<QuizMode />);
+    renderWithRouter(<QuizMode />);
 
     const option = screen.getByRole('button', { name: '10' });
     await user.click(option);
@@ -153,7 +161,7 @@ describe('QuizMode', () => {
     const user = userEvent.setup();
     const { generateQuestion } = await import('@/utils/quizGenerator');
 
-    render(<QuizMode />);
+    renderWithRouter(<QuizMode />);
 
     const option = screen.getByRole('button', { name: '10' });
     await user.click(option);
@@ -171,7 +179,7 @@ describe('QuizMode', () => {
 
   it('should disable options after answering', async () => {
     const user = userEvent.setup();
-    render(<QuizMode />);
+    renderWithRouter(<QuizMode />);
 
     const correctOption = screen.getByRole('button', { name: '10' });
     await user.click(correctOption);
@@ -191,7 +199,7 @@ describe('QuizMode', () => {
     });
 
     // This should not crash
-    render(<QuizMode />);
+    renderWithRouter(<QuizMode />);
 
     expect(logger.default.error).toHaveBeenCalledWith(
       'Failed to generate quiz question',

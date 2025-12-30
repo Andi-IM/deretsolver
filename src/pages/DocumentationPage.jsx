@@ -1,9 +1,7 @@
-import { useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Trans, useTranslation } from 'react-i18next';
-import { useLocation } from 'react-router-dom';
 
-import logger from '@/utils/logger';
+import { usePageTracking } from '@/hooks/usePageTracking';
 
 const PATTERNS_LIST = [
   { key: 'arithmetic', example: '2, 5, 8, 11' },
@@ -17,25 +15,8 @@ const PATTERNS_LIST = [
 
 function DocumentationPage() {
   const { t, i18n } = useTranslation();
-  const location = useLocation();
-
-  // Analytics: Log page view (deferred to not block render)
-  useEffect(() => {
-    import('@/utils/firebase')
-      .then(({ initializeFirebase }) => initializeFirebase())
-      .then(({ analytics }) => {
-        if (analytics) {
-          return import('firebase/analytics').then(({ logEvent }) => {
-            logEvent(analytics, 'page_view', {
-              page_path: location.pathname,
-              page_title: 'Documentation',
-            });
-          });
-        }
-        return null;
-      })
-      .catch((err) => logger.error('Failed to log analytics:', err));
-  }, [location.pathname]);
+  // Analytics: Log page view
+  usePageTracking('Documentation');
 
   return (
     <>

@@ -96,7 +96,7 @@ describe('DocumentationPage', () => {
 
     await waitFor(() => {
       expect(logger.default.error).toHaveBeenCalledWith(
-        'Failed to log analytics:',
+        'Failed to log analytics for Documentation:',
         expect.any(Error),
       );
     });

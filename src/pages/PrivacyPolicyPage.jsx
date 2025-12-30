@@ -1,20 +1,18 @@
 import { useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
-import { useLocation } from 'react-router-dom';
+
+import { usePageTracking } from '@/hooks/usePageTracking';
 
 function PrivacyPolicyPage() {
   const { t, i18n } = useTranslation();
-  const location = useLocation();
+
+  // Analytics: Log page view
+  usePageTracking('Privacy Policy');
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-
-  // Update document title manually to ensure it works with client-side navigation
-  useEffect(() => {
-    document.title = `${t('privacy.title')} | ${t('app.shortname')}`;
-  }, [t, location.pathname]);
 
   return (
     <>
