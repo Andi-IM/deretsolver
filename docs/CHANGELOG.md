@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.5.5] - 2025-12-30
+
+### Added
+
+- **Testing:** Achieved 100% test coverage for `useRecaptcha` hook.
+
+### Changed
+
+- **Refactoring:** Updated `ResultSection.test.jsx` to use real i18n instance instead of mocks for more robust testing.
+
 ## [1.5.4] - 2025-12-30
 
 ### Added
