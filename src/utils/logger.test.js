@@ -245,4 +245,62 @@ describe('Logger with Dependency Injection', () => {
       expect(console.info).toHaveBeenCalled();
     });
   });
+
+  // Coverage for defaultConsole wrappers
+  describe('defaultConsole', () => {
+    it('should call global console methods', async () => {
+      const spies = {
+        debug: vi.spyOn(console, 'debug').mockImplementation(() => {}),
+        info: vi.spyOn(console, 'info').mockImplementation(() => {}),
+        warn: vi.spyOn(console, 'warn').mockImplementation(() => {}),
+        error: vi.spyOn(console, 'error').mockImplementation(() => {}),
+        log: vi.spyOn(console, 'log').mockImplementation(() => {}),
+      };
+
+      const { defaultConsole } = await import('@/utils/logger');
+
+      defaultConsole.debug('test');
+      defaultConsole.info('test');
+      defaultConsole.warn('test');
+      defaultConsole.error('test');
+      defaultConsole.log('test');
+
+      expect(spies.debug).toHaveBeenCalled();
+      expect(spies.info).toHaveBeenCalled();
+      expect(spies.warn).toHaveBeenCalled();
+      expect(spies.error).toHaveBeenCalled();
+      expect(spies.log).toHaveBeenCalled();
+
+      vi.restoreAllMocks();
+    });
+  });
+
+  describe('createFirebaseTransport Edge Cases', () => {
+    it('should use default firebase getter when none provided', async () => {
+      // Mock module dependencies
+      vi.mock('@/utils/firebase', () => ({
+        getFirebaseAnalytics: vi.fn().mockResolvedValue({ app: 'mock-app' }),
+      }));
+
+      // createFirebaseTransport with null checks the default path
+      const transport = createFirebaseTransport();
+
+      await transport('ERROR', 'test', null);
+
+      const { getFirebaseAnalytics } = await import('@/utils/firebase');
+      expect(getFirebaseAnalytics).toHaveBeenCalled();
+    });
+
+    it('should catch and log errors during transport execution', async () => {
+      const mockGetter = vi.fn().mockRejectedValue(new Error('Firebase init failed'));
+      const spyWarn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+      const transport = createFirebaseTransport(mockGetter);
+
+      await transport('ERROR', 'test', null);
+
+      expect(spyWarn).toHaveBeenCalledWith('Failed to send log to Firebase', expect.any(Error));
+      spyWarn.mockRestore();
+    });
+  });
 });

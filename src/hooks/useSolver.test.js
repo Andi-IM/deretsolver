@@ -50,6 +50,12 @@ describe('transformToNestedFormat', () => {
     const result = transformToNestedFormat(solverResult);
     expect(result.visualization.nodes[0].label).toBe('i=0');
   });
+  it('should fallback to empty array if sequenceValues is missing', () => {
+    const solverResult = { type: 'Test' }; // no sequenceValues
+    const result = transformToNestedFormat(solverResult);
+    expect(result.visualization.nodes).toEqual([]);
+    expect(result.visualization.connections).toEqual([]);
+  });
 });
 
 describe('selectBestResult', () => {
@@ -60,12 +66,38 @@ describe('selectBestResult', () => {
     expect(result.type).toBe('Fibonacci');
   });
 
-  it('should fallback to local hints when Gemini fails', () => {
+  it('should fallback to local hints when Gemini fails', async () => {
     const localRes = { type: 'Hint', isHint: true };
     const geminiRes = { error: 'API error' };
     const { result, error } = selectBestResult(localRes, geminiRes);
     expect(result).toEqual(localRes);
     expect(error).toContain('API error');
+
+    // Verify logger warning (L53)
+    // logger is already mocked and imported if we add the import to top level,
+    // but the test file doesn't import 'default' logger yet.
+    // Let's import it dynamically to avoid conflict if any.
+    const { default: logger } = await import('@/utils/logger');
+    expect(logger.warn).toHaveBeenCalledWith(
+      'Gemini failed, falling back to local hints:',
+      'API error',
+    );
+  });
+
+  it('should handle missing predictions array in transform', () => {
+    // Tests L21-L24 default behavior
+    const solverResult = {
+      type: 'Test',
+      sequenceValues: [1, 2, 3],
+      // predictions undefined -> predictionCount = 1
+    };
+
+    const result = transformToNestedFormat(solverResult);
+
+    // Last item should be prediction by default if predictions array is missing
+    expect(result.visualization.nodes[2].isPrediction).toBe(true);
+    // Previous items should not
+    expect(result.visualization.nodes[1].isPrediction).toBe(false);
   });
 
   it('should return error when both fail', () => {
@@ -74,6 +106,19 @@ describe('selectBestResult', () => {
     const { result, error } = selectBestResult(localRes, geminiRes);
     expect(result).toBeNull();
     expect(error).toBe('API error');
+  });
+
+  it('should use local error if Gemini result is missing', () => {
+    const localRes = { error: 'Local error' };
+    const { result, error } = selectBestResult(localRes, null);
+    expect(result).toBeNull();
+    expect(error).toBe('Local error');
+  });
+
+  it('should use default error message if all fail', () => {
+    const { result, error } = selectBestResult(null, null);
+    expect(result).toBeNull();
+    expect(error).toBe('Unable to solve sequence');
   });
 });
 

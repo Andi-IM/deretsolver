@@ -18,10 +18,13 @@ export function transformToNestedFormat(solverResult) {
 
   const predictionCount = solverResult.predictions ? solverResult.predictions.length : 1;
 
-  const nodes = (solverResult.sequenceValues || []).map((value, i) => ({
+  const values = solverResult.sequenceValues || [];
+  const total = values.length;
+
+  const nodes = values.map((value, i) => ({
     value,
     label: solverResult.sequenceLabels?.[i] || `i=${i}`,
-    isPrediction: i >= (solverResult.sequenceValues?.length || 0) - predictionCount,
+    isPrediction: i >= total - predictionCount,
   }));
 
   return {

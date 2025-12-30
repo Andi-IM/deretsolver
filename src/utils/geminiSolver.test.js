@@ -41,6 +41,12 @@ describe('solveWithGemini', () => {
     expect(result.error).toContain('Please enter at least 3 numbers');
   });
 
+  it('returns error if API key is missing', async () => {
+    const result = await solveWithGemini('1, 2, 3', '');
+    expect(result).toHaveProperty('error');
+    expect(result.error).toContain('Please provide a valid Gemini API Key');
+  });
+
   it('handles successful API response', async () => {
     const mockResultData = {
       type: 'Geometric Sequence',
@@ -213,10 +219,49 @@ describe('solveWithGemini', () => {
       expect.any(Error),
     );
 
+    expect(loggerErrorSpy).toHaveBeenCalledWith(
+      'Failed to parse connection item:',
+      'invalid-json-string',
+      expect.any(Error),
+    );
+
     // Because the item remains a string, Zod validation fails for the entire schema
     // and returns a generic error object
     expect(result).toHaveProperty('error');
     expect(result.error).toContain('Failed to connect to Gemini API');
+  });
+
+  it('handles non-array connections (L79 coverage)', async () => {
+    // Tests the path where Array.isArray(val) is false
+    const mockResultData = {
+      type: 'Arithmetic Sequence',
+      rule: 'Add 2',
+      next: 10,
+      sequenceValues: [2, 4, 6, 8, 10],
+      sequenceLabels: ['n1', 'n2', 'n3', 'n4', 'n5'],
+      connections: 'not-an-array', // Force L79
+      isInterleaved: false,
+      predictions: [10],
+    };
+
+    const mockResponse = {
+      text: JSON.stringify(mockResultData),
+    };
+
+    const mockGenerateContent = vi.fn(async () => mockResponse);
+
+    MockGoogleGenAI.mockImplementation(function mockConstructor() {
+      return {
+        models: {
+          generateContent: mockGenerateContent,
+        },
+      };
+    });
+
+    const result = await solveWithGemini(mockInput, mockApiKey);
+
+    // Should fail schema validation because connections must be array
+    expect(result).toHaveProperty('error');
   });
 
   it('handles timeout when API takes longer than 3000ms', async () => {
