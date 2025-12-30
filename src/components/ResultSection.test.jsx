@@ -1,14 +1,12 @@
 import { render, screen } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import ResultSection from '@/components/ResultSection';
+import i18n from '@/i18n';
 
-// Mock react-i18next
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({
-    t: (key) => key,
-  }),
-}));
+beforeAll(async () => {
+  await i18n.changeLanguage('en');
+});
 
 describe('ResultSection', () => {
   const mockResult = {
@@ -40,32 +38,32 @@ describe('ResultSection', () => {
 
   it('should render result analysis section', () => {
     render(<ResultSection result={mockResult} />);
-    expect(screen.getByText('result.analysis_title')).toBeInTheDocument();
-    expect(screen.getByText('result.visualization_title')).toBeInTheDocument();
+    expect(screen.getByText('Result Analysis')).toBeInTheDocument();
+    expect(screen.getByText('Sequence Visualization')).toBeInTheDocument();
   });
 
   it('should display pattern type', () => {
     render(<ResultSection result={mockResult} />);
-    expect(screen.getByText('result.pattern_type')).toBeInTheDocument();
+    expect(screen.getByText('Pattern Type')).toBeInTheDocument();
     expect(screen.getByText('Arithmetic')).toBeInTheDocument();
   });
 
   it('should display rule', () => {
     render(<ResultSection result={mockResult} />);
-    expect(screen.getByText('result.rule')).toBeInTheDocument();
+    expect(screen.getByText('Rule')).toBeInTheDocument();
     expect(screen.getByText('Add 2 to each term')).toBeInTheDocument();
   });
 
   it('should show success badge for normal result', () => {
     render(<ResultSection result={mockResult} />);
-    expect(screen.getByText('result.success')).toBeInTheDocument();
-    expect(screen.getByText('result.success_message')).toBeInTheDocument();
+    expect(screen.getByText('Success')).toBeInTheDocument();
+    expect(screen.getByText('Pattern successfully identified.')).toBeInTheDocument();
   });
 
   it('should show hint badge when isHint is true', () => {
     const hintResult = { ...mockResult, isHint: true };
     render(<ResultSection result={hintResult} />);
-    expect(screen.getByText(/result.hint_title|Pattern Not Found/)).toBeInTheDocument();
+    expect(screen.getByText('Pattern Not Found')).toBeInTheDocument();
   });
 
   it('should display single prediction', () => {
@@ -77,7 +75,7 @@ describe('ResultSection', () => {
 
   it('should display multiple predictions', () => {
     render(<ResultSection result={mockResult} />);
-    expect(screen.getByText('result.predicted_next_plural')).toBeInTheDocument();
+    expect(screen.getByText('Predicted Next Numbers')).toBeInTheDocument();
     // Check that predictions are rendered - use getAllByText since values appear multiple times
     const tens = screen.getAllByText('10');
     const twelves = screen.getAllByText('12');
@@ -103,16 +101,16 @@ describe('ResultSection', () => {
 
   it('should render legend items', () => {
     render(<ResultSection result={mockResult} />);
-    expect(screen.getByText('result.legend.add')).toBeInTheDocument();
-    expect(screen.getByText('result.legend.sub')).toBeInTheDocument();
-    expect(screen.getByText('result.legend.mul')).toBeInTheDocument();
-    expect(screen.getByText('result.legend.pow')).toBeInTheDocument();
+    expect(screen.getByText('Add')).toBeInTheDocument();
+    expect(screen.getByText('Sub')).toBeInTheDocument();
+    expect(screen.getByText('Mul')).toBeInTheDocument();
+    expect(screen.getByText('Pow')).toBeInTheDocument();
   });
 
   it('should handle result without visualization', () => {
     const noVisualization = { ...mockResult, visualization: undefined };
     render(<ResultSection result={noVisualization} />);
-    expect(screen.getByText('result.analysis_title')).toBeInTheDocument();
+    expect(screen.getByText('Result Analysis')).toBeInTheDocument();
   });
 
   it('should handle result with empty connections', () => {
@@ -151,7 +149,7 @@ describe('ResultSection', () => {
   it('should display singular prediction label when only one prediction', () => {
     const singlePredictionArray = { ...mockResult, predictions: [42] };
     render(<ResultSection result={singlePredictionArray} />);
-    expect(screen.getByText('result.predicted_next')).toBeInTheDocument();
+    expect(screen.getByText('Predicted Next Number')).toBeInTheDocument();
   });
 
   it('should handle node without label (fallback to index)', () => {
@@ -197,7 +195,7 @@ describe('ResultSection', () => {
   it('should display hint message when isHint is true', () => {
     const hintResult = { ...mockResult, isHint: true };
     render(<ResultSection result={hintResult} />);
-    expect(screen.getByText('result.hint_message')).toBeInTheDocument();
+    expect(screen.getByText(/We couldn't automatically identify/)).toBeInTheDocument();
   });
 
   it('should render sub connection type', () => {
