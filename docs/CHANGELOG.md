@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.5.3] - 2025-12-30
+
+### Added
+
+- **Testing:** Implemented dependency injection in `FeedbackDialog.jsx` for better testability.
+- **Testing:** Added `ThemeToggle.test.jsx` with 3 unit tests.
+- **Testing:** Added test for unknown pattern detection in `solver.test.js`.
+
+### Changed
+
+- **Coverage:** Updated thresholds to 97% lines, 95% statements, 94% functions, 89% branches.
+- **Refactoring:** Extracted `loadRecaptchaScript` and `submitFeedback` as injectable dependencies.
+
 ## [1.5.2] - 2025-12-30
 
 ### Added
