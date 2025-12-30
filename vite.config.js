@@ -26,6 +26,7 @@ export default defineConfig(({ mode }) => {
         enableBundleAnalysis: env.CODECOV_TOKEN !== undefined,
         bundleName: 'deretsolver',
         uploadToken: env.CODECOV_TOKEN,
+        gitService: 'github'
       }),
     ],
     envPrefix: ['VITE_', 'GOOGLE_AI_APIKEY'],

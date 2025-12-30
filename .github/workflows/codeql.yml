@@ -18,7 +18,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          fetch-depth: 0
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v4
         with:
@@ -43,10 +43,11 @@ jobs:
         run: npx vitest run --reporter=junit --outputFile=coverage/test-report.junit.xml
       - name: Upload test results to Codecov
         if: ${{ !cancelled() }}
-        uses: codecov/test-results-action@v1
+        uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          file: coverage/test-report.junit.xml
+          files: coverage/test-report.junit.xml
+          report_type: test_results
           fail_ci_if_error: true
       - name: Run tests with coverage
         run: npx vitest run --coverage
