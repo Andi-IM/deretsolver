@@ -19,8 +19,7 @@ jobs:
         with:
           node-version: 20
           cache: 'npm'
-      - name: create .env
-        run: echo "CODECOV_TOKEN=${{ secrets.CODECOV_TOKEN }}" > .env
+      - run: echo "CODECOV_TOKEN=${{ secrets.CODECOV_TOKEN }}" > .env
       - run: npm ci --legacy-peer-deps && npm run build
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
