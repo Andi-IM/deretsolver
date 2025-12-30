@@ -1,5 +1,6 @@
 [![CodeQL](https://github.com/Andi-IM/deretsolver/actions/workflows/codeql.yml/badge.svg)](https://github.com/Andi-IM/deretsolver/actions/workflows/codeql.yml)
 [![Deploy to Firebase Hosting on merge](https://github.com/Andi-IM/deretsolver/actions/workflows/firebase-hosting-merge.yml/badge.svg)](https://github.com/Andi-IM/deretsolver/actions/workflows/firebase-hosting-merge.yml)
+[![codecov](https://codecov.io/github/Andi-IM/deretsolver/graph/badge.svg?token=4TKB07CI3X)](https://codecov.io/github/Andi-IM/deretsolver)
 
 # Deret Solver (v1.4.0)
 
