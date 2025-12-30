@@ -270,5 +270,44 @@
       "title": "Contact Us",
       "content": "If you have any questions about this Privacy Policy, please contact us through the feedback form available on our website."
     }
+  },
+  "quiz": {
+    "title": "Pattern Quiz",
+    "description": "Find the missing number in the sequence.",
+    "streak": "Streak: {{count}} 🔥",
+    "next_question": "Next Question",
+    "difficulty_label": "Difficulty",
+    "difficulty": {
+      "EASY": "EASY",
+      "MEDIUM": "MEDIUM",
+      "HARD": "HARD"
+    },
+    "feedback": {
+      "correct": "Correct! 🎉",
+      "incorrect": "Incorrect 😔",
+      "rule_label": "Rule"
+    },
+    "rules": {
+      "arithmetic": "Arithmetic sequence with difference {{diff}}",
+      "geometric": "Geometric sequence with ratio {{ratio}}",
+      "square": "Perfect squares",
+      "cube": "Perfect cubes",
+      "fibonacci": "Fibonacci-like sequence",
+      "prime": "Prime numbers",
+      "factorial": "Factorials",
+      "two_level": "Two-level difference"
+    },
+    "explanations": {
+      "arithmetic": "Each number {{action}} by {{absDiff}}. {{last}} {{sign}} {{absDiff}} = {{next}}.",
+      "arithmetic_increase": "increases",
+      "arithmetic_decrease": "decreases",
+      "geometric": "Each term is multiplied by {{ratio}}. {{last}} * {{ratio}} = {{next}}.",
+      "square": "The terms are squares of consecutive integers ({{start}}², {{start_1}}², ...). The next is {{start_len}}² = {{next}}.",
+      "cube": "The terms are cubes of consecutive integers ({{start}}³, {{start_1}}³, ...). The next is {{start_len}}³ = {{next}}.",
+      "fibonacci": "Each number is the sum of the previous two numbers. {{last}} + {{last_prev}} = {{next}}.",
+      "prime": "The sequence consists of consecutive prime numbers. The next prime after {{last}} is {{next}}.",
+      "factorial": "The terms are factorials of consecutive integers ({{start}}!, {{start_1}}!, ...). The next is {{start_len}}! = {{next}}.",
+      "two_level": "The differences between terms are {{diffs}}. These differences increase by {{diffInc}}. The next difference is {{nextDiff}}. {{last}} + {{nextDiff}} = {{next}}."
+    }
   }
 }

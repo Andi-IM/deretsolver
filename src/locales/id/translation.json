@@ -270,5 +270,44 @@
       "title": "Hubungi Kami",
       "content": "Jika Anda memiliki pertanyaan tentang Kebijakan Privasi ini, silakan hubungi kami melalui formulir umpan balik yang tersedia di situs web kami."
     }
+  },
+  "quiz": {
+    "title": "Kuis Pola",
+    "description": "Temukan angka yang hilang dalam deret.",
+    "streak": "Streak: {{count}} 🔥",
+    "next_question": "Pertanyaan Berikutnya",
+    "difficulty_label": "Kesulitan",
+    "difficulty": {
+      "EASY": "MUDAH",
+      "MEDIUM": "SEDANG",
+      "HARD": "SULIT"
+    },
+    "feedback": {
+      "correct": "Benar! 🎉",
+      "incorrect": "Salah 😔",
+      "rule_label": "Aturan"
+    },
+    "rules": {
+      "arithmetic": "Barisan aritmatika dengan selisih {{diff}}",
+      "geometric": "Barisan geometri dengan rasio {{ratio}}",
+      "square": "Kuadrat sempurna",
+      "cube": "Pangkat tiga sempurna",
+      "fibonacci": "Barisan mirip Fibonacci",
+      "prime": "Bilangan prima",
+      "factorial": "Faktorial",
+      "two_level": "Beda bertingkat"
+    },
+    "explanations": {
+      "arithmetic": "Setiap angka {{action}} sebesar {{absDiff}}. {{last}} {{sign}} {{absDiff}} = {{next}}.",
+      "arithmetic_increase": "bertambah",
+      "arithmetic_decrease": "berkurang",
+      "geometric": "Setiap suku dikalikan dengan {{ratio}}. {{last}} * {{ratio}} = {{next}}.",
+      "square": "Suku-sukunya adalah kuadrat dari bilangan bulat berurutan ({{start}}², {{start_1}}², ...). Berikutnya adalah {{start_len}}² = {{next}}.",
+      "cube": "Suku-sukunya adalah pangkat tiga dari bilangan bulat berurutan ({{start}}³, {{start_1}}³, ...). Berikutnya adalah {{start_len}}³ = {{next}}.",
+      "fibonacci": "Setiap angka adalah jumlah dari dua angka sebelumnya. {{last}} + {{last_prev}} = {{next}}.",
+      "prime": "Barisan ini terdiri dari bilangan prima berurutan. Bilangan prima berikutnya setelah {{last}} adalah {{next}}.",
+      "factorial": "Suku-sukunya adalah faktorial dari bilangan bulat berurutan ({{start}}!, {{start_1}}!, ...). Berikutnya adalah {{start_len}}! = {{next}}.",
+      "two_level": "Selisih antar suku adalah {{diffs}}. Selisih ini bertambah sebesar {{diffInc}}. Selisih berikutnya adalah {{nextDiff}}. {{last}} + {{nextDiff}} = {{next}}."
+    }
   }
 }

@@ -60,8 +60,11 @@ vi.mock('@/utils/quizGenerator', () => ({
     sequence: [2, 4, 6, 8],
     options: [10, 11, 12, 14],
     correctAnswer: 10,
-    rule: 'Add 2',
-    explanation: 'Each number increases by 2',
+    rule: { key: 'quiz.rules.arithmetic', data: { diff: 2 } },
+    explanation: {
+      key: 'quiz.explanations.arithmetic',
+      data: { action: 'increases', absDiff: 2, last: 8, sign: '+', next: 10 },
+    },
   })),
 }));
 
@@ -91,7 +94,7 @@ describe('App', () => {
 
   it('should render quiz page on /quiz route', () => {
     renderWithRouter('/quiz');
-    expect(screen.getByText('Pattern Quiz')).toBeInTheDocument();
+    expect(screen.getByText('quiz.title')).toBeInTheDocument();
   });
 
   it('should render privacy page on /privacy route', () => {

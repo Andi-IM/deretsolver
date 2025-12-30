@@ -43,8 +43,20 @@ const generators = {
     return {
       sequence: seq,
       answer: next,
-      rule: `Arithmetic sequence with difference ${diff}`,
-      explanation: `Each number ${diff > 0 ? 'increases' : 'decreases'} by ${Math.abs(diff)}. ${seq[seq.length - 1]} ${diff > 0 ? '+' : '-'} ${Math.abs(diff)} = ${next}.`,
+      rule: { key: 'quiz.rules.arithmetic', data: { diff } },
+      explanation: {
+        key: 'quiz.explanations.arithmetic',
+        data: {
+          action:
+            diff > 0
+              ? 'quiz.explanations.arithmetic_increase'
+              : 'quiz.explanations.arithmetic_decrease',
+          absDiff: Math.abs(diff),
+          last: seq[seq.length - 1],
+          sign: diff > 0 ? '+' : '-',
+          next,
+        },
+      },
     };
   },
   [SEQUENCE_TYPES.GEOMETRIC]: () => {
@@ -59,8 +71,11 @@ const generators = {
     return {
       sequence: seq,
       answer: next,
-      rule: `Geometric sequence with ratio ${ratio}`,
-      explanation: `Each term is multiplied by ${ratio}. ${seq[seq.length - 1]} * ${ratio} = ${next}.`,
+      rule: { key: 'quiz.rules.geometric', data: { ratio } },
+      explanation: {
+        key: 'quiz.explanations.geometric',
+        data: { ratio, last: seq[seq.length - 1], next },
+      },
     };
   },
   [SEQUENCE_TYPES.SQUARE]: () => {
@@ -72,8 +87,11 @@ const generators = {
     return {
       sequence: seq,
       answer: next,
-      rule: 'Perfect squares',
-      explanation: `The terms are squares of consecutive integers (${startN}², ${startN + 1}², ...). The next is ${startN + length}² = ${next}.`,
+      rule: { key: 'quiz.rules.square' },
+      explanation: {
+        key: 'quiz.explanations.square',
+        data: { start: startN, start_1: startN + 1, start_len: startN + length, next },
+      },
     };
   },
   [SEQUENCE_TYPES.CUBE]: () => {
@@ -85,8 +103,11 @@ const generators = {
     return {
       sequence: seq,
       answer: next,
-      rule: 'Perfect cubes',
-      explanation: `The terms are cubes of consecutive integers (${startN}³, ${startN + 1}³, ...). The next is ${startN + length}³ = ${next}.`,
+      rule: { key: 'quiz.rules.cube' },
+      explanation: {
+        key: 'quiz.explanations.cube',
+        data: { start: startN, start_1: startN + 1, start_len: startN + length, next },
+      },
     };
   },
   [SEQUENCE_TYPES.FIBONACCI]: () => {
@@ -102,8 +123,11 @@ const generators = {
     return {
       sequence: seq,
       answer: next,
-      rule: 'Fibonacci-like sequence',
-      explanation: `Each number is the sum of the previous two numbers. ${seq[seq.length - 1]} + ${seq[seq.length - 2]} = ${next}.`,
+      rule: { key: 'quiz.rules.fibonacci' },
+      explanation: {
+        key: 'quiz.explanations.fibonacci',
+        data: { last: seq[seq.length - 1], last_prev: seq[seq.length - 2], next },
+      },
     };
   },
   [SEQUENCE_TYPES.PRIME]: () => {
@@ -119,8 +143,11 @@ const generators = {
     return {
       sequence: seq,
       answer: next,
-      rule: 'Prime numbers',
-      explanation: `The sequence consists of consecutive prime numbers. The next prime after ${seq[seq.length - 1]} is ${next}.`,
+      rule: { key: 'quiz.rules.prime' },
+      explanation: {
+        key: 'quiz.explanations.prime',
+        data: { last: seq[seq.length - 1], next },
+      },
     };
   },
   [SEQUENCE_TYPES.FACTORIAL]: () => {
@@ -133,8 +160,11 @@ const generators = {
     return {
       sequence: seq,
       answer: next,
-      rule: 'Factorials',
-      explanation: `The terms are factorials of consecutive integers (${startN}!, ${startN + 1}!, ...). The next is ${startN + length}! = ${next}.`,
+      rule: { key: 'quiz.rules.factorial' },
+      explanation: {
+        key: 'quiz.explanations.factorial',
+        data: { start: startN, start_1: startN + 1, start_len: startN + length, next },
+      },
     };
   },
   [SEQUENCE_TYPES.TWO_LEVEL]: () => {
@@ -163,8 +193,11 @@ const generators = {
     return {
       sequence: seq,
       answer: next,
-      rule: 'Two-level difference',
-      explanation: `The differences between terms are ${diffs.join(', ')}. These differences increase by ${diffInc}. The next difference is ${nextDiff}. ${current} + ${nextDiff} = ${next}.`,
+      rule: { key: 'quiz.rules.two_level' },
+      explanation: {
+        key: 'quiz.explanations.two_level',
+        data: { diffs: diffs.join(', '), diffInc, nextDiff, last: current, next },
+      },
     };
   },
 };

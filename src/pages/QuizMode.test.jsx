@@ -29,8 +29,11 @@ vi.mock('@/utils/quizGenerator', () => ({
     sequence: [2, 4, 6, 8],
     options: [10, 11, 12, 14],
     correctAnswer: 10,
-    rule: 'Add 2',
-    explanation: 'Each number increases by 2',
+    rule: { key: 'quiz.rules.arithmetic', data: { diff: 2 } },
+    explanation: {
+      key: 'quiz.explanations.arithmetic',
+      data: { action: 'increases', absDiff: 2, last: 8, sign: '+', next: 10 },
+    },
   })),
 }));
 
@@ -41,18 +44,18 @@ describe('QuizMode', () => {
 
   it('should render quiz page with header', () => {
     render(<QuizMode />);
-    expect(screen.getByText('Pattern Quiz')).toBeInTheDocument();
-    expect(screen.getByText('Find the missing number in the sequence.')).toBeInTheDocument();
+    expect(screen.getByText('quiz.title')).toBeInTheDocument();
+    expect(screen.getByText('quiz.description')).toBeInTheDocument();
   });
 
   it('should display difficulty badge', () => {
     render(<QuizMode />);
-    expect(screen.getByText('MEDIUM')).toBeInTheDocument();
+    expect(screen.getByText('quiz.difficulty.MEDIUM')).toBeInTheDocument();
   });
 
   it('should display streak counter', () => {
     render(<QuizMode />);
-    expect(screen.getByText(/Streak: 0/)).toBeInTheDocument();
+    expect(screen.getByText(/quiz.streak/)).toBeInTheDocument();
   });
 
   it('should display question sequence', () => {
@@ -80,7 +83,7 @@ describe('QuizMode', () => {
     await user.click(correctOption);
 
     await waitFor(() => {
-      expect(screen.getByText('Correct! 🎉')).toBeInTheDocument();
+      expect(screen.getByText('quiz.feedback.correct')).toBeInTheDocument();
     });
   });
 
@@ -92,7 +95,7 @@ describe('QuizMode', () => {
     await user.click(wrongOption);
 
     await waitFor(() => {
-      expect(screen.getByText('Incorrect 😔')).toBeInTheDocument();
+      expect(screen.getByText('quiz.feedback.incorrect')).toBeInTheDocument();
     });
   });
 
@@ -104,8 +107,8 @@ describe('QuizMode', () => {
     await user.click(option);
 
     await waitFor(() => {
-      expect(screen.getByText(/Add 2/)).toBeInTheDocument();
-      expect(screen.getByText('Each number increases by 2')).toBeInTheDocument();
+      expect(screen.getByText(/quiz.rules.arithmetic/)).toBeInTheDocument();
+      expect(screen.getByText('quiz.explanations.arithmetic')).toBeInTheDocument();
     });
   });
 
@@ -117,7 +120,7 @@ describe('QuizMode', () => {
     await user.click(correctOption);
 
     await waitFor(() => {
-      expect(screen.getByText(/Streak: 1/)).toBeInTheDocument();
+      expect(screen.getByText(/quiz.streak/)).toBeInTheDocument();
     });
   });
 
@@ -130,7 +133,7 @@ describe('QuizMode', () => {
     await user.click(correctOption);
 
     await waitFor(() => {
-      expect(screen.getByText(/Streak: 1/)).toBeInTheDocument();
+      expect(screen.getByText(/quiz.streak/)).toBeInTheDocument();
     });
   });
 
@@ -142,7 +145,7 @@ describe('QuizMode', () => {
     await user.click(option);
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: 'Next Question' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'quiz.next_question' })).toBeInTheDocument();
     });
   });
 
@@ -156,10 +159,10 @@ describe('QuizMode', () => {
     await user.click(option);
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: 'Next Question' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'quiz.next_question' })).toBeInTheDocument();
     });
 
-    const nextButton = screen.getByRole('button', { name: 'Next Question' });
+    const nextButton = screen.getByRole('button', { name: 'quiz.next_question' });
     await user.click(nextButton);
 
     // generateQuestion should be called again

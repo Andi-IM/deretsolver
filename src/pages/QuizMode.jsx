@@ -70,16 +70,14 @@ function QuizMode() {
         <div className="text-center space-y-2">
           <div className="flex justify-center items-center gap-2 mb-4">
             <span className="bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">
-              {difficulty}
+              {t(`quiz.difficulty.${difficulty}`)}
             </span>
             <span className="bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-300 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">
-              Streak: {streak} 🔥
+              {t('quiz.streak', { count: streak })}
             </span>
           </div>
-          <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Pattern Quiz</h1>
-          <p className="text-slate-500 dark:text-slate-400">
-            Find the missing number in the sequence.
-          </p>
+          <h1 className="text-3xl font-bold text-slate-900 dark:text-white">{t('quiz.title')}</h1>
+          <p className="text-slate-500 dark:text-slate-400">{t('quiz.description')}</p>
         </div>
 
         {/* Question Card */}
@@ -125,20 +123,26 @@ function QuizMode() {
                     <h3
                       className={`font-bold text-lg mb-2 ${isCorrect ? 'text-green-800 dark:text-green-300' : 'text-red-800 dark:text-red-300'}`}
                     >
-                      {isCorrect ? 'Correct! 🎉' : 'Incorrect 😔'}
+                      {isCorrect ? t('quiz.feedback.correct') : t('quiz.feedback.incorrect')}
                     </h3>
                     <p className="text-slate-700 dark:text-slate-300 mb-1">
-                      <span className="font-semibold">Rule:</span> {question.rule}
+                      <span className="font-semibold">{t('quiz.feedback.rule_label')}:</span>{' '}
+                      {t(question.rule.key, question.rule.data)}
                     </p>
                     <p className="text-slate-600 dark:text-slate-400 text-sm">
-                      {question.explanation}
+                      {t(question.explanation.key, {
+                        ...question.explanation.data,
+                        action: question.explanation.data?.action
+                          ? t(question.explanation.data.action)
+                          : undefined,
+                      })}
                     </p>
                   </div>
                   <button
                     onClick={loadNewQuestion}
                     className="bg-slate-900 dark:bg-slate-800 text-white px-6 py-3 rounded-xl font-bold hover:bg-slate-800 dark:hover:bg-slate-700 transition-colors shadow-lg shadow-slate-900/10 dark:shadow-none whitespace-nowrap w-full md:w-auto"
                   >
-                    Next Question
+                    {t('quiz.next_question')}
                   </button>
                 </div>
               </div>
@@ -167,7 +171,7 @@ function QuizMode() {
                     }}
                     className={`px-3 py-1 rounded text-xs font-bold ${difficulty === d ? 'bg-slate-800 text-white' : 'bg-slate-200 text-slate-500'}`}
                   >
-                    {d}
+                    {t(`quiz.difficulty.${d}`)}
                   </button>
                 )),
             )}
