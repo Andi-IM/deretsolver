@@ -233,4 +233,25 @@ describe('QuizMode', () => {
 
     expect(hardButton).toHaveClass('bg-slate-800');
   });
+
+  it('should handle missing explanation action gracefully', async () => {
+    // Mock generateQuestion to return a question without explanation action
+    generateQuestion.mockReturnValueOnce({
+      sequence: [2, 4, 6, 8],
+      options: [10, 11, 12, 14],
+      correctAnswer: 10,
+      rule: { key: 'quiz.rules.arithmetic', data: { diff: 2 } },
+      explanation: {
+        key: 'quiz.explanations.arithmetic',
+        data: { absDiff: 2, last: 8, sign: '+', next: 10 }, // No action
+      },
+    });
+
+    const { user } = setup();
+
+    const option = screen.getByRole('button', { name: '10' });
+    await user.click(option);
+
+    expect(await screen.findByText('quiz.explanations.arithmetic')).toBeInTheDocument();
+  });
 });

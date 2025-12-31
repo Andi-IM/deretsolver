@@ -287,4 +287,13 @@ describe('solveSequence', () => {
     expect(result.type).toBe('Interleaved Sequence');
     expect(result.next).toBe(25);
   });
+
+  // Coverage for L591 - Non-consecutive factorials
+  it('does not detect non-consecutive factorials as factorial sequence', () => {
+    // 1! = 1, 3! = 6, 5! = 120
+    // This falls through detectFactorials (L591) and gets picked up by detectTwoLevel
+    const result = solveSequence('1, 6, 120');
+    expect(result.type).not.toBe('Factorial Sequence');
+    expect(result.type).toBe('2-Level Arithmetic');
+  });
 });
