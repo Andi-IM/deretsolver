@@ -119,10 +119,6 @@ describe('solveSequence', () => {
     expect(result.next).toBe(120);
   });
 
-  // =====================
-  // NEW TESTS FOR 90%+ COVERAGE
-  // =====================
-
   // Error cases
   it('returns error for less than 3 numbers', () => {
     expect(solveSequence('1, 2').error).toBe('Please enter at least 3 numbers.');
@@ -130,10 +126,7 @@ describe('solveSequence', () => {
     expect(solveSequence('').error).toBe('Please enter at least 3 numbers.');
   });
 
-  // Note: Unknown pattern (hints) test removed because 2-Level Arithmetic
-  // catches all sequences with any pattern in the differences.
-
-  // 2-Level Arithmetic (Triangular numbers pattern: differences increase by 1)
+  // 2-Level Arithmetic
   it('solves 2-level arithmetic 1, 3, 6, 10, 15 -> 21', () => {
     const result = solveSequence('1, 3, 6, 10, 15');
     expect(result).not.toBeNull();
@@ -148,7 +141,7 @@ describe('solveSequence', () => {
     expect(result.next).toBe(16);
   });
 
-  // Interleaved with exactly 4 numbers (minimum)
+  // Interleaved with exactly 4 numbers
   it('handles minimum interleaved sequence with 4 numbers', () => {
     const result = solveSequence('1, 100, 2, 99');
     expect(result).not.toBeNull();
@@ -156,33 +149,19 @@ describe('solveSequence', () => {
     expect(result.predictions).toEqual([3, 98]);
   });
 
-  // Geometric with zeros (should fail geometric detection)
+  // Geometric with zeros
   it('returns fallback for geometric with zero', () => {
     const result = solveSequence('0, 0, 0, 0');
-    // Should fall through since geometric check skips zeros
     expect(result).not.toBeNull();
-    // Should be arithmetic with 0 difference
     expect(result.type).toBe('Arithmetic Progression');
     expect(result.next).toBe(0);
   });
 
-  // Coverage for L95: interleaved logic requires at least 4 numbers
+  // Coverage for L95
   it('does not detect interleaved for 3 numbers (L95 coverage)', () => {
-    // 1, 10, 2 -> looks like start of interleaved (1, 2...) and (10...)
-    // But with only 3 numbers, it shouldn't trigger Interleaved (needs 4)
     const result = solveSequence('1, 10, 2');
-
-    // Should fall through to Unknown Pattern (isHint) OR simple fallback
-    // Based on implementation, if no solver matches, it returns a Hint object.
-    // The previous error was "expected undefined to be true" -> result.isHint was undefined.
-    // Let's inspect what it returns.
-    // Actually, solveSequence returns { type: 'Unknown Pattern', isHint: true ... }
-    // IF the input is valid.
-    // Check if result is not null.
     expect(result).not.toBeNull();
     expect(result.type).not.toBe('Interleaved Sequence');
-    // If it's Unknown Pattern, it should have isHint. If it's something else, fine.
-    // Just verify L95 "not interleaved" logic.
   });
 
   // Extended prime sequence
@@ -193,11 +172,10 @@ describe('solveSequence', () => {
     expect(result.next).toBe(17);
   });
 
-  // Non-consecutive primes (should fail prime detection)
+  // Non-consecutive primes
   it('does not detect non-consecutive primes as prime sequence', () => {
     const result = solveSequence('2, 5, 11, 17');
     expect(result).not.toBeNull();
-    // These are primes but not consecutive, so should not match Prime Numbers
     expect(result.type).not.toBe('Prime Numbers');
   });
 
@@ -221,7 +199,7 @@ describe('solveSequence', () => {
   it('includes proper visualization connections for arithmetic', () => {
     const result = solveSequence('10, 20, 30, 40');
     expect(result.visualization).toBeDefined();
-    expect(result.visualization.nodes.length).toBe(5); // 4 input + 1 prediction
+    expect(result.visualization.nodes.length).toBe(5);
     expect(result.visualization.connections.length).toBe(4);
     expect(result.visualization.connections[0].type).toBe('add');
     expect(result.visualization.connections[0].label).toBe('+10');
@@ -234,49 +212,30 @@ describe('solveSequence', () => {
     expect(result.visualization.connections[0].label).toBe('-10');
   });
 
-  // Interleaved where last index is even vs odd
+  // Interleaved where last index is odd
   it('handles interleaved where last index is odd', () => {
-    const result = solveSequence('1, 10, 2, 9, 3'); // 5 elements, last index is 4 (even)
+    const result = solveSequence('1, 10, 2, 9, 3');
     expect(result).not.toBeNull();
     expect(result.type).toBe('Interleaved Sequence');
   });
 
   // Complex Interleaved Visualization Coverage
   it('generates correct visualization connections for interleaved', () => {
-    // Evens: 2, 4, 6 (Arithmetic +2)
-    // Odds: 10, 20, 30 (Arithmetic +10)
-    // Sequence: 2, 10, 4, 20, 6, 30
     const result = solveSequence('2, 10, 4, 20, 6, 30');
-
     expect(result.type).toBe('Interleaved Sequence');
     expect(result.isInterleaved).toBe(true);
-
-    // Check next predictions
-    // Next is index 6 (even position) -> Next term for evens series (2,4,6 -> 8)
     expect(result.next).toBe(8);
-    // Predictions should be [8, 40]
     expect(result.predictions).toEqual([8, 40]);
 
-    // Check connections
     const connections = result.visualization.connections;
-    // Evens connections: 0->2 (+2), 2->4 (+2) -> Remapped: 0->2, 4->8 ??
-    // Original indices in even array: 0,1,2.
-    // Remapped indices in main array: 0, 2, 4.
-    // Connection 0->1 in even becomes 0->2 in main.
-    // Connection 1->2 in even becomes 2->4 in main.
-
     const evenConn = connections.find((c) => c.fromIndex === 0 && c.toIndex === 2);
     expect(evenConn).toBeDefined();
     expect(evenConn.label).toBe('+2');
 
-    // Odds connections: 1->3 (+10), 3->5 (+10)
     const oddConn = connections.find((c) => c.fromIndex === 1 && c.toIndex === 3);
     expect(oddConn).toBeDefined();
     expect(oddConn.label).toBe('+10');
 
-    // Verify prediction connections included
-    // Even prediction connection: from 4 to 6 (predicted index)
-    // Odd prediction connection: from 5 to 7 (predicted index)
     const evenPredConn = connections.find((c) => c.fromIndex === 4 && c.toIndex === 6);
     expect(evenPredConn).toBeDefined();
 
@@ -286,7 +245,6 @@ describe('solveSequence', () => {
 
   // Unknown Pattern / Hints
   it('falls back to hints for unknown patterns', () => {
-    // Truly random sequence provided by user
     const result = solveSequence('47, 3, 89, 12, 56, 94, 21, 68, 7, 73');
     expect(result).not.toBeNull();
     expect(result.type).toBe('Unknown Pattern');
@@ -295,10 +253,38 @@ describe('solveSequence', () => {
     expect(result.visualization.connections.length).toBe(9);
   });
 
-  // Geometric edge case: ratio near 1 but not 1
+  // Geometric edge case
   it('handles float precision in geometric detection', () => {
     const result = solveSequence('1, 1.1, 1.21, 1.331');
     expect(result.type).toBe('Geometric Progression');
     expect(result.next).toBeCloseTo(1.4641);
+  });
+
+  // =====================
+  // INTERLEAVED SUB-SOLVER COVERAGE (L108-114)
+  // =====================
+
+  it('solves interleaved with geometric sub-sequence (L108)', () => {
+    const result = solveSequence('2, 5, 4, 10, 8, 15, 16, 20');
+    expect(result.type).toBe('Interleaved Sequence');
+    expect(result.next).toBe(32);
+  });
+
+  it('solves interleaved with fibonacci sub-sequence (L110)', () => {
+    const result = solveSequence('1, 10, 1, 10, 2, 10, 3, 10, 5, 10');
+    expect(result.type).toBe('Interleaved Sequence');
+    expect(result.next).toBe(8);
+  });
+
+  it('solves interleaved with 2-level sub-sequence (L112)', () => {
+    const result = solveSequence('1, 5, 3, 5, 6, 5, 10, 5');
+    expect(result.type).toBe('Interleaved Sequence');
+    expect(result.next).toBe(15);
+  });
+
+  it('solves interleaved with power sub-sequence (L114)', () => {
+    const result = solveSequence('1, 2, 4, 4, 9, 6, 16, 8');
+    expect(result.type).toBe('Interleaved Sequence');
+    expect(result.next).toBe(25);
   });
 });

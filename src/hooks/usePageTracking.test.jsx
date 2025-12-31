@@ -42,4 +42,22 @@ describe('usePageTracking', () => {
       );
     });
   });
+  it('should log error if firebase initialization fails', async () => {
+    const { initializeFirebase } = await import('@/utils/firebase');
+    const logger = (await import('@/utils/logger')).default;
+    const pageTitle = 'Error Page';
+
+    initializeFirebase.mockRejectedValueOnce(new Error('Firebase init failed'));
+
+    renderHook(() => usePageTracking(pageTitle), {
+      wrapper: ({ children }) => <MemoryRouter>{children}</MemoryRouter>,
+    });
+
+    await vi.waitFor(() => {
+      expect(logger.error).toHaveBeenCalledWith(
+        `Failed to log analytics for ${pageTitle}:`,
+        expect.any(Error),
+      );
+    });
+  });
 });
