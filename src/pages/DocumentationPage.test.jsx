@@ -4,6 +4,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { usePageTracking } from '@/hooks/usePageTracking';
 import DocumentationPage from '@/pages/DocumentationPage';
 
 // Mock dependencies
@@ -13,23 +14,13 @@ vi.mock('react-i18next', () => ({
     i18n: { language: 'en' },
   }),
   Trans: ({ i18nKey }) => <span>{i18nKey}</span>,
+  // Ensure useTranslation hook is mocked correctly if needed elsewhere,
+  // but the simple mock above is usually sufficient for this component structure.
 }));
 
-vi.mock('@/utils/logger', () => ({
-  default: {
-    error: vi.fn(),
-  },
-}));
-
-vi.mock('@/utils/firebase', () => ({
-  initializeFirebase: vi.fn(() => Promise.resolve({ analytics: {} })),
-}));
-
-// Mock firebase/analytics
-vi.mock('firebase/analytics', () => ({
-  getAnalytics: vi.fn(),
-  logEvent: vi.fn(),
-  isSupported: vi.fn(() => Promise.resolve(true)),
+// Mock the usage of the custom hook
+vi.mock('@/hooks/usePageTracking', () => ({
+  usePageTracking: vi.fn(),
 }));
 
 describe('DocumentationPage', () => {
@@ -53,7 +44,6 @@ describe('DocumentationPage', () => {
   it('should render documentation title', () => {
     renderComponent();
     // Use getAllByText since title appears in both Helmet (managed by HelmetProvider) and h2
-    // Or just check that at least one is present
     const titles = screen.getAllByText('documentation.title');
     expect(titles.length).toBeGreaterThan(0);
   });
@@ -69,39 +59,16 @@ describe('DocumentationPage', () => {
     expect(screen.getByText('documentation.api_key.title')).toBeInTheDocument();
   });
 
-  it('should initialize firebase analytics on mount', async () => {
-    const { initializeFirebase } = await import('@/utils/firebase');
-
-    renderComponent();
-
-    // Check if initial firebase call happens
-    await waitFor(() => {
-      expect(initializeFirebase).toHaveBeenCalled();
-    });
-  });
-
-  it('should update document title', async () => {
+  it('should match document title', async () => {
     renderComponent();
     await waitFor(() => {
       expect(document.title).toBe('documentation.title | app.shortname');
     });
   });
 
-  it('should handle analytics error gracefully', async () => {
-    const logger = await import('@/utils/logger');
-    const firebase = await import('@/utils/firebase');
-
-    // Mock failure
-    firebase.initializeFirebase.mockRejectedValueOnce(new Error('Firebase init failed'));
-
+  it('should track page view on mount', () => {
     renderComponent();
-
-    await waitFor(() => {
-      expect(logger.default.error).toHaveBeenCalledWith(
-        'Failed to log analytics for Documentation:',
-        expect.any(Error),
-      );
-    });
+    expect(usePageTracking).toHaveBeenCalledWith('Documentation');
   });
 
   it('should render supported patterns list', () => {
