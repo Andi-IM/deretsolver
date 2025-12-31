@@ -1,15 +1,18 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { addDoc } from 'firebase/firestore';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import FeedbackDialog from '@/components/FeedbackDialog';
 import * as useRecaptchaHook from '@/hooks/useRecaptcha';
+import logger from '@/utils/logger';
 
 // Mock modules
 vi.mock('@/hooks/useRecaptcha', () => ({
   defaultLoadRecaptchaScript: vi.fn(),
   useRecaptcha: vi.fn(),
 }));
+
 vi.mock('@/utils/logger', () => ({
   default: {
     error: vi.fn(),
@@ -49,6 +52,19 @@ describe('FeedbackDialog', () => {
 
   const mockInput = '1, 3, 5, 7, 9';
 
+  const setup = (props = {}) => {
+    return {
+      user: userEvent.setup({ delay: null }),
+      ...render(
+        <FeedbackDialog
+          result={props.result !== undefined ? props.result : mockResult}
+          input={props.input || mockInput}
+          {...props}
+        />,
+      ),
+    };
+  };
+
   beforeEach(() => {
     // Reset all mocks
     vi.clearAllMocks();
@@ -66,29 +82,24 @@ describe('FeedbackDialog', () => {
   });
 
   it('should render feedback dialog when result is provided', () => {
-    render(<FeedbackDialog result={mockResult} input={mockInput} />);
+    setup();
     expect(screen.getByText('feedback.title')).toBeInTheDocument();
     expect(screen.getByText('feedback.question')).toBeInTheDocument();
   });
 
   it('should show initial state with yes/no buttons', () => {
-    render(<FeedbackDialog result={mockResult} input={mockInput} />);
+    setup();
     expect(screen.getByRole('button', { name: /feedback.yes/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /feedback.no/i })).toBeInTheDocument();
   });
 
   it('should show thank you message after clicking helpful', async () => {
-    const user = userEvent.setup();
-    const { addDoc } = await import('firebase/firestore');
-
-    render(<FeedbackDialog result={mockResult} input={mockInput} />);
+    const { user } = setup();
 
     const yesButton = screen.getByRole('button', { name: /feedback.yes/i });
     await user.click(yesButton);
 
-    await waitFor(() => {
-      expect(screen.getByText('feedback.thank_you')).toBeInTheDocument();
-    });
+    expect(await screen.findByText('feedback.thank_you')).toBeInTheDocument();
 
     expect(addDoc).toHaveBeenCalledWith(
       undefined,
@@ -104,29 +115,21 @@ describe('FeedbackDialog', () => {
   });
 
   it('should show not helpful form after clicking not helpful', async () => {
-    const user = userEvent.setup();
-    render(<FeedbackDialog result={mockResult} input={mockInput} />);
+    const { user } = setup();
 
     const noButton = screen.getByRole('button', { name: /feedback.no/i });
     await user.click(noButton);
 
-    await waitFor(() => {
-      expect(screen.getByText('feedback.issue_prompt')).toBeInTheDocument();
-    });
+    expect(await screen.findByText('feedback.issue_prompt')).toBeInTheDocument();
   });
 
   it('should submit not helpful feedback with reason and comment', async () => {
-    const user = userEvent.setup();
-    const { addDoc } = await import('firebase/firestore');
-
-    render(<FeedbackDialog result={mockResult} input={mockInput} />);
+    const { user } = setup();
 
     const noButton = screen.getByRole('button', { name: /feedback.no/i });
     await user.click(noButton);
 
-    await waitFor(() => {
-      expect(screen.getByText('feedback.issue_prompt')).toBeInTheDocument();
-    });
+    expect(await screen.findByText('feedback.issue_prompt')).toBeInTheDocument();
 
     const incorrectButton = screen.getByRole('button', { name: /feedback.reasons.incorrect/i });
     await user.click(incorrectButton);
@@ -137,9 +140,7 @@ describe('FeedbackDialog', () => {
     const submitButton = screen.getByRole('button', { name: /feedback.submit/i });
     await user.click(submitButton);
 
-    await waitFor(() => {
-      expect(screen.getByText('feedback.thank_you')).toBeInTheDocument();
-    });
+    expect(await screen.findByText('feedback.thank_you')).toBeInTheDocument();
 
     expect(addDoc).toHaveBeenCalledWith(
       undefined,
@@ -156,11 +157,13 @@ describe('FeedbackDialog', () => {
   });
 
   it('should disable submit button when no reason is selected', async () => {
-    const user = userEvent.setup();
-    render(<FeedbackDialog result={mockResult} input={mockInput} />);
+    const { user } = setup();
 
     const noButton = screen.getByRole('button', { name: /feedback.no/i });
     await user.click(noButton);
+
+    // Wait for the form to appear
+    await screen.findByText('feedback.issue_prompt');
 
     await waitFor(() => {
       const submitButton = screen.getByRole('button', { name: /feedback.submit/i });
@@ -169,47 +172,32 @@ describe('FeedbackDialog', () => {
   });
 
   it('should allow cancel from not helpful form', async () => {
-    const user = userEvent.setup();
-    render(<FeedbackDialog result={mockResult} input={mockInput} />);
+    const { user } = setup();
 
     const noButton = screen.getByRole('button', { name: /feedback.no/i });
     await user.click(noButton);
 
-    await waitFor(() => {
-      expect(screen.getByText('feedback.issue_prompt')).toBeInTheDocument();
-    });
+    expect(await screen.findByText('feedback.issue_prompt')).toBeInTheDocument();
 
     const cancelButton = screen.getByRole('button', { name: /feedback.cancel/i });
     await user.click(cancelButton);
 
-    await waitFor(() => {
-      expect(screen.getByText('feedback.question')).toBeInTheDocument();
-    });
+    expect(await screen.findByText('feedback.question')).toBeInTheDocument();
   });
 
   it('should handle Firebase submission error gracefully', async () => {
-    const user = userEvent.setup();
-    const { addDoc } = await import('firebase/firestore');
-    const logger = await import('@/utils/logger');
-
+    const { user } = setup();
     addDoc.mockRejectedValueOnce(new Error('Firebase error'));
-
-    render(<FeedbackDialog result={mockResult} input={mockInput} />);
 
     const yesButton = screen.getByRole('button', { name: /feedback.yes/i });
     await user.click(yesButton);
 
-    await waitFor(() => {
-      expect(screen.getByText('feedback.thank_you')).toBeInTheDocument();
-    });
+    expect(await screen.findByText('feedback.thank_you')).toBeInTheDocument();
 
-    expect(logger.default.error).toHaveBeenCalled();
+    expect(logger.error).toHaveBeenCalled();
   });
 
   it('should handle result with only next property', async () => {
-    const user = userEvent.setup();
-    const { addDoc } = await import('firebase/firestore');
-
     const resultWithOnlyNext = {
       id: 'test-2',
       type: 'geometric',
@@ -217,7 +205,7 @@ describe('FeedbackDialog', () => {
       next: '16',
     };
 
-    render(<FeedbackDialog result={resultWithOnlyNext} input={mockInput} />);
+    const { user } = setup({ result: resultWithOnlyNext });
 
     const yesButton = screen.getByRole('button', { name: /feedback.yes/i });
     await user.click(yesButton);
@@ -233,15 +221,12 @@ describe('FeedbackDialog', () => {
   });
 
   it('should select different reason options', async () => {
-    const user = userEvent.setup();
-    render(<FeedbackDialog result={mockResult} input={mockInput} />);
+    const { user } = setup();
 
     const noButton = screen.getByRole('button', { name: /feedback.no/i });
     await user.click(noButton);
 
-    await waitFor(() => {
-      expect(screen.getByText('feedback.issue_prompt')).toBeInTheDocument();
-    });
+    expect(await screen.findByText('feedback.issue_prompt')).toBeInTheDocument();
 
     const unclearButton = screen.getByRole('button', { name: /feedback.reasons.unclear/i });
     await user.click(unclearButton);
@@ -256,27 +241,21 @@ describe('FeedbackDialog', () => {
   });
 
   it('should handle reCAPTCHA not available during token generation', async () => {
-    const user = userEvent.setup();
-    const { addDoc } = await import('firebase/firestore');
-    const logger = await import('@/utils/logger');
-
     // Mock getRecaptchaToken to return null and log warning
     useRecaptchaHook.useRecaptcha.mockReturnValue({
       isRecaptchaReady: false,
       getRecaptchaToken: vi.fn(() => {
-        logger.default.warn('reCAPTCHA not ready, skipping token generation');
+        logger.warn('reCAPTCHA not ready, skipping token generation');
         return Promise.resolve(null);
       }),
     });
 
-    render(<FeedbackDialog result={mockResult} input={mockInput} />);
+    const { user } = setup();
 
     const yesButton = screen.getByRole('button', { name: /feedback.yes/i });
     await user.click(yesButton);
 
-    await waitFor(() => {
-      expect(screen.getByText('feedback.thank_you')).toBeInTheDocument();
-    });
+    expect(await screen.findByText('feedback.thank_you')).toBeInTheDocument();
 
     // Should still submit with null token
     expect(addDoc).toHaveBeenCalledWith(
@@ -286,47 +265,36 @@ describe('FeedbackDialog', () => {
       }),
     );
 
-    expect(logger.default.warn).toHaveBeenCalledWith(
-      'reCAPTCHA not ready, skipping token generation',
-    );
+    expect(logger.warn).toHaveBeenCalledWith('reCAPTCHA not ready, skipping token generation');
   });
 
   it('should handle reCAPTCHA execute failure', async () => {
-    const user = userEvent.setup();
-    const logger = await import('@/utils/logger');
-
     // Mock getRecaptchaToken to fail
     useRecaptchaHook.useRecaptcha.mockReturnValue({
       isRecaptchaReady: true,
       getRecaptchaToken: vi.fn(() => Promise.reject(new Error('reCAPTCHA error'))),
     });
 
-    render(<FeedbackDialog result={mockResult} input={mockInput} />);
+    const { user } = setup();
 
     const yesButton = screen.getByRole('button', { name: /feedback.yes/i });
     await user.click(yesButton);
 
     await waitFor(() => {
-      expect(logger.default.error).toHaveBeenCalledWith(
-        'Error adding document: ',
-        expect.any(Error),
-      );
+      expect(logger.error).toHaveBeenCalledWith('Error adding document: ', expect.any(Error));
     });
   });
 
   it('should show submitting state while processing feedback', async () => {
-    const user = userEvent.setup();
-    const { addDoc } = await import('firebase/firestore');
+    const { user } = setup();
 
     // Make addDoc slow
     addDoc.mockImplementation(
       () =>
         new Promise((resolve) => {
-          setTimeout(() => resolve({ id: 'test-id' }), 100);
+          setTimeout(() => resolve({ id: 'test-id' }), 10);
         }),
     );
-
-    render(<FeedbackDialog result={mockResult} input={mockInput} />);
 
     const yesButton = screen.getByRole('button', { name: /feedback.yes/i });
     await user.click(yesButton);
@@ -335,27 +303,20 @@ describe('FeedbackDialog', () => {
     expect(screen.getByText('feedback.sending')).toBeInTheDocument();
 
     // Wait for completion
-    await waitFor(() => {
-      expect(screen.getByText('feedback.thank_you')).toBeInTheDocument();
-    });
+    expect(await screen.findByText('feedback.thank_you')).toBeInTheDocument();
   });
 
   it('should handle undefined result properties gracefully', async () => {
-    const user = userEvent.setup();
-    const { addDoc } = await import('firebase/firestore');
-
     const incompleteResult = {
       id: 'test-3',
     };
 
-    render(<FeedbackDialog result={incompleteResult} input={mockInput} />);
+    const { user } = setup({ result: incompleteResult });
 
     const noButton = screen.getByRole('button', { name: /feedback.no/i });
     await user.click(noButton);
 
-    await waitFor(() => {
-      expect(screen.getByText('feedback.issue_prompt')).toBeInTheDocument();
-    });
+    expect(await screen.findByText('feedback.issue_prompt')).toBeInTheDocument();
 
     const incorrectButton = screen.getByRole('button', { name: /feedback.reasons.incorrect/i });
     await user.click(incorrectButton);
@@ -391,14 +352,10 @@ describe('FeedbackDialog', () => {
       };
     });
 
-    render(
-      <FeedbackDialog
-        result={mockResult}
-        input={mockInput}
-        loadRecaptchaScript={mockLoadRecaptcha}
-        submitFeedback={mockSubmitFeedback}
-      />,
-    );
+    setup({
+      loadRecaptchaScript: mockLoadRecaptcha,
+      submitFeedback: mockSubmitFeedback,
+    });
 
     await waitFor(() => {
       expect(mockLoadRecaptcha).toHaveBeenCalled();
@@ -406,12 +363,8 @@ describe('FeedbackDialog', () => {
   });
 
   it('should use injected submitFeedback when helpful is clicked', async () => {
-    const user = userEvent.setup();
     const mockSubmitFeedback = vi.fn(() => Promise.resolve());
-
-    render(
-      <FeedbackDialog result={mockResult} input={mockInput} submitFeedback={mockSubmitFeedback} />,
-    );
+    const { user } = setup({ submitFeedback: mockSubmitFeedback });
 
     const yesButton = screen.getByRole('button', { name: /feedback.yes/i });
     await user.click(yesButton);
@@ -427,19 +380,13 @@ describe('FeedbackDialog', () => {
   });
 
   it('should use injected submitFeedback when not helpful is submitted', async () => {
-    const user = userEvent.setup();
     const mockSubmitFeedback = vi.fn(() => Promise.resolve());
-
-    render(
-      <FeedbackDialog result={mockResult} input={mockInput} submitFeedback={mockSubmitFeedback} />,
-    );
+    const { user } = setup({ submitFeedback: mockSubmitFeedback });
 
     const noButton = screen.getByRole('button', { name: /feedback.no/i });
     await user.click(noButton);
 
-    await waitFor(() => {
-      expect(screen.getByText('feedback.issue_prompt')).toBeInTheDocument();
-    });
+    expect(await screen.findByText('feedback.issue_prompt')).toBeInTheDocument();
 
     const incorrectButton = screen.getByRole('button', { name: /feedback.reasons.incorrect/i });
     await user.click(incorrectButton);
@@ -458,22 +405,14 @@ describe('FeedbackDialog', () => {
   });
 
   it('should handle submitFeedback failure gracefully', async () => {
-    const user = userEvent.setup();
     const mockSubmitFeedback = vi.fn(() => Promise.reject(new Error('Submit failed')));
-    const logger = await import('@/utils/logger');
-
-    render(
-      <FeedbackDialog result={mockResult} input={mockInput} submitFeedback={mockSubmitFeedback} />,
-    );
+    const { user } = setup({ submitFeedback: mockSubmitFeedback });
 
     const yesButton = screen.getByRole('button', { name: /feedback.yes/i });
     await user.click(yesButton);
 
     await waitFor(() => {
-      expect(logger.default.error).toHaveBeenCalledWith(
-        'Error adding document: ',
-        expect.any(Error),
-      );
+      expect(logger.error).toHaveBeenCalledWith('Error adding document: ', expect.any(Error));
       // Should still show thank you (optimistic UI)
       expect(screen.getByText('feedback.thank_you')).toBeInTheDocument();
     });

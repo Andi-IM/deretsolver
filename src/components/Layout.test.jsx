@@ -5,11 +5,14 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
 import Layout from '@/components/Layout';
-import { ThemeProvider } from '@/context/ThemeContext';
 
-// Mock language switcher to avoid complex setup
+// Mock language switcher and theme toggle to avoid complex setup/context
 vi.mock('@/components/LanguageSwitcher', () => ({
   default: () => <button type="button">Switch Language</button>,
+}));
+
+vi.mock('@/components/ThemeToggle', () => ({
+  default: () => <button type="button">Toggle Theme</button>,
 }));
 
 vi.mock('react-i18next', () => ({
@@ -21,11 +24,9 @@ vi.mock('react-i18next', () => ({
 const renderWithRouter = (initialRoute = '/') => {
   return render(
     <MemoryRouter initialEntries={[initialRoute]}>
-      <ThemeProvider>
-        <Layout>
-          <div>Child Content</div>
-        </Layout>
-      </ThemeProvider>
+      <Layout>
+        <div>Child Content</div>
+      </Layout>
     </MemoryRouter>,
   );
 };
@@ -74,7 +75,7 @@ describe('Layout Component', () => {
 
   describe('Mobile Menu', () => {
     it('toggles mobile menu when hamburger button is clicked', async () => {
-      const user = userEvent.setup();
+      const user = userEvent.setup({ delay: null });
       renderWithRouter();
 
       const toggleButton = screen.getByRole('button', { name: /Toggle menu/i });
@@ -97,7 +98,7 @@ describe('Layout Component', () => {
     });
 
     it('closes mobile menu when Solver link is clicked', async () => {
-      const user = userEvent.setup();
+      const user = userEvent.setup({ delay: null });
       renderWithRouter();
 
       const toggleButton = screen.getByRole('button', { name: /Toggle menu/i });
@@ -111,7 +112,7 @@ describe('Layout Component', () => {
     });
 
     it('closes mobile menu when Quiz Mode link is clicked', async () => {
-      const user = userEvent.setup();
+      const user = userEvent.setup({ delay: null });
       renderWithRouter();
 
       const toggleButton = screen.getByRole('button', { name: /Toggle menu/i });
@@ -124,7 +125,7 @@ describe('Layout Component', () => {
     });
 
     it('closes mobile menu when Documentation link is clicked', async () => {
-      const user = userEvent.setup();
+      const user = userEvent.setup({ delay: null });
       renderWithRouter();
 
       const toggleButton = screen.getByRole('button', { name: /Toggle menu/i });
