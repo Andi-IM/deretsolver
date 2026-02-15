@@ -159,4 +159,58 @@ test.describe('SolverPage E2E', async () => {
     const content = await page.content();
     expect(content).toContain('30');
   });
+
+  test('GMAT: prime numbers 2, 3, 5, 7, 11 -> 13', async ({ page }) => {
+    await solveSequence(page, '2, 3, 5, 7, 11');
+    const content = await page.content();
+    expect(content).toContain('13');
+  });
+
+  test('GMAT: factorial sequence 1, 2, 6, 24, 120 -> 720', async ({ page }) => {
+    await solveSequence(page, '1, 2, 6, 24, 120');
+    const content = await page.content();
+    expect(content).toContain('720');
+  });
+
+  test('GMAT: alternating arithmetic 3, 7, 5, 9, 7, 11 -> 9', async ({ page }) => {
+    await solveSequence(page, '3, 7, 5, 9, 7, 11');
+    const content = await page.content();
+    expect(content).toContain('9');
+  });
+
+  test('GMAT: double geometric 2, 6, 18, 54 -> 162', async ({ page }) => {
+    await solveSequence(page, '2, 6, 18, 54');
+    const content = await page.content();
+    expect(content).toContain('162');
+  });
+
+  test('GMAT: sum of previous two (Fibonacci) 0, 1, 1, 2, 3, 5 -> 8', async ({ page }) => {
+    await solveSequence(page, '0, 1, 1, 2, 3, 5');
+    const content = await page.content();
+    expect(content).toContain('>8<');
+  });
+
+  test('GMAT: arithmetic with difference 3 1, 4, 7, 10, 13 -> 16', async ({ page }) => {
+    await solveSequence(page, '1, 4, 7, 10, 13');
+    const content = await page.content();
+    expect(content).toContain('16');
+  });
+
+  test('GMAT: square plus one 2, 5, 10, 17, 26 -> 37', async ({ page }) => {
+    await solveSequence(page, '2, 5, 10, 17, 26');
+    const content = await page.content();
+    expect(content).toContain('37');
+  });
+
+  test('GMAT: multiplication by 3 then subtract 1 3, 8, 23, 68 -> 203', async ({ page }) => {
+    await solveSequence(page, '3, 8, 23, 68');
+    const content = await page.content();
+    expect(content).toContain('203');
+  });
+
+  test('GMAT: n^2 - 1 sequence 0, 3, 8, 15, 24 -> 35', async ({ page }) => {
+    await solveSequence(page, '0, 3, 8, 15, 24');
+    const content = await page.content();
+    expect(content).toContain('35');
+  });
 });
