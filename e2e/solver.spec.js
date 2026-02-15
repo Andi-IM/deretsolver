@@ -213,4 +213,16 @@ test.describe('SolverPage E2E', async () => {
     const content = await page.content();
     expect(content).toContain('35');
   });
+
+  test('alternating *4 and -3n: 2,8,5,20,14,56,47 -> 188', async ({ page }) => {
+    await solveSequence(page, '2,8,5,20,14,56,47');
+    const content = await page.content();
+    expect(content).toContain('188');
+  });
+
+  test('geometric sequence with middle gap: 1,2,8,x,64,128 -> 16', async ({ page }) => {
+    await solveSequence(page, '1,2,8,x,64,128');
+    const content = await page.content();
+    expect(content).toContain('16');
+  });
 });

@@ -7,7 +7,17 @@ import InputHelperBar from './input/InputHelperBar';
 import SequenceInput from './input/SequenceInput';
 import SolveButton from './input/SolveButton';
 
-function InputSection({ input, setInput, onSolve, error, isLoading, apiKey, setApiKey }) {
+function InputSection({
+  input,
+  setInput,
+  onSolve,
+  error,
+  isLoading,
+  apiKey,
+  setApiKey,
+  aiProvider,
+  setProvider,
+}) {
   const [showKeyInput, setShowKeyInput] = useState(false);
   const { t } = useTranslation();
 
@@ -29,7 +39,13 @@ function InputSection({ input, setInput, onSolve, error, isLoading, apiKey, setA
           onApiKeyToggle={() => setShowKeyInput(!showKeyInput)}
         />
 
-        <ApiKeyInput value={apiKey} onChange={setApiKey} visible={showKeyInput} />
+        <ApiKeyInput
+          value={apiKey}
+          onChange={setApiKey}
+          visible={showKeyInput}
+          provider={aiProvider}
+          onProviderChange={setProvider}
+        />
       </div>
 
       <SolveButton

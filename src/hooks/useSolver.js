@@ -1,8 +1,9 @@
-import { useCallback, useReducer } from 'react';
+import { useCallback, useEffect, useReducer } from 'react';
 
 import solveWithGemini from '@/utils/geminiSolver';
 import logger from '@/utils/logger';
 import solveSequence from '@/utils/solver';
+import solveWithSumopod from '@/utils/sumopodSolver';
 
 // =============================================================================
 // PURE FUNCTIONS - Easily testable without React
@@ -27,12 +28,17 @@ export function transformToNestedFormat(solverResult) {
     isPrediction: i >= total - predictionCount,
   }));
 
+  const hasMissingValue = (solverResult.sequenceLabels || []).some(
+    (label) => label && /^[xX?]+$|^\.\.\.$/.test(label),
+  );
+
   return {
     type: solverResult.type,
     rule: solverResult.rule,
     next: solverResult.next,
     predictions: solverResult.predictions,
     isInterleaved: solverResult.isInterleaved,
+    isMissingValue: hasMissingValue,
     visualization: {
       nodes,
       connections: solverResult.connections || [],
@@ -76,6 +82,7 @@ export const initialState = {
   result: null,
   error: null,
   isLoading: false,
+  aiProvider: 'gemini', // default
 };
 
 export const ActionTypes = {
@@ -87,6 +94,7 @@ export const ActionTypes = {
   SOLVE_SUCCESS: 'SOLVE_SUCCESS',
   SOLVE_ERROR: 'SOLVE_ERROR',
   SET_ERROR: 'SET_ERROR',
+  SET_PROVIDER: 'SET_PROVIDER',
   RESET: 'RESET',
 };
 
@@ -129,6 +137,9 @@ export function solverReducer(state, action) {
     case ActionTypes.SET_ERROR:
       return { ...state, error: action.payload };
 
+    case ActionTypes.SET_PROVIDER:
+      return { ...state, aiProvider: action.payload };
+
     case ActionTypes.RESET:
       return initialState;
 
@@ -151,12 +162,37 @@ export function solverReducer(state, action) {
  * @param {Object} deps - Injectable dependencies for testing
  * @returns {Promise<void>}
  */
-export async function executeSolve(input, apiKey, dispatch, deps = {}) {
-  const { localSolver = solveSequence, geminiSolver = solveWithGemini } = deps;
+export async function executeSolve(input, apiKey, dispatch, deps = {}, aiProvider = 'gemini') {
+  const {
+    localSolver = solveSequence,
+    geminiSolver = solveWithGemini,
+    sumopodSolver = solveWithSumopod,
+  } = deps;
 
   dispatch({ type: ActionTypes.SOLVE_START });
 
-  // 1. Try Local Solver first
+  // 1. Try AI first if API key is available (for complex patterns)
+  if (apiKey && input.trim().length > 0) {
+    dispatch({ type: ActionTypes.SOLVE_LOADING });
+
+    let aiRes;
+    if (aiProvider === 'sumopod') {
+      aiRes = await sumopodSolver(input, apiKey);
+    } else {
+      aiRes = await geminiSolver(input, apiKey);
+    }
+
+    if (aiRes && !aiRes.error) {
+      const nestedResult = transformToNestedFormat(aiRes);
+      dispatch({ type: ActionTypes.SOLVE_SUCCESS, payload: { result: nestedResult, error: null } });
+      return;
+    }
+
+    // AI failed, log and continue to local solver
+    logger.warn('AI solver failed, falling back to local solver:', aiRes?.error);
+  }
+
+  // 2. Fallback to Local Solver
   const localRes = localSolver(input);
 
   if (localRes && !localRes.error) {
@@ -164,13 +200,10 @@ export async function executeSolve(input, apiKey, dispatch, deps = {}) {
     return;
   }
 
-  // 2. Fallback to Gemini if valid input
+  // 3. Both failed
   if (input.trim().length > 0) {
     dispatch({ type: ActionTypes.SOLVE_LOADING });
-
-    const geminiRes = await geminiSolver(input, apiKey);
-    const { result, error } = selectBestResult(localRes, geminiRes);
-
+    const { result, error } = selectBestResult(localRes, { error: 'Unable to solve sequence' });
     dispatch({ type: ActionTypes.SOLVE_SUCCESS, payload: { result, error } });
   } else {
     dispatch({
@@ -208,8 +241,24 @@ export const useSolver = (options = {}) => {
   );
 
   const handleSolve = useCallback(
-    () => executeSolve(state.input, state.apiKey, dispatch, options.deps),
-    [state.input, state.apiKey, options.deps],
+    () => executeSolve(state.input, state.apiKey, dispatch, options.deps, state.aiProvider),
+    [state.input, state.apiKey, state.aiProvider, options.deps],
+  );
+
+  // Sync SumoPod key from env if available and provider is sumopod and no key set
+  useEffect(() => {
+    if (state.aiProvider === 'sumopod' && !state.apiKey) {
+      // Look for key in environment variables (Vite pattern)
+      const envKey = import.meta.env.VITE_SUMOPOD_AI_KEY || import.meta.env.SUMOPOD_AI_KEY;
+      if (envKey) {
+        dispatch({ type: ActionTypes.SET_API_KEY, payload: envKey });
+      }
+    }
+  }, [state.aiProvider, state.apiKey]);
+
+  const setProvider = useCallback(
+    (value) => dispatch({ type: ActionTypes.SET_PROVIDER, payload: value }),
+    [],
   );
 
   return {
@@ -221,6 +270,7 @@ export const useSolver = (options = {}) => {
     setInput,
     setApiKey,
     setError,
+    setProvider,
     handleSolve,
     dispatch,
     state,

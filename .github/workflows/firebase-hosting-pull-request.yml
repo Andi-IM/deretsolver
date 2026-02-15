@@ -13,6 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      VITE_SUMOPOD_AI_KEY: ${{ secrets.VITE_SUMOPOD_AI_KEY }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -21,7 +22,7 @@ jobs:
         with:
           node-version: 20
           cache: 'npm'
-      - run: echo "CODECOV_TOKEN=${{ secrets.CODECOV_TOKEN }}" > .env
+      - run: echo "CODECOV_TOKEN=${{ secrets.CODECOV_TOKEN }}" > .env && echo "VITE_SUMOPOD_AI_KEY=${{ secrets.VITE_SUMOPOD_AI_KEY }}" >> .env
       - run: npm ci --legacy-peer-deps && npm run build
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:

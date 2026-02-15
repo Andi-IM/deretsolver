@@ -70,8 +70,12 @@ function ResultSection({ result }) {
           <div className="pt-8 mt-4 border-t border-border-muted">
             <p className="text-center text-xs font-medium text-text-muted mb-3 uppercase tracking-wide">
               {result.predictions && result.predictions.length > 1
-                ? t('result.predicted_next_plural')
-                : t('result.predicted_next')}
+                ? result.isMissingValue
+                  ? t('result.missing_value_answer_plural')
+                  : t('result.predicted_next_plural')
+                : result.isMissingValue
+                  ? t('result.missing_value_answer')
+                  : t('result.predicted_next')}
             </p>
             {result.predictions && result.predictions.length > 1 ? (
               <div className="grid grid-cols-2 gap-3">
@@ -202,7 +206,7 @@ function VisualizerContent({ visualization }) {
           </marker>
         </defs>
 
-        {connections.map((conn) => {
+        {connections.map((conn, idx) => {
           // Coordinates
           const x1 = conn.fromIndex * ITEM_WIDTH + NODE_SIZE / 2;
           const x2 = conn.toIndex * ITEM_WIDTH + NODE_SIZE / 2;
@@ -248,7 +252,7 @@ function VisualizerContent({ visualization }) {
           const colorClass = strokeColors[conn.type] || '#94a3b8';
 
           return (
-            <g key={`conn-${conn.fromIndex}-${conn.toIndex}-${conn.type}`}>
+            <g key={`conn-${idx}-${conn.fromIndex}-${conn.toIndex}-${conn.type}`}>
               <path
                 d={pathD}
                 fill="none"
@@ -278,7 +282,7 @@ function VisualizerContent({ visualization }) {
       {/* Nodes Layer */}
       {nodes.map((node, i) => (
         <div
-          key={node.label || i}
+          key={`node-${i}-${node.label || ''}`}
           className="absolute transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center z-10"
           style={{ left: i * ITEM_WIDTH + NODE_SIZE / 2, top: MIDDLE_Y }}
         >

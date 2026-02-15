@@ -8,7 +8,18 @@ import { usePageTracking } from '@/hooks/usePageTracking';
 import { useSolver } from '@/hooks/useSolver';
 
 function SolverPage() {
-  const { input, setInput, handleSolve, result, error, isLoading, apiKey, setApiKey } = useSolver();
+  const {
+    input,
+    setInput,
+    handleSolve,
+    result,
+    error,
+    isLoading,
+    apiKey,
+    setApiKey,
+    aiProvider,
+    setProvider,
+  } = useSolver();
   const { t, i18n } = useTranslation();
 
   // Analytics: Log page view
@@ -44,6 +55,8 @@ function SolverPage() {
         isLoading={isLoading}
         apiKey={apiKey}
         setApiKey={setApiKey}
+        aiProvider={aiProvider}
+        setProvider={setProvider}
       />
 
       <ResultSection result={result} />

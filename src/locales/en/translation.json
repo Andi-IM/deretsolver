@@ -16,6 +16,8 @@
     "rule": "Rule",
     "predicted_next": "Predicted Next Number",
     "predicted_next_plural": "Predicted Next Numbers",
+    "missing_value_answer": "Answer (Missing Value)",
+    "missing_value_answer_plural": "Answers (Missing Values)",
     "visualization_title": "Sequence Visualization",
     "legend": {
       "add": "Add",
@@ -51,9 +53,11 @@
     "helper": "Use commas (e.g., 2, 4, 8)",
     "items_count": "{{count}} items",
     "api_key_set": "API Key Set",
-    "add_api_key": "Add Gemini API Key",
+    "add_api_key": "Add AI API Key",
     "api_key_placeholder": "Enter Gemini API Key (starts with AIza...)",
     "api_key_helper": "Required for advanced pattern detection (interleaved, complex logic).",
+    "sumopod_key_placeholder": "Enter SumoPod API Key (starts with sk-...)",
+    "sumopod_key_helper": "SumoPod is currently in free session. Use your SumoPod API Key.",
     "processing": "Processing",
     "solve": "Solve Pattern",
     "error_title": "Error Notification"

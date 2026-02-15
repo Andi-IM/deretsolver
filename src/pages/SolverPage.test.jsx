@@ -47,6 +47,8 @@ vi.mock('@/hooks/useSolver', () => ({
     isLoading: false,
     apiKey: '',
     setApiKey: vi.fn(),
+    aiProvider: 'gemini',
+    setProvider: vi.fn(),
   }),
 }));
 
@@ -142,6 +144,8 @@ describe('SolverPage with result', () => {
         isLoading: false,
         apiKey: '',
         setApiKey: vi.fn(),
+        aiProvider: 'gemini',
+        setProvider: vi.fn(),
       }),
     }));
 

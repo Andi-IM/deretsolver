@@ -21,10 +21,152 @@ function solveWithMissingValues(parts, knownNums, placeholderIndices, _placehold
   let result = tryArithmeticWithMissing(knownNums, totalLength);
   if (result) return result;
 
+  // Try affine recurrence pattern (u[n] = a*u[n-1] + b)
+  result = tryAffineWithMissing(parts, knownNums, totalLength, placeholderIndices);
+  if (result) return result;
+
+  // Try alternating operations pattern
+  result = tryAlternatingWithMissing(parts, knownNums, totalLength, placeholderIndices);
+  if (result) return result;
+
   // Try interleaved pattern
   result = tryInterleavedWithMissing(parts, knownNums, totalLength, placeholderIndices);
   if (result) return result;
 
+  return null;
+}
+
+function tryAffineWithMissing(parts, knownNums, totalLength, placeholderIndices) {
+  const placeholderPattern = /^[xX?]+$|^\.\.\.$/;
+
+  // Map positions to known values
+  const positionToValue = new Map();
+  let numIdx = 0;
+  for (let i = 0; i < totalLength; i++) {
+    if (!placeholderPattern.test(parts[i])) {
+      positionToValue.set(i, knownNums[numIdx++]);
+    }
+  }
+
+  // We need at least 3 numbers to solve for a and b in u[n] = a*u[n-1] + b
+  // and they must be at consecutive known positions to be simple,
+  // or we solve the general u[p] = a^k * u[p-k] + b * (a^k - 1) / (a - 1)
+  // For simplicity, let's look for 3 consecutive known numbers first.
+
+  let a, b;
+  let found = false;
+
+  for (let i = 0; i < totalLength - 2; i++) {
+    if (positionToValue.has(i) && positionToValue.has(i + 1) && positionToValue.has(i + 2)) {
+      const u0 = positionToValue.get(i);
+      const u1 = positionToValue.get(i + 1);
+      const u2 = positionToValue.get(i + 2);
+
+      if (Math.abs(u1 - u0) > 0.0001) {
+        a = (u2 - u1) / (u1 - u0);
+        b = u1 - a * u0;
+        found = true;
+        break;
+      }
+    }
+  }
+
+  if (!found) return null;
+
+  // Verify for all known numbers
+  const isAffine = Array.from(positionToValue.entries()).every(([pos, val]) => {
+    if (pos === 0) return true;
+    // We need the previous value to verify. Since we are filling, we can reconstruct.
+    // However, a simpler check if we have a and b:
+    // val should follow the recurrence from the first known value.
+    const firstPos = Array.from(positionToValue.keys())[0];
+    const firstVal = positionToValue.get(firstPos);
+
+    // u[p] = a^(p-p0) * u[p0] + b * (a^(p-p0) - 1) / (a - 1)
+    let expected;
+    if (Math.abs(a - 1) < 0.0001) {
+      expected = firstVal + b * (pos - firstPos);
+    } else {
+      expected =
+        Math.pow(a, pos - firstPos) * firstVal + (b * (Math.pow(a, pos - firstPos) - 1)) / (a - 1);
+    }
+
+    return Math.abs(val - expected) < 0.0001;
+  });
+
+  if (isAffine) {
+    const filledValues = [];
+    const firstPos = Array.from(positionToValue.keys())[0];
+    const firstVal = positionToValue.get(firstPos);
+
+    for (let i = 0; i < totalLength; i++) {
+      if (Math.abs(a - 1) < 0.0001) {
+        filledValues.push(firstVal + b * (i - firstPos));
+      } else {
+        filledValues.push(
+          Math.pow(a, i - firstPos) * firstVal + (b * (Math.pow(a, i - firstPos) - 1)) / (a - 1),
+        );
+      }
+    }
+
+    const nodes = filledValues.map((v, i) => ({
+      value: v,
+      label: `i=${i}`,
+      isPrediction: placeholderIndices.includes(i),
+    }));
+
+    const connections = [];
+    for (let i = 0; i < totalLength - 1; i++) {
+      const aVal = parseFloat(a.toFixed(2));
+      const bVal = parseFloat(b.toFixed(2));
+      const op = bVal >= 0 ? '+' : '-';
+      connections.push({
+        fromIndex: i,
+        toIndex: i + 1,
+        label: `(×${aVal}) ${op} ${Math.abs(bVal)}`,
+        type: 'mul',
+      });
+    }
+
+    return {
+      type: 'Affine Recurrence',
+      rule: `Multiply by ${parseFloat(a.toFixed(2))}, then ${
+        parseFloat(b.toFixed(2)) >= 0 ? 'add' : 'subtract'
+      } ${Math.abs(parseFloat(b.toFixed(2)))}`,
+      next: filledValues[totalLength - 1],
+      predictions: filledValues.slice(placeholderIndices[0]),
+      filledValues,
+      visualization: { nodes, connections },
+    };
+  }
+
+  return null;
+}
+
+function tryAlternatingWithMissing(parts, knownNums, totalLength, placeholderIndices) {
+  // If placeholders are at the end, just use detectAlternatingOperations
+  if (placeholderIndices[0] === knownNums.length) {
+    const result = detectAlternatingOperations(knownNums);
+    if (result) {
+      const currentNums = [...knownNums];
+      const predictions = [];
+      for (let i = 0; i < placeholderIndices.length; i++) {
+        const nextResult = detectAlternatingOperations(currentNums);
+        if (!nextResult) break;
+        currentNums.push(nextResult.next);
+        predictions.push(nextResult.next);
+      }
+
+      if (predictions.length === placeholderIndices.length) {
+        return {
+          ...result,
+          predictions,
+          filledValues: currentNums,
+          next: predictions[0],
+        };
+      }
+    }
+  }
   return null;
 }
 
@@ -243,6 +385,10 @@ const solveSequence = (input) => {
 
   // 5.1 Alternating Delta: pattern like -1, +2, -1, +2, -1 repeating
   result = detectAlternatingDelta(nums);
+  if (result) return result;
+
+  // 5.2 Alternating Operations: e.g. *4, -3, *4, -6
+  result = detectAlternatingOperations(nums);
   if (result) return result;
 
   // ============================================================================
@@ -565,7 +711,7 @@ function detectGeometric(nums) {
       connections.push({
         fromIndex: i,
         toIndex: i + 1,
-        label: `x${parseFloat(ratio.toFixed(6))}`,
+        label: `×${parseFloat(ratio.toFixed(6))}`,
         type: 'mul',
       });
     }
@@ -827,16 +973,23 @@ function detectAffineRecurrence(nums) {
     const nodes = nums.map((n, i) => ({ value: n, label: `i=${i}` }));
     nodes.push({ value: next, label: 'Next', isPrediction: true });
 
-    const connections = nums.slice(0, nums.length - 1).map((_, i) => ({
-      fromIndex: i,
-      toIndex: i + 1,
-      label: `${parseFloat(a.toFixed(2))}*x + ${parseFloat(b.toFixed(2))}`,
-      type: 'mul',
-    }));
+    const connections = nums.slice(0, nums.length - 1).map((_, i) => {
+      const aVal = parseFloat(a.toFixed(2));
+      const bVal = parseFloat(b.toFixed(2));
+      const op = bVal >= 0 ? '+' : '-';
+      return {
+        fromIndex: i,
+        toIndex: i + 1,
+        label: `(×${aVal}) ${op} ${Math.abs(bVal)}`,
+        type: 'mul',
+      };
+    });
 
     return {
       type: 'Affine Recurrence',
-      rule: `u[n] = ${parseFloat(a.toFixed(2))}*u[n-1] + ${parseFloat(b.toFixed(2))}`,
+      rule: `Multiply by ${parseFloat(a.toFixed(2))}, then ${
+        parseFloat(b.toFixed(2)) >= 0 ? 'add' : 'subtract'
+      } ${Math.abs(parseFloat(b.toFixed(2)))}`,
       next,
       visualization: { nodes, connections },
     };
@@ -939,6 +1092,113 @@ function detectAlternatingDelta(nums) {
     return {
       type: 'Alternating Delta',
       rule: `Alternating: ${uniqueAbsDiffs[0]}, ${uniqueAbsDiffs[1]} repeating`,
+      next,
+      visualization: { nodes, connections },
+    };
+  }
+
+  return null;
+}
+
+function detectAlternatingOperations(nums) {
+  if (nums.length < 5) return null;
+
+  const diffs = [];
+  const ratios = [];
+  for (let i = 1; i < nums.length; i++) {
+    diffs.push(nums[i] - nums[i - 1]);
+    ratios.push(nums[i - 1] !== 0 ? nums[i] / nums[i - 1] : null);
+  }
+
+  const ops = diffs.map((d, i) => ({
+    diff: d,
+    ratio: ratios[i],
+  }));
+
+  const findPattern = (sequence) => {
+    if (sequence.length < 2) return null;
+
+    // Constant Diff
+    if (sequence.every((s) => Math.abs(s.diff - sequence[0].diff) < 0.0001)) {
+      return { type: 'add', val: sequence[0].diff, variety: 'constant' };
+    }
+    // Constant Ratio
+    if (sequence.every((s) => s.ratio !== null && Math.abs(s.ratio - sequence[0].ratio) < 0.0001)) {
+      return { type: 'mul', val: sequence[0].ratio, variety: 'constant' };
+    }
+    // Arithmetic Diff
+    if (sequence.length >= 2) {
+      const sDiffs = sequence.map((s) => s.diff);
+      const arith = detectArithmetic(sDiffs);
+      if (arith) {
+        return { type: 'add', variety: 'arithmetic', arith };
+      }
+    }
+
+    return null;
+  };
+
+  const evenSteps = ops.filter((_, i) => i % 2 === 0);
+  const oddSteps = ops.filter((_, i) => i % 2 === 1);
+
+  const patternEven = findPattern(evenSteps);
+  const patternOdd = findPattern(oddSteps);
+
+  if (patternEven && patternOdd) {
+    const getOpForStep = (pattern, stepIdxInSubsequence, subSeq) => {
+      if (pattern.variety === 'constant') return { type: pattern.type, val: pattern.val };
+      if (pattern.variety === 'arithmetic') {
+        const sDiffs = subSeq.map((s) => s.diff);
+        const d = sDiffs[1] - sDiffs[0];
+        const lastKnownVal = sDiffs[sDiffs.length - 1];
+        const stepsFromLast = stepIdxInSubsequence - (sDiffs.length - 1);
+        const nextVal = lastKnownVal + d * stepsFromLast;
+        return { type: 'add', val: nextVal };
+      }
+      return null;
+    };
+
+    const isNextEven = (nums.length - 1) % 2 === 0;
+    const activePattern = isNextEven ? patternEven : patternOdd;
+    const subSeq = isNextEven ? evenSteps : oddSteps;
+    const nextSubIdx = Math.floor((nums.length - 1) / 2);
+    const nextOp = getOpForStep(activePattern, nextSubIdx, subSeq);
+
+    if (!nextOp) return null;
+
+    const next =
+      nextOp.type === 'add'
+        ? nums[nums.length - 1] + nextOp.val
+        : nums[nums.length - 1] * nextOp.val;
+
+    const nodes = nums.map((n, i) => ({ value: n, label: `i=${i}` }));
+    nodes.push({ value: next, label: 'Next', isPrediction: true });
+
+    const connections = ops.map((op, i) => {
+      const p = i % 2 === 0 ? patternEven : patternOdd;
+      const label =
+        p.type === 'mul' && p.variety === 'constant'
+          ? `×${p.val}`
+          : `${op.diff >= 0 ? '+' : ''}${op.diff}`;
+      return {
+        fromIndex: i,
+        toIndex: i + 1,
+        label,
+        type: p.type === 'mul' && p.variety === 'constant' ? 'mul' : op.diff >= 0 ? 'add' : 'sub',
+      };
+    });
+
+    connections.push({
+      fromIndex: nums.length - 1,
+      toIndex: nums.length,
+      label:
+        nextOp.type === 'mul' ? `×${nextOp.val}` : `${nextOp.val >= 0 ? '+' : ''}${nextOp.val}`,
+      type: nextOp.type === 'mul' ? 'mul' : nextOp.val >= 0 ? 'add' : 'sub',
+    });
+
+    return {
+      type: 'Alternating Operations',
+      rule: `Alternating: ${patternEven.variety} ${patternEven.type} and ${patternOdd.variety} ${patternOdd.type}`,
       next,
       visualization: { nodes, connections },
     };

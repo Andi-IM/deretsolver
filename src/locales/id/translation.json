@@ -16,6 +16,8 @@
     "rule": "Aturan",
     "predicted_next": "Prediksi Angka Berikutnya",
     "predicted_next_plural": "Prediksi Angka-angka Berikutnya",
+    "missing_value_answer": "Jawaban (Nilai Hilang)",
+    "missing_value_answer_plural": "Jawaban (Nilai-nilai Hilang)",
     "visualization_title": "Visualisasi Deret",
     "legend": {
       "add": "Tam",
@@ -51,9 +53,11 @@
     "helper": "Gunakan koma (cth: 2, 4, 8)",
     "items_count": "{{count}} item",
     "api_key_set": "Kunci API Terpasang",
-    "add_api_key": "Tambah Kunci API Gemini",
+    "add_api_key": "Tambah Kunci API AI",
     "api_key_placeholder": "Masukkan Kunci API Gemini (dimulai dgn AIza...)",
     "api_key_helper": "Diperlukan untuk deteksi pola tingkat lanjut (logic kompleks).",
+    "sumopod_key_placeholder": "Masukkan Kunci API SumoPod (dimulai dgn sk-...)",
+    "sumopod_key_helper": "SumoPod saat ini dalam masa free session. Masukkan Kunci API SumoPod Anda.",
     "processing": "Memproses",
     "solve": "Pecahkan Pola",
     "error_title": "Notifikasi Error"
